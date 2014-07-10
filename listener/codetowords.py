@@ -5,7 +5,7 @@ producing a language model based on the transformations here. The result
 *should* be a fairly tightly constrained frequency set that we'll add as a 
 heavily weighted favourite to the base (natural) language model.
 """
-import re, tokenize
+import re, tokenize, sys
 
 OP_NAMES = {
     '(':'open paren',
@@ -18,7 +18,10 @@ OP_NAMES = {
     '!=':'not equal',
     '.': 'dot',
     ',': 'comma',
-    
+    '%': 'percent',
+    '{': 'open brace',
+    '}': 'close brace',
+    '@': 'at',
 }
 
 def parse_camel( name ):
@@ -73,7 +76,7 @@ def codetowords( lines ):
         elif type == tokenize.NEWLINE:
             current_line = []
             new_lines.append( current_line )
-        elif type == tokenize.ENDMARKER:
+        elif type in (tokenize.ENDMARKER,tokenize.INDENT,tokenize.DEDENT):
             pass
         elif type == tokenize.NAME:
             current_line.extend( break_down_name( token ) )
@@ -122,3 +125,8 @@ def test_tokens():
     for line,expected in expected:
         result = codetowords([line])
         assert result == expected, (line, result)
+
+def main():
+    lines = open( sys.argv[1] ).readlines()
+    import pprint
+    pprint.pprint(codetowords( lines ))
