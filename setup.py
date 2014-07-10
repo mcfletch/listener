@@ -22,7 +22,7 @@ if __name__ == "__main__":
         keywords='',
         packages=find_packages(),
         include_package_data=True,
-        license='MIT',
+        license='BSD', # Pocketsphinx is BSD-like
         # Dev-only requirements:
         # nose
         # pychecker
@@ -38,6 +38,8 @@ if __name__ == "__main__":
         ],
         entry_points = dict(
             console_scripts = [
+                "text2wfreq=listener.text2wfreq:main",
+                "listener-pipe=listener.pipeline:main",
             ],
         ),
         zip_safe=False,
