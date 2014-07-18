@@ -141,14 +141,14 @@ class Pipeline( object ):
                     'dict="%s"'%(dictionary,), '!',
                 'fakesink',
                 
-                'queue', 'name="wave"','!',
-                'audioconvert', '!',
-                'audioresample', '!',
-                'wavenc',  '!',
-                'multifilesink',
-                    'name=filesink',
-                    'location=%r'%(os.path.join( self.working_directory, 'recordings', '%d.wav' )),
-                    'next-file=discont',
+#                'queue', 'name="wave"','!',
+#                'audioconvert', '!',
+#                'audioresample', '!',
+#                'wavenc',  '!',
+#                'multifilesink',
+#                    'name=filesink',
+#                    'location=%r'%(os.path.join( self.working_directory, 'recordings', '%d.wav' )),
+#                    'next-file=discont',
             ]
 
     _pipeline = None
@@ -209,6 +209,7 @@ class Pipeline( object ):
             'type':'partial',
             'text': text,
             'uttid': uttid,
+            'nbest': None,
         })
     def sphinx_result(self, asr, text, uttid):
         """Forward result signals via our queue"""
@@ -216,6 +217,7 @@ class Pipeline( object ):
             'type':'final',
             'text': text,
             'uttid': uttid,
+            'nbest': getattr( self.sphinx, 'nbest',(text,)),
         })
         
 
@@ -236,7 +238,7 @@ def main():
         except Queue.Empty as err:
             pass 
         else:
-            print( '%(type) 7s #%(uttid)05s %(text)s'%result )
+            print( '%(type) 7s #%(uttid)05s %(text)s %(nbest)s'%result )
             if result['type'] == 'final':
                 print()
 
