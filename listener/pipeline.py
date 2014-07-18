@@ -19,14 +19,26 @@ def create_working_directory( directory ):
     os.makedirs( directory, 0700 )
     model_dir =os.path.join(directory,'lm') 
     os.mkdir( model_dir )
-    shutil.copy( 
-        '/usr/share/pocketsphinx/model/lm/wsj/wlist5o.3e-7.vp.tg.lm.DMP', 
-        os.path.join(model_dir,'language_model.dmp')
-    )
-    shutil.copy(
+    # we expect either a HUB4 or WSJ model...
+    DMPs = [
+        '/usr/share/pocketsphinx/model/lm/en_US/hub4.5000.DMP',
+        '/usr/share/pocketsphinx/model/lm/wsj/wlist5o.3e-7.vp.tg.lm.DMP',
+    ]
+    DICTIONARY = [
+        '/usr/share/pocketsphinx/model/lm/en_US/cmu07a.dic',
         '/usr/share/pocketsphinx/model/lm/wsj/wlist5o.dic',
-        os.path.join(model_dir,'dictionary.dic')
-    )
+    ]
+    for (dmp,dic) in zip(DMPs,DICTIONARY):
+        if os.path.exists( dmp ):
+            shutil.copy( 
+                dmp, 
+                os.path.join(model_dir,'language_model.dmp')
+            )
+            shutil.copy(
+                dic,
+                os.path.join(model_dir,'dictionary.dic')
+            )
+    os.mkdir( os.path.join(directory, 'recordings') )
     return directory
 
 class Pipeline( object ):
@@ -118,15 +130,25 @@ class Pipeline( object ):
         # require a clear signal before cutting in
         return [
                 'alsasrc', 'name=source', '!',
+#                'tee', 'name=tee', 'pull-mode=1','!',
                 'audioconvert', '!',
                 'audioresample', '!',
                 'vader','name=vader', 'auto-threshold=true', '!',
+#                'queue', '!',
                 'pocketsphinx',
                     'name=sphinx', 
                     'lm="%s"'%(language_model,),
-                    'dict="%s"'%(dictionary,),
-                    '!',
+                    'dict="%s"'%(dictionary,), '!',
                 'fakesink',
+                
+                'queue', 'name="wave"','!',
+                'audioconvert', '!',
+                'audioresample', '!',
+                'wavenc',  '!',
+                'multifilesink',
+                    'name=filesink',
+                    'location=%r'%(os.path.join( self.working_directory, 'recordings', '%d.wav' )),
+                    'next-file=discont',
             ]
 
     _pipeline = None
@@ -145,6 +167,11 @@ class Pipeline( object ):
             sphinx.connect('partial_result', self.sphinx_partial_result)
             sphinx.connect('result', self.sphinx_result)
             sphinx.set_property('configured', True)
+            
+#            # connect up to the tee after negotiation
+#            tee = self._pipeline.get_by_name( 'tee' )
+#            wave = self._pipeline.get_by_name( 'wave' )
+#            tee.link( wave )
 
             self.pipeline.set_state(gst.STATE_PAUSED)
 
@@ -190,6 +217,7 @@ class Pipeline( object ):
             'text': text,
             'uttid': uttid,
         })
+        
 
 def main():
     """Command-line script to run the pipeline"""
