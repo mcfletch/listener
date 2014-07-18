@@ -12,6 +12,10 @@ OP_NAMES = {
     ')':'close paren',
     '[':'open bracket',
     ']':'close bracket',
+    '{': 'open brace',
+    '}': 'close brace',
+    '<': 'less than',
+    '>': 'greater than',
     ':':'colon',
     '=':'equals',
     '==':'equal equal',
@@ -19,8 +23,6 @@ OP_NAMES = {
     '.': 'dot',
     ',': 'comma',
     '%': 'percent',
-    '{': 'open brace',
-    '}': 'close brace',
     '@': 'at',
 }
 
