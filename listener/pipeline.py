@@ -12,34 +12,10 @@ pygst.require("0.10")
 import gst
 import gobject
 import Queue
+from . import workingdir
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 
-def create_working_directory( directory ):
-    os.makedirs( directory, 0700 )
-    model_dir =os.path.join(directory,'lm') 
-    os.mkdir( model_dir )
-    # we expect either a HUB4 or WSJ model...
-    DMPs = [
-        '/usr/share/pocketsphinx/model/lm/en_US/hub4.5000.DMP',
-        '/usr/share/pocketsphinx/model/lm/wsj/wlist5o.3e-7.vp.tg.lm.DMP',
-    ]
-    DICTIONARY = [
-        '/usr/share/pocketsphinx/model/lm/en_US/cmu07a.dic',
-        '/usr/share/pocketsphinx/model/lm/wsj/wlist5o.dic',
-    ]
-    for (dmp,dic) in zip(DMPs,DICTIONARY):
-        if os.path.exists( dmp ):
-            shutil.copy( 
-                dmp, 
-                os.path.join(model_dir,'language_model.dmp')
-            )
-            shutil.copy(
-                dic,
-                os.path.join(model_dir,'dictionary.dic')
-            )
-    os.mkdir( os.path.join(directory, 'recordings') )
-    return directory
 
 class Pipeline( object ):
     """Holds the PocketSphinx Pipeline we'll use for recognition
@@ -108,8 +84,6 @@ class Pipeline( object ):
     def __init__( self, working_directory ):
         """Initialize our pipeline using the given working-directory"""
         self.working_directory = working_directory
-        if not os.path.exists( working_directory ):
-            create_working_directory( working_directory )
     
     _queue = None 
     @property 
@@ -122,25 +96,23 @@ class Pipeline( object ):
     def pipeline_command( self ): 
         # TODO: *also* save to in-memory file(s) for acoustic training
         # and re-processing by different contextual language models
-        language_model = os.path.join( self.working_directory, 'lm', 'language_model.dmp' )
-        dictionary = os.path.join( self.working_directory, 'lm', 'dictionary.dic' )
         # TODO: allow for swapping in different pocket-sphinx contexts against the same 
         # stream, potentially having multiple pocket-sphinxs running at the same time
         # TODO: add an audio pre-processing stage to filter out background noise and 
         # require a clear signal before cutting in
         return [
                 'alsasrc', 'name=source', '!',
-#                'tee', 'name=tee', 'pull-mode=1','!',
+                'tee', 'name=tee', 'pull-mode=1','!',
                 'audioconvert', '!',
                 'audioresample', '!',
                 'vader','name=vader', 'auto-threshold=true', '!',
-#                'queue', '!',
                 'pocketsphinx',
                     'name=sphinx', 
-                    'lm="%s"'%(language_model,),
-                    'dict="%s"'%(dictionary,), '!',
+                    'lm="%s"'%(self.working_directory.language_model_file,),
+                    'dict="%s"'%(self.working_directory.dictionary_file,), '!',
                 'fakesink',
                 
+#                'tee', '!',
 #                'queue', 'name="wave"','!',
 #                'audioconvert', '!',
 #                'audioresample', '!',
@@ -148,7 +120,7 @@ class Pipeline( object ):
 #                'multifilesink',
 #                    'name=filesink',
 #                    'location=%r'%(os.path.join( self.working_directory, 'recordings', '%d.wav' )),
-#                    'next-file=discont',
+#                    'next-file=key-unit-event',
             ]
 
     _pipeline = None
@@ -156,8 +128,6 @@ class Pipeline( object ):
     def pipeline( self ):
         if self._pipeline is None:
             gobject.threads_init()
-            language_model = os.path.join( self.working_directory, 'lm', 'language_model.dmp' )
-            dictionary = os.path.join( self.working_directory, 'dictionary.dic' )
             
             command = " ".join( self.pipeline_command )
             log.info( 'Pipeline: %s', command )
@@ -173,6 +143,8 @@ class Pipeline( object ):
 #            wave = self._pipeline.get_by_name( 'wave' )
 #            tee.link( wave )
 
+#            import ipdb
+#            ipdb.set_trace()
             self.pipeline.set_state(gst.STATE_PAUSED)
 
         return self._pipeline
@@ -220,17 +192,12 @@ class Pipeline( object ):
             'nbest': getattr( self.sphinx, 'nbest',(text,)),
         })
         
+        
 
 def main():
     """Command-line script to run the pipeline"""
-    config_dir = os.environ.get('XDG_CONFIG_HOME',os.path.expanduser('~/.config'))
-    if os.path.exists( config_dir ):
-        config_dir = os.path.join( config_dir, 'listener' )
-    else:
-        config_dir = os.path.expanduser( '~/.listener' )
-    if not os.path.exists( config_dir ):
-        config_dir = create_working_directory( config_dir )
-    pipe = Pipeline(config_dir)
+    context = workingdir.Context( 'default' )
+    pipe = Pipeline(context)
     pipe.start_listening()
     while True:
         try:
