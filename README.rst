@@ -12,13 +12,22 @@ Dependencies::
         pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
         espeak
 
-python library, use::
+Listener is a python library (using setuptools), use::
 
-or::
+	setup.py develop --user
 
-	setup.py develop
+to install. You will have a command `listener-pipe` which will attempt to 
+setup a gstreamer pipeline using a downloaded language model 
+that matches the hub4wsj above. The pipeline will store utterances 
+into `~/.config/listener/default/recordings` and print out the partial 
+and final results to the console.
 
-(requires setuptools/distribute)
+There's also a trivial utility command to play the recorded utterances 
+so that you can review them for quality. Recording level is *very*
+important for pocketsphinx; too loud and you'll have an infinitely long 
+utterance where every bit of background is considered speech; too soft 
+and you'll just get random junk where only the loudest bits of speech 
+are processed.
 
 What's the Idea?
 ================
@@ -36,8 +45,9 @@ The model is (and this is just a sketch so far):
           features for pre and post-processing the audio if necessary
           however, so far those features don't actually work, at least they 
           don't seem to work wrt storing data etc.
-    * record each utterance into ram-disk or the like
+    * record each utterance into ram-disk (or disk)
         * currently this is being done in the vader component
+          and is just being dumped to home directory rather than ram disk
     * provide "correct that" style training/grammar updates
       * use the already-uttered sound-file to do the training
       * train acousticly *and* update language model 
@@ -58,9 +68,11 @@ The model is (and this is just a sketch so far):
         * scan the project source code and convert to dictation words
         * build a language model from that translation
         * layer the project-specific language model onto a generic natural-language model
+    * similarly, allow for e.g. "read my mail" functionality so that we can parse a 
+      user's (sent) email to get an idea of how they normally speak
     * apply interpretation at a higher level
         * if there are 10 possible matches, given context, which one would make the most sense?
-        * apply "sounds like" filtering to get more possible matches
+        * apply "sounds like" filtering to get more possible matches? (hopefully not required)
     * ideally, be able to switch between fine-grained models such that saying "from " would 
       trigger a switch to a new context such that a different sphinx would then process the 
       module name. This is really a fluid set, we want layers of models and the ability to 
@@ -70,4 +82,5 @@ The model is (and this is just a sketch so far):
         * "identifiers" 
         * classes
         * modules
-        
+    * possibly figure out how to include the "context" in the model when processing hmms,
+      such that sphinx could see context as a known-state value in the HMM?
