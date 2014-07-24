@@ -67,6 +67,10 @@ class Context( object ):
         return os.path.join( self.directory, 'recordings' )
     @property
     @one_shot
+    def buffer_directory( self ):
+        return os.path.join( self.directory, 'buffer' )
+    @property
+    @one_shot
     def language_model_file( self ):
         return os.path.join( self.language_model_directory, 'language_model.dmp' )
     @property 
@@ -118,6 +122,8 @@ class Context( object ):
             )
         if not os.path.exists( self.recording_directory ):
             os.mkdir( self.recording_directory )
+        if not os.path.exists( self.buffer_directory ):
+            os.mkdir( self.buffer_directory )
         return self.directory
 
     SPHINXTRAIN_BIN = '/usr/lib/sphinxtrain/sphinxtrain'

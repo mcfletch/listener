@@ -6,7 +6,7 @@ You may modify and redistribute this file under the same terms as
 the CMU Sphinx system.  See 
 http://cmusphinx.sourceforge.net/html/LICENSE for more information.
 """
-import sys, os, shutil, logging
+import sys, os, shutil, logging, pprint,subprocess
 import pygst
 pygst.require("0.10")
 import gst
@@ -81,10 +81,12 @@ class Pipeline( object ):
         http://cmusphinx.sourceforge.net/wiki/tutorialadapt
 
     """
-    def __init__( self, working_directory ):
+    def __init__( self, context ):
         """Initialize our pipeline using the given working-directory"""
-        self.working_directory = working_directory
-    
+        self.context = context
+        for filename in os.listdir( context.buffer_directory ):
+            os.remove( os.path.join( context.buffer_directory, filename ))
+        self.existing_utterances = set()
     _queue = None 
     @property 
     def queue( self ):
@@ -102,25 +104,22 @@ class Pipeline( object ):
         # require a clear signal before cutting in
         return [
                 'alsasrc', 'name=source', '!',
-                'tee', 'name=tee', 'pull-mode=1','!',
                 'audioconvert', '!',
-                'audioresample', '!',
-                'vader','name=vader', 'auto-threshold=true', '!',
+                'audioresample', 
+                '!',
+                'audio/x-raw-int,width=16,depth=16,channels=1,rate=8000', 
+                '!',
+                'tee', 'name=tee', '!',
+                'vader',
+                    'name=vader', 
+                    'auto-threshold=true', 
+                    'dump-dir=%s'%(self.context.buffer_directory,),
+                    '!',
                 'pocketsphinx',
                     'name=sphinx', 
-                    'lm="%s"'%(self.working_directory.language_model_file,),
-                    'dict="%s"'%(self.working_directory.dictionary_file,), '!',
+                    'lm="%s"'%(self.context.language_model_file,),
+                    'dict="%s"'%(self.context.dictionary_file,), '!',
                 'fakesink',
-                
-#                'tee', '!',
-#                'queue', 'name="wave"','!',
-#                'audioconvert', '!',
-#                'audioresample', '!',
-#                'wavenc',  '!',
-#                'multifilesink',
-#                    'name=filesink',
-#                    'location=%r'%(os.path.join( self.working_directory, 'recordings', '%d.wav' )),
-#                    'next-file=key-unit-event',
             ]
 
     _pipeline = None
@@ -185,14 +184,24 @@ class Pipeline( object ):
         })
     def sphinx_result(self, asr, text, uttid):
         """Forward result signals via our queue"""
+        new = []
+        for filename in os.listdir( self.context.buffer_directory ):
+            if filename not in self.existing_utterances:
+                self.existing_utterances.add( filename )
+                new.append( filename )
         self.queue.put( {
             'type':'final',
             'text': text,
             'uttid': uttid,
             'nbest': getattr( self.sphinx, 'nbest',(text,)),
+            'files': new,
         })
-        
-        
+    
+        # to convert a raw-file dump to .wav file...
+        # sox -r 8000 -e signed -b 16 -c1 00000002.raw test.wav
+        # to play it back raw...
+        # 
+
 
 def main():
     """Command-line script to run the pipeline"""
@@ -205,7 +214,19 @@ def main():
         except Queue.Empty as err:
             pass 
         else:
-            print( '%(type) 7s #%(uttid)05s %(text)s %(nbest)s'%result )
             if result['type'] == 'final':
+                pprint.pprint( result )
                 print()
+            else:
+                print( '%(type) 7s #%(uttid)05s %(text)s'%result )
+                
 
+def rawplay():
+    subprocess.Popen( [
+        'gst-launch',
+        'filesrc','location=%s'%(sys.argv[1]),'!',
+        'audioparse','width=16','rate=8000','depth=16','signed=true','channels=1','!',
+        'audiorate','!',
+        'audioconvert','!',
+        'alsasink'
+    ]).communicate()
