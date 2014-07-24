@@ -1,5 +1,5 @@
 """Creation of working directories for storing language models and training data"""
-import os,shutil,tempfile,subprocess
+import os,shutil,tempfile,subprocess,json,time,glob
 from functools import wraps
 def one_shot( func ):
     """Only calculate once for each instance"""
@@ -23,6 +23,19 @@ def base_cache_directory(appname='listener'):
     cache_dir = os.environ.get( 'XDG_CACHE_HOME', os.path.expanduser('~/.cache'))
     cache_dir = os.path.join( cache_dir, appname )
     return cache_dir
+
+def twrite( filename, data ):
+    """Note: this is *not* thread/process safe!"""
+    if isinstance( data, unicode ):
+        data = data.encode('utf-8')
+    elif not isinstance( data, bytes ):
+        data = json.dumps( data )
+        if isinstance( data, unicode ):
+            data = data.encode('utf-8')
+    with open( filename+ '~', 'wb' ) as fh:
+        fh.write( data )
+    os.rename( filename + '~', filename )
+    return filename
 
 class Context( object ):
     """Holds a dictation context from which we attempt to recognize"""
@@ -74,7 +87,6 @@ class Context( object ):
             'tar', '-zxf',
             archive,
         ], cwd=tempdir )
-        # we expect either a HUB4 or WSJ model...
         HMMs = [
             os.path.join( tempdir, 'hub4wsj_sc_8k'),
         ]
@@ -108,23 +120,64 @@ class Context( object ):
             os.mkdir( self.recording_directory )
         return self.directory
 
+    SPHINXTRAIN_BIN = '/usr/lib/sphinxtrain/sphinxtrain'
     def acoustic_adaptation( self ):
         """Run acoustic adaptation on recorded data-set
         
         TODO: Likely should be machine and sound-source dependent so that 
         users can switch between devices?
         """
-        command = [
-            'sphinx_fe',
-                '-argfile', os.path.join( self.hmm_directory, 'feat.params'),
-                '-samprate', '16000',
-                '-c',os.path.join( self.hmm_directory,'arctic20.fileids'),
-                '-di',self.hmm_directory,
-                '-do',self.hmm_directory,
-                '-ei','wav',
-                '-eo','mfc',
-                '-mswav','yes',
-        ]
+        log.info( 'Running acoustic adaptation' )
+        training_records = list( self.training_records )
+        
+        fileid_file = os.path.join( self.hmm_directory, 'training.fileids' )
+        twrite( fileid_file, '\n'.join([ record['filename'] for record in training_records]) )
+        
+        transcription_file = os.path.join( self.hmm_directory, 'training.transcription' )
+        twrite( transcription_file, '\n'.join([
+            '<s> %(transcription)s </s> (%(filename)s)'%record 
+            for record in records 
+        ]))
+        
+        
+        for command in [
+            [
+                'sphinx_fe',
+                    '-argfile', os.path.join( self.hmm_directory, 'feat.params'),
+                    '-samprate', '16000',
+                    '-c',fileid_file,
+                    '-di',self.hmm_directory,
+                    '-do',self.hmm_directory,
+                    '-ei','wav',
+                    '-eo','mfc',
+                    '-mswav','yes',
+            ],
+            [
+                os.path.join( self.SPHINXTRAIN_BIN,'bw'),
+                '-hmmdir', self.hmm_directory,
+                '-moddeffn', os.path.join( self.hmm_directory,'mdef.txt'),
+                '-ts2cbfn','.semi.',
+                '-feat','1s_c_d_dd',
+                '-svspec','0-12/13-25/26-38',
+                '-cmn','current',
+                '-agc','none',
+                # TODO: note that this is a very large file!
+                '-dictfn',self.dictionary_file,
+                '-ctlfn',fileid_file,
+                '-lsnfn',transcription_file,
+                '-accumdir', self.hmm_directory,
+            ],
+            
+            [
+                os.path.join( self.SPHINXTRAIN_BIN,'mllr_solve'),
+                '-meanfn',os.path.join( self.hmm_directory, 'means' ),
+                '-varfn',os.path.join( self.hmm_directory, 'variances'),
+                '-outmllrfn','mllr_matrix',
+                '-accumdir', self.hmm_directory,
+            ],
+        ]:
+            log.info( 'Running: %s', command.join(' '))
+            subprocess.check_call( command, cwd=self.hmm_directory )
     
     def download_url( self, url, filename ):
         """Download given URL to a local filename in our cache directory 
@@ -143,4 +196,43 @@ class Context( object ):
     HMM_URL = 'https://sourceforge.net/projects/cmusphinx/files/Acoustic%20and%20Language%20Models/US%20English%20HUB4WSJ%20Acoustic%20Model/hub4wsj_sc_8k.tar.gz/download'
     def download_hmm_archive( self ):
         return self.download_url( self.HMM_URL, 'hub4_wsj_language_model.tar.gz' )
+    
+    def transcription_filename( self, transcription ):
+        name = os.path.join( 
+            self.recording_directory, 
+            ''.join([ c if c.isalnum() else '_' for c in transcription ]) + '.wav'
+        )
+        return name
+    
+    def add_training_data( self, recording, transcription, private=False ):
+        name = self.transcription_filename( transcription )
+        if os.path.exists( name ):
+            raise RuntimeError( 'Delete the file %s before calling add_training_data' )
+        shutil.copy( recording, name )
+        description = name + '.json'
+        record = { 
+            'filename': name, 'transcription': transcription, 'timestamp': time.time(),
+            'private': private,
+        }
+        twrite( description, record )
+        return record
+    def remove_training_data( self, transcription ):
+        name = self.transcription_filename( transcription )
+        for n in (name+'.json', name ):
+            try:
+                os.remove( name + '.json' )
+            except (IOError,OSError) as err:
+                pass
+    def training_records( self, private=True ):
+        for json_file in glob.glob( os.path.join( self.recording_directory, '*.json' )):
+            try:
+                record = json.loads( open( json_file ).read())
+                if os.path.exists( record['filename'] ):
+                    if private or not record['private']:
+                        yield record 
+                else:
+                    log.error( 'Training record in %s does not have accompanying data', json_file )
+                    os.rename( json_file, json_file+'.stale' )
+            except Exception as err:
+                pass 
     

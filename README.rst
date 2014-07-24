@@ -7,7 +7,7 @@ editor.
 
 Dependencies::
 
-	apt-get install gstreamer0.10-pocketsphinx build-essential libsphinxbase1 sphinxbase-utils
+	apt-get install gstreamer0.10-pocketsphinx build-essential libsphinxbase1 sphinxbase-utils sphinxtrain
 
 python library, use::
 
