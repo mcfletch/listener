@@ -7,7 +7,10 @@ editor.
 
 Dependencies::
 
-	apt-get install gstreamer0.10-pocketsphinx build-essential libsphinxbase1 sphinxbase-utils sphinxtrain
+	$ apt-get install gstreamer0.10-pocketsphinx build-essential \
+        libsphinxbase1 sphinxbase-utils sphinxtrain \
+        pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
+        espeak
 
 python library, use::
 
