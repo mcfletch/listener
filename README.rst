@@ -33,11 +33,24 @@ The model is (and this is just a sketch so far):
           features for pre and post-processing the audio if necessary
           however, so far those features don't actually work, at least they 
           don't seem to work wrt storing data etc.
-    * record each utterance into ram-disk or the like, using a multifilesink 
-      and generated events to keep those files around
+    * record each utterance into ram-disk or the like
+        * currently this is being done in the vader component
     * provide "correct that" style training/grammar updates
       * use the already-uttered sound-file to do the training
       * train acousticly *and* update language model 
+      * acoustic training relies on have a reliable transcription
+      * transcription requires that each "word" be in the dictionary with 
+        phonetic translation
+        * when new words are encountered we will need to help the user 
+          convert them to phonetics (preferably without their needing to 
+          work with the phonetic alphabet in the normal case, but allowing 
+          them to see what is being used and override/fix it when necessary)
+        * may be able to use e.g. espeak --punct -q -x --pho "Hello world!"
+          to provide a guess as to the phonemes. A mapping will be required 
+          to do that, see http://en.wikipedia.org/wiki/Arpabet
+      * plan to allow for "upload your utterances" functionality, so that 
+        a user can upload non-private utterances as voice-training data 
+        (with the transcription).
     * on opening a project (git/bzr/hg repository)
         * scan the project source code and convert to dictation words
         * build a language model from that translation

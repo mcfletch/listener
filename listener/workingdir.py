@@ -198,6 +198,11 @@ class Context( object ):
             urllib.urlretrieve( url, target )
         return target
         
+    # Only a root context should *likely* be doing acoustic training 
+    # so it's likely we shouldn't have the acoustic training files 
+    # present in the non-root contexts...
+    # We may *also* want to move the user-specific HMM into 
+    # its own directory (separate from the downloaded/base HMM)?
     
     HMM_URL = 'https://sourceforge.net/projects/cmusphinx/files/Acoustic%20and%20Language%20Models/US%20English%20HUB4WSJ%20Acoustic%20Model/hub4wsj_sc_8k.tar.gz/download'
     def download_hmm_archive( self ):
