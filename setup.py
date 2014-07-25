@@ -28,10 +28,6 @@ if __name__ == "__main__":
         # pychecker
         # coverage
         # globalsub
-        package_data = {
-            'listener': [
-            ],
-        },
         install_requires=[
         ],
         scripts = [
