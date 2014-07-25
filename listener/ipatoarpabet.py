@@ -50,7 +50,7 @@ def dictionary_espeak( ):
     """
     output_mapping = os.path.expanduser( '~/.config/listener/default/lm/dictionary.ipa' )
     if not os.path.exists( output_mapping ):
-        log.warn( 'Running IPA conversion, this will take 1/2 hour or more' )
+        log.warn( 'Running IPA conversion, this will take 1/4 hour or more' )
         dictionary = os.path.expanduser( '~/.config/listener/default/lm/dictionary.dict' )
         mapping = {}
         mapped = 0
@@ -108,6 +108,7 @@ def translate( word, ipa=None ):
         raise
 
 def translate_main():
+    logging.basicConfig( level=logging.INFO )
     content = sys.stdin.read().split()
     for word in content:
         print word
@@ -144,6 +145,7 @@ def create_stat_mapping( ):
     There are a *large* number of cases where the ipa and arpabet mappings 
     are not 1:1 and/or do not map known-mapping values
     """
+    logging.basicConfig( level=logging.INFO )
     dictionary = dictionary_espeak()
     mapping = {}
     mapped = 0
@@ -188,6 +190,7 @@ def clean_dict_word( word ):
     return word
 
 def test():
+    logging.basicConfig( level=logging.INFO )
     dictionary = dictionary_espeak()
     good = bad = total_tlength = close_count = 0
     try:
@@ -232,5 +235,4 @@ def test():
         print '%s good %s bad %s'%(good,bad, (good/float(good+bad or 1)))
 
 if __name__ == '__main__':
-    logging.basicConfig( level=logging.INFO )
     test()
