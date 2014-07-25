@@ -65,7 +65,7 @@ def dictionary_espeak( ):
                 log.info( 'Converting word %s', i )
     return output_mapping
 
-def get_espeak( word, voice='en-ca' ):
+def get_espeak( word, voice='en-us' ):
     """Get espeak ipa (in ipa=3 format) for the given word in en-ca voice"""
     return kill_speaking_cues(subprocess.check_output([
         'espeak',
@@ -110,7 +110,9 @@ def translate( word, ipa=None ):
 def translate_main():
     content = sys.stdin.read().split()
     for word in content:
-        print translate(word)
+        print word
+        for possible in translate(word):
+            print u'\t%s'%(possible,)
 
 def frequency_table( count_table, threshold=0.05 ):
     """Generate a frequency table from a count-of-correspondence table"""
