@@ -42,7 +42,8 @@ if __name__ == "__main__":
                 "listener-pipe=listener.pipeline:main",
                 'listener-code-to-words-py=listener.codetowords:main',
                 'listener-rawplay=listener.pipeline:rawplay',
-                'listener-ipa-arpa-statmap=listener.ipa2arpabet:stat_mapping',
+                
+                'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',
             ],
         ),
         zip_safe=False,
