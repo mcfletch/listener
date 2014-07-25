@@ -12,9 +12,11 @@ class BackgroundListener(QtCore.QThread):
     
     """
     active = True
+    loading = True
     def run(self):
         """Create the GStreamer Pipeline with the PocketSphinx listener"""
         self.context = context.Context( 'default' )
+        self.loading = False
         self.pipeline = pipeline.Pipeline(self.context)
         self.pipeline.start_listening()
         while self.active:
@@ -25,16 +27,36 @@ class BackgroundListener(QtCore.QThread):
             else:
                 log.info( 'Got message: %s', message )
 
+class ListenerMain( QtGui.QMainWindow ):
+    """Main application window for listener"""
+    def __init__( self, *args, **named ):
+        super( ListenerMain, self ).__init__( *args, **named )
+        self.listener = BackgroundListener()
+        self.listener.start()
+        self.create_gui()
+    def create_gui( self ):
+        self.setWindowTitle( 'Listener' )
+        self.statusBar().showMessage( 'Initializing the context' )
+        self.create_menus()
+    def quit( self, *args ):
+        self.listener.active = False 
+        QtGui.qApp.quit()
+    def create_menus( self ):
+        exitAction = QtGui.QAction(QtGui.QIcon('exit.png'), '&Exit', self)        
+        exitAction.setShortcut('Alt-F4')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(self.quit)
+        
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(exitAction)        
+                
 def main():
     logging.basicConfig( level=logging.DEBUG )
     app = QtGui.QApplication(sys.argv)
-    bl = BackgroundListener()
-    bl.start()
     
-    MainWindow = QtGui.QMainWindow()
+    MainWindow = ListenerMain()
     MainWindow.show()
-    MainWindow.setWindowTitle( 'Listener' )
-    MainWindow.show()    
     
     app.exec_()
 
