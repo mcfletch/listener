@@ -2,27 +2,17 @@
 # -*- coding: utf-8 -*-
 import json
 import pprint 
-import os, csv, subprocess, codecs
+import os, csv, subprocess, codecs, sys
 import logging
 import difflib
 log = logging.getLogger( __name__ )
 
 HERE = os.path.dirname( __file__ )
-MAPPING_FILE = os.path.join( HERE, 'ipatoarpabet.csv' )
 STAT_MAP_FILE = os.path.join( HERE,'ipastatmap.json')
 # Threshold below which we stop generating IPA -> ARPA correspondences
 # this prevents generating dozens of possible options where the likelihood 
 # is low of a match
 STAT_MAP_THREHOLD = .2
-
-MAPPING = None 
-def get_mapping( ):
-    global MAPPING
-    if MAPPING is None:
-        MAPPING = {}
-        for line in csv.reader( open( MAPPING_FILE, 'rb' ) ):
-            MAPPING.setdefault(line[1].decode('utf-8'),[]).append( line[0].decode('utf-8'))
-    return MAPPING
 
 STAT_MAPPING = None 
 def get_stat_mapping( ):
@@ -86,10 +76,10 @@ def get_espeak( word, voice='en-ca' ):
 def _stat_translate( ipa ):
     result = []
     mapping = get_stat_mapping()
-    ipa = _expand_rs( [
+    ipa = [
         c.strip() for c in 
         ipa.split(u'_')
-    ] )
+    ]
     results = []
     for sound in ipa:
         if not sound:
@@ -108,31 +98,6 @@ def _stat_translate( ipa ):
             results = [ r+' '+t for r in results for t in translations if t]
     return results
     
-def _translate( ipa ):
-    result = []
-    mapping = get_mapping()
-    ipa = [
-        c.strip() for c in 
-        ipa.split(u'_')
-    ]
-    results = [ ]
-    for sound in ipa:
-        if sound in mapping:
-            sound = [sound]
-        for character in sound:
-            if not character:
-                continue
-            translations = mapping.get(character)
-            if not translations:
-                log.error(u'Unrecognized ipa: %s', character)
-                continue
-                #raise ValueError( character, ipa )
-            elif not results:
-                results = translations[:]
-            else:
-                results = [ r+' '+t for r in results for t in translations if t]
-    return results
-
 def translate( word, ipa=None ):
     if ipa is None:
         ipa = get_espeak( word )
@@ -142,24 +107,10 @@ def translate( word, ipa=None ):
         err.args += (word,ipa)
         raise
 
-ALWAYS_MAPS = {
-    't': 'T',
-    'p': 'P',
-    'n': 'N',
-    'l': 'L',
-}
-def check_consonants( ipa, description ):
-    """Check for mis-match on known-mapping consonants
-    
-    The idea here is to reduce the number of cases where 
-    the ipa and arpa just *happen* to have the same number 
-    of phonemes but they don't actually map...
-    """
-    for (i,d) in zip( ipa,description):
-        if i in ALWAYS_MAPS:
-            if d != ALWAYS_MAPS[i]:
-                return False 
-    return True
+def translate_main():
+    content = sys.stdin.read().split()
+    for word in content:
+        print translate(word)
 
 def frequency_table( count_table, threshold=0.05 ):
     """Generate a frequency table from a count-of-correspondence table"""
@@ -185,15 +136,6 @@ def print_frequency_table( table ):
         for (left,right) in zip(lefts,possible):
             print (u'%s\t%s (%0.1f))'%(left,right[0],right[1]*100))
 
-def _expand_rs( ipa ):
-    """Expands ipa r-suffixes, as they generally translate to two sounds in arpa"""
-    for i in range(len(ipa)-1, -1, -1):
-        if len(ipa[i]) < 2:
-            continue
-        if ipa[i].endswith(u'r'):
-            ipa[i:i+1] = [ipa[i][:-1],u'r']
-    return ipa
-    
 def create_stat_mapping( ):
     """Process the whole dictionary attempting to find IPA -> Arpabet mapping
     
@@ -214,7 +156,7 @@ def create_stat_mapping( ):
             description = description.decode('utf-8')
             ipa = ipa.decode('utf-8')
             description = description.split(' ')
-            ipa_fragments = _expand_rs( ipa.split('_'))
+            ipa_fragments = ipa.split('_')
             if not len(ipa_fragments) == len(description):
                 continue 
 #            if not check_consonants( ipa_fragments, description ):
@@ -278,17 +220,15 @@ def test():
                 bad += 1
                 our_options = "\n\t\t".join( translated )
             if not i%1000:
-                print 'good=%s bad=%s close=%s good=%0.3f (good_or_close=%0.3f) avg choices %s'%(
+                print 'good=%s bad=%s close=%s good=%0.3f (good_or_close=%0.3f) avg choices %0.1f'%(
                     good,bad, close_count,
                     (good/float(good+bad or 1)), 
                     ((good+close_count)/float(good+bad or 1)),
-                    total_tlength/(good+bad)
+                    total_tlength/float(good+bad)
                 )
     finally:
         print '%s good %s bad %s'%(good,bad, (good/float(good+bad or 1)))
 
 if __name__ == '__main__':
     logging.basicConfig( level=logging.INFO )
-    #dictionary_espeak()
-    #stat_mapping()
     test()

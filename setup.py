@@ -44,6 +44,7 @@ if __name__ == "__main__":
                 'listener-rawplay=listener.pipeline:rawplay',
                 
                 'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',
+                'listener-arpa=listener.ipatoarpabet:translate_main',
             ],
         ),
         zip_safe=False,
