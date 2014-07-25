@@ -4,6 +4,7 @@ import json
 import pprint 
 import os, csv, subprocess, codecs
 import logging
+import difflib
 log = logging.getLogger( __name__ )
 
 HERE = os.path.dirname( __file__ )
@@ -244,7 +245,7 @@ def clean_dict_word( word ):
 
 def test():
     dictionary = dictionary_espeak()
-    good = bad = total_tlength = 0
+    good = bad = total_tlength = close_count = 0
     try:
         for i,line in enumerate(open(dictionary)):
             try:
@@ -270,12 +271,19 @@ def test():
             if description in translated:
                 good += 1
             else:
+                close = difflib.get_close_matches( description, translated )
+                if close:
+                    close_count += 1
+                    #print '%s\n%s\n'%(description,close[0])
                 bad += 1
                 our_options = "\n\t\t".join( translated )
-#                ipa = get_espeak( word )
-#                print( '%(word)s %(ipa)s\n\t\n\t%(description)s\n\t\t%(our_options)s'%locals())
             if not i%1000:
-                print '%s good %s bad %0.3f avg choices %s'%(good,bad, (good/float(good+bad or 1)), total_tlength/(good+bad))
+                print 'good=%s bad=%s close=%s good=%0.3f (good_or_close=%0.3f) avg choices %s'%(
+                    good,bad, close_count,
+                    (good/float(good+bad or 1)), 
+                    ((good+close_count)/float(good+bad or 1)),
+                    total_tlength/(good+bad)
+                )
     finally:
         print '%s good %s bad %s'%(good,bad, (good/float(good+bad or 1)))
 
