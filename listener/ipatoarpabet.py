@@ -18,9 +18,10 @@ def get_espeak( word ):
     return subprocess.check_output([
         'espeak',
         '-q','--ipa=3',
+        '-v', 'en-ca',
         word,
     ]).decode('utf-8')
-def translate( ipa ):
+def _translate( ipa ):
     result = []
     mapping = get_mapping()
     ipa = [
@@ -31,6 +32,8 @@ def translate( ipa ):
             u'ˈ',u''
         ).replace(
             u'ː', u''
+        ).replace(
+            u'\u0303',''
         ).split(u'_')
     ]
     results = [ ]
@@ -42,12 +45,22 @@ def translate( ipa ):
                 continue
             translations = mapping.get(character)
             if not translations:
-                raise ValueError( character, ipa )
+                print (u'Unrecognized ipa: %s'%(character))
+                continue
+                #raise ValueError( character, ipa )
             elif not results:
                 results = translations[:]
             else:
-                results = [ r+' '+t for r in results for t in translations]
+                results = [ r+' '+t for r in results for t in translations if t]
     return results
+
+def translate( word ):
+    ipa = get_espeak( word )
+    try:
+        return _translate( ipa )
+    except ValueError as err:
+        err.args += (word,ipa)
+        raise
 
 def test():
     mapping = get_mapping()
@@ -55,7 +68,7 @@ def test():
     dictionary = os.path.expanduser( '~/.config/listener/default/lm/dictionary.dict' )
     good = bad = 0
     try:
-        for line in open(dictionary):
+        for i,line in enumerate(open(dictionary)):
             try:
                 word,description = line.strip().split('\t',1)
             except ValueError as err:
@@ -65,22 +78,26 @@ def test():
                 word = word.rsplit('(',1)[0]
             while word and not word[0].isalnum():
                 word = word[1:]
-            ipa = get_espeak( word )
             try:
-                translated = translate( ipa )
+                translated = translate( word )
             except ValueError as err:
-                err.args += (word,ipa)
                 print( 
-                    u'Failed to translate: %s %s -> %s  char=%s(%r)'%(
+                    u'Failed to translate: %s (%s) -> %s  char=%s(%r)'%(
                     word,
-                    ipa, description, err.args[0], err.args[0],
+                    err.args[1],
+                    description, 
+                    err.args[0], err.args[0],
                 ))
                 raise
             if description in translated:
                 good += 1
             else:
                 bad += 1
-                print( '%(word)s %(ipa)s\n\t%(translated)s\n\t%(description)s'%locals())
+                our_options = "\n\t\t".join( translated )
+                ipa = get_espeak( word )
+                print( '%(word)s %(ipa)s\n\t\n\t%(description)s\n\t\t%(our_options)s'%locals())
+            if not i%1000:
+                print '%s good %s bad %0.3f'%(good,bad, (good/float(good+bad or 1)))
     finally:
         print '%s good %s bad %s'%(good,bad, (good/float(good+bad or 1)))
 
