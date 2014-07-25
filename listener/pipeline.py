@@ -12,7 +12,7 @@ pygst.require("0.10")
 import gst
 import gobject
 import Queue
-from . import workingdir
+from . import context
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 
@@ -206,7 +206,7 @@ class Pipeline( object ):
 
 def main():
     """Command-line script to run the pipeline"""
-    context = workingdir.Context( 'default' )
+    context = context.Context( 'default' )
     pipe = Pipeline(context)
     pipe.start_listening()
     while True:
