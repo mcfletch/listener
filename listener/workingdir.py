@@ -1,6 +1,9 @@
 """Creation of working directories for storing language models and training data"""
 import os,shutil,tempfile,subprocess,json,time,glob
 from functools import wraps
+import logging
+log = logging.getLogger( __name__ )
+
 def one_shot( func ):
     """Only calculate once for each instance"""
     key = '_' + func.__name__
@@ -192,6 +195,8 @@ class Context( object ):
         """
         filename = os.path.basename( filename )
         target = os.path.join( base_cache_directory(), filename )
+        if not os.path.exists( base_cache_directory()):
+            os.makedirs( base_cache_directory() )
         if not os.path.exists( target ):
             log.warn( 'Downloading from %s', url )
             import urllib
