@@ -84,8 +84,9 @@ class Pipeline( object ):
     def __init__( self, context ):
         """Initialize our pipeline using the given working-directory"""
         self.context = context
-        for filename in os.listdir( context.buffer_directory ):
-            os.remove( os.path.join( context.buffer_directory, filename ))
+        if os.path.exists( context.buffer_directory ):
+            for filename in os.listdir( context.buffer_directory ):
+                os.remove( os.path.join( context.buffer_directory, filename ))
         self.existing_utterances = set()
     _queue = None 
     @property 
