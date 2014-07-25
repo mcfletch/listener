@@ -203,7 +203,6 @@ class Pipeline( object ):
         # to play it back raw...
         # 
 
-
 def main():
     """Command-line script to run the pipeline"""
     context = context.Context( 'default' )

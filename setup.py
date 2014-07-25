@@ -41,6 +41,8 @@ if __name__ == "__main__":
                 
                 'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',
                 'listener-arpa=listener.ipatoarpabet:translate_main',
+                
+                'listener-qt=listener.qtgui:main',
             ],
         ),
         zip_safe=False,
