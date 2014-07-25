@@ -9,6 +9,10 @@ log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 MAPPING_FILE = os.path.join( HERE, 'ipatoarpabet.csv' )
 STAT_MAP_FILE = os.path.join( HERE,'ipastatmap.json')
+# Threshold below which we stop generating IPA -> ARPA correspondences
+# this prevents generating dozens of possible options where the likelihood 
+# is low of a match
+STAT_MAP_THREHOLD = .2
 
 MAPPING = None 
 def get_mapping( ):
@@ -96,7 +100,7 @@ def _stat_translate( ipa ):
             log.error(u'Unrecognized ipa: %s', sound)
             continue
         # choose the most likely 
-        translations = [ t[0] for t in translations if t[1] > .2 ]
+        translations = [ t[0] for t in translations if t[1] > STAT_MAP_THREHOLD ]
         if not results:
             results = translations[:]
         else:
@@ -157,6 +161,7 @@ def check_consonants( ipa, description ):
     return True
 
 def frequency_table( count_table, threshold=0.05 ):
+    """Generate a frequency table from a count-of-correspondence table"""
     result = {}
     for (ipa,counts) in count_table.items():
         counts = sorted( counts.items(), key=lambda x: x[1], reverse=True )
@@ -171,6 +176,14 @@ def frequency_table( count_table, threshold=0.05 ):
         ]
         result[ipa] = counts 
     return result
+def print_frequency_table( table ):
+    """Print out a frequency table in friendly format"""
+    for ipa,possible in sorted(table.items()):
+        lefts = [u'']*len(possible)
+        lefts[0] = ipa
+        for (left,right) in zip(lefts,possible):
+            print (u'%s\t%s (%0.1f))'%(left,right[0],right[1]*100))
+
 def _expand_rs( ipa ):
     """Expands ipa r-suffixes, as they generally translate to two sounds in arpa"""
     for i in range(len(ipa)-1, -1, -1):
@@ -219,6 +232,8 @@ def create_stat_mapping( ):
         }, indent=2, ensure_ascii=False ).encode('utf-8')
         log.info( 'Writing statistics to: %s', STAT_MAP_FILE )
         open( STAT_MAP_FILE, 'w').write( table )
+    print_frequency_table( frequency_table(mapping) )
+
 
 def clean_dict_word( word ):
     if word.endswith( ')' ):

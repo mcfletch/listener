@@ -58,9 +58,8 @@ The model is (and this is just a sketch so far):
           convert them to phonetics (preferably without their needing to 
           work with the phonetic alphabet in the normal case, but allowing 
           them to see what is being used and override/fix it when necessary)
-        * may be able to use e.g. espeak --punct -q -x --pho "Hello world!"
-          to provide a guess as to the phonemes. A mapping will be required 
-          to do that, see http://en.wikipedia.org/wiki/Arpabet
+        * code is written to allow for use of espeak phonetic output to 
+          produce loose ARPABet translations
       * plan to allow for "upload your utterances" functionality, so that 
         a user can upload non-private utterances as voice-training data 
         (with the transcription).
