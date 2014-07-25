@@ -6,6 +6,8 @@ producing a language model based on the transformations here. The result
 heavily weighted favourite to the base (natural) language model.
 """
 import re, tokenize, sys
+import logging
+log = logging.getLogger( __name__ )
 
 OP_NAMES = {
     '(':'open paren',
