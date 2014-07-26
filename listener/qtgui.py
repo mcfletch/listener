@@ -1,5 +1,5 @@
 """Qt GUI wrapper"""
-import sys,logging,Queue,cgi, os
+import sys,logging,Queue,cgi, os,json
 from . import pipeline, context
 try:
     from PySide import (
@@ -25,11 +25,11 @@ class QtPipelineGenerator( QtCore.QObject ):
 
 class JavascriptBridge( QtCore.QObject ):
     """A QObject that can process clicks"""
-    js_event = QtCore.Signal(dict)
+    js_event = QtCore.Signal(str)
     
-    @QtCore.Slot(dict)
+    @QtCore.Slot(str)
     def send_event( self, event ):
-        return self.js_event.emit( event )
+        return self.js_event.emit( json.loads(event) )
 
 class QtPipeline(pipeline.Pipeline):
     """Pipeline that sends messages through Qt Events"""
@@ -56,7 +56,11 @@ class ListenerMain( QtGui.QMainWindow ):
         self.statusBar().showMessage( 'Initializing the context' )
         self.create_menus()
         
+        QtWebKit.QWebSettings.globalSettings().setAttribute(
+            QtWebKit.QWebSettings.DeveloperExtrasEnabled, True
+        )
         self.view = QtWebKit.QWebView(self)
+        self.view_frame.baseURL = 'file://'+os.path.abspath(os.path.join( HERE ))
         self.view.setHtml( self.main_view_html() )
         
         self.main_html = self.element_by_selector( 'div.main-view' )
@@ -84,6 +88,7 @@ class ListenerMain( QtGui.QMainWindow ):
     def main_view_html( self ):
         return MAIN_PAGE_TEMPLATE.render( 
             view = self,
+            HERE = os.path.abspath( HERE ),
         )
     def quit( self, *args ):
         self.listener.active = False 
@@ -101,16 +106,25 @@ class ListenerMain( QtGui.QMainWindow ):
     def on_partial( self, record ):
         self.statusBar().showMessage( record['text'] )
     def on_final( self, record ):
-        self.final_results.appendInside(
-            '''<li class="final-result">%s</li>'''%(cgi.escape( record['text']) )
+        js = '''add_final( %s );'''%(json.dumps( record ))
+        self.view_frame.evaluateJavaScript(
+            js
         )
-        element = self.final_results.lastChild()
+#        self.final_results.appendInside(
+#            '''<li class="final-result">%s</li>'''%(cgi.escape( record['text']) )
+#        )
+#        element = self.final_results.lastChild()
     @QtCore.Slot()
     def add_gui_bridge( self ):
+        self.bridge = JavascriptBridge()
+        self.bridge.js_event.connect( self.on_js_event )
         self.view_frame.addToJavaScriptWindowObject(
             "gui_bridge",
-            JavascriptBridge(),
+            self.bridge,
         )
+    @QtCore.Slot()
+    def on_js_event( self, event ):
+        print( 'JS Event %s'%(event,))
     
 def main():
     logging.basicConfig( level=logging.DEBUG )

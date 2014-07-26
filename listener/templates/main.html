@@ -1,13 +1,31 @@
 <!doctype html>
 <html>
-<head><title>Listener</title></head>
+<head>
+    <title>Listener</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="file://{{HERE}}/static/pure-min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="file://{{HERE}}/static/style.css" />
+</head>
 <body>
-    <h1>Listener</h1>
-    <div class="side-menu">Hello world</div>
-    <div class="main-view">
-        <div class="main-view-header">Main View</div>
+<div class="main-window pure-g">
+    <div class="side-menu pure-u-1-5">
+        <div class="view-header main-view-header">Navigation</div>
+    </div>
+    <div class="main-view pure-u-4-5">
+        <div class="view-header main-view-header">Recognition and Training</div>
         <ul class="final-results">
         </ul>
     </div>
+</div>
+<div class="templates" style="display: none;">
+    <ul>
+        <li class="final-result-item">
+            <span data-property="uttid" class="utterance-id"></span>
+            <span data-property="text" class="original-recognition"></span>
+            <button data-action="listen" class="send-event" type="button">Listen</button>
+        </li>
+    </ul>
+</div>
+<script src="file://{{HERE}}/static/jquery-2.1.1.js"></script>
+<script src="file://{{HERE}}/static/mainwindow.js"></script>
 </body>
 </html>
