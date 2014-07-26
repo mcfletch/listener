@@ -1,0 +1,16 @@
+body {
+    background-color: white;
+    font-family: Verdana, Helvetica, Arial;
+    margin: 0;
+}
+.clear-both {
+    clear: both;
+}
+.hidden {
+    display: none;
+}
+.view-header {
+    padding: .2em;
+    background-color: black;
+    color: white;
+}
