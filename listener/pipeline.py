@@ -88,12 +88,6 @@ class Pipeline( object ):
             for filename in os.listdir( context.buffer_directory ):
                 os.remove( os.path.join( context.buffer_directory, filename ))
         self.existing_utterances = set()
-    _queue = None 
-    @property 
-    def queue( self ):
-        if self._queue is None:
-            self._queue = Queue.Queue()
-        return self._queue
 
     @property
     def pipeline_command( self ): 
@@ -177,36 +171,44 @@ class Pipeline( object ):
         
     def sphinx_partial_result(self, sphinx, text, uttid):
         """Forward partial result signals via our queue"""
-        self.queue.put( {
+        self.send( {
             'type':'partial',
             'text': text,
             'uttid': uttid,
             'nbest': None,
         })
     def sphinx_result(self, asr, text, uttid):
-        """Forward result signals via our queue"""
+        """Forward result signals via our send() method"""
         new = []
         for filename in os.listdir( self.context.buffer_directory ):
             if filename not in self.existing_utterances:
                 self.existing_utterances.add( filename )
                 new.append( filename )
-        self.queue.put( {
+        self.send( {
             'type':'final',
             'text': text,
             'uttid': uttid,
             'nbest': getattr( self.sphinx, 'nbest',(text,)),
             'files': new,
         })
-    
-        # to convert a raw-file dump to .wav file...
-        # sox -r 8000 -e signed -b 16 -c1 00000002.raw test.wav
-        # to play it back raw...
-        # 
+    def send( self, message ):
+        raise NotImplemented( 'Must have a send method on pipelines' )
+
+class QueuePipeline( Pipeline ):
+    """Sub-class of Pipeline using Python Queues for comm"""
+    _queue = None 
+    @property 
+    def queue( self ):
+        if self._queue is None:
+            self._queue = Queue.Queue()
+        return self._queue
+    def send( self, message ):
+        self.queue.put( message )
 
 def main():
     """Command-line script to run the pipeline"""
     context = context.Context( 'default' )
-    pipe = Pipeline(context)
+    pipe = QueuePipeline(context)
     pipe.start_listening()
     while True:
         try:

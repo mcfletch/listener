@@ -1,43 +1,90 @@
 """Qt GUI wrapper"""
-import sys,logging,Queue
+import sys,logging,Queue,cgi, os
 from . import pipeline, context
 try:
-    from PySide import QtCore, QtGui
+    from PySide import (
+        QtCore, QtGui, QtWebKit
+    )
 except ImportError as err:
-    from PyQt4 import QtCore, QtGui
+    from PyQt4 import (
+        QtCore, QtGui, QtWebKit
+    )
+from jinja2 import Environment, FileSystemLoader
+
+HERE = os.path.dirname( __file__ )
+
+TEMPLATE_ENVIRONMENT = Environment( loader=FileSystemLoader(os.path.join( HERE, 'templates')) )
+MAIN_PAGE_TEMPLATE = TEMPLATE_ENVIRONMENT.get_template( 'main.html' )
+
 log = logging.getLogger(__name__)
 
-class BackgroundListener(QtCore.QThread):
-    """Need a command to re-train based on recordings-to-date:
+class QtPipelineGenerator( QtCore.QObject ):
+    """QObject generating events from the Pipeline"""
+    partial = QtCore.Signal(dict)
+    final = QtCore.Signal(dict)
+
+class JavascriptBridge( QtCore.QObject ):
+    """A QObject that can process clicks"""
+    js_event = QtCore.Signal(dict)
     
-    """
-    active = True
-    loading = True
-    def run(self):
-        """Create the GStreamer Pipeline with the PocketSphinx listener"""
-        self.context = context.Context( 'default' )
-        self.loading = False
-        self.pipeline = pipeline.Pipeline(self.context)
-        self.pipeline.start_listening()
-        while self.active:
-            try:
-                message = self.pipeline.queue.get(True,1)
-            except Queue.Empty as err:
-                pass 
-            else:
-                log.info( 'Got message: %s', message )
+    @QtCore.Slot(dict)
+    def send_event( self, event ):
+        return self.js_event.emit( event )
+
+class QtPipeline(pipeline.Pipeline):
+    """Pipeline that sends messages through Qt Events"""
+    @property 
+    @context.one_shot
+    def events( self ):
+        return QtPipelineGenerator()
+    def send( self, message ):
+        if message['type'] == 'partial':
+            self.events.partial.emit( message )
+        elif message['type'] == 'final':
+            self.events.final.emit( message )
 
 class ListenerMain( QtGui.QMainWindow ):
     """Main application window for listener"""
     def __init__( self, *args, **named ):
         super( ListenerMain, self ).__init__( *args, **named )
-        self.listener = BackgroundListener()
-        self.listener.start()
+        self.context = context.Context( 'default' )
+        self.pipeline = QtPipeline( self.context )
         self.create_gui()
+        self.pipeline.start_listening()
     def create_gui( self ):
         self.setWindowTitle( 'Listener' )
         self.statusBar().showMessage( 'Initializing the context' )
         self.create_menus()
+        
+        self.view = QtWebKit.QWebView(self)
+        self.view.setHtml( self.main_view_html() )
+        
+        self.main_html = self.element_by_selector( 'div.main-view' )
+        self.final_results = self.element_by_selector( '.final-results' )
+        
+        self.view_frame.javaScriptWindowObjectCleared.connect(
+            self.add_gui_bridge
+        )
+        
+        self.setCentralWidget( self.view )
+        
+        self.view.show()
+        
+        self.pipeline.events.partial.connect( self.on_partial )
+        self.pipeline.events.final.connect( self.on_final )
+    
+    @property
+    def view_frame( self ):
+        return self.view.page().mainFrame()
+    def elements_by_selector( self, selector ):
+        return self.view_frame.findAllElements( selector )
+    def element_by_selector( self, selector ):
+        return self.view_frame.findFirstElement( selector )
+        
+    def main_view_html( self ):
+        return MAIN_PAGE_TEMPLATE.render( 
+            view = self,
+        )
     def quit( self, *args ):
         self.listener.active = False 
         QtGui.qApp.quit()
@@ -49,8 +96,22 @@ class ListenerMain( QtGui.QMainWindow ):
         
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(exitAction)        
-                
+        fileMenu.addAction(exitAction)
+    
+    def on_partial( self, record ):
+        self.statusBar().showMessage( record['text'] )
+    def on_final( self, record ):
+        self.final_results.appendInside(
+            '''<li class="final-result">%s</li>'''%(cgi.escape( record['text']) )
+        )
+        element = self.final_results.lastChild()
+    @QtCore.Slot()
+    def add_gui_bridge( self ):
+        self.view_frame.addToJavaScriptWindowObject(
+            "gui_bridge",
+            JavascriptBridge(),
+        )
+    
 def main():
     logging.basicConfig( level=logging.DEBUG )
     app = QtGui.QApplication(sys.argv)
