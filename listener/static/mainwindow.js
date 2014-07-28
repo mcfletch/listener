@@ -7,7 +7,7 @@ $(document).ready( function() {
         display.find( '[data-action]').each( function( clickable ) {
             var element = $(this);
             element.click( function( evt ) {
-                window.gui_bridge.js_event( JSON.stringify({
+                window.gui_bridge.send_event( JSON.stringify({
                     'action': element.attr('data-action'),
                     'record': record,
                 }));
