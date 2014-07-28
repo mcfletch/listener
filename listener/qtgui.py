@@ -1,5 +1,5 @@
 """Qt GUI wrapper"""
-import sys,logging,Queue,cgi, os,json, pprint
+import sys,logging,Queue,cgi, os,json, pprint, math
 from . import pipeline, context
 try:
     from PySide import (
@@ -22,6 +22,7 @@ class QtPipelineGenerator( QtCore.QObject ):
     """QObject generating events from the Pipeline"""
     partial = QtCore.Signal(dict)
     final = QtCore.Signal(dict)
+    level = QtCore.Signal(dict)
 
 class JavascriptBridge( QtCore.QObject ):
     """A QObject that can process clicks"""
@@ -39,10 +40,9 @@ class QtPipeline(pipeline.Pipeline):
     def events( self ):
         return QtPipelineGenerator()
     def send( self, message ):
-        if message['type'] == 'partial':
-            self.events.partial.emit( message )
-        elif message['type'] == 'final':
-            self.events.final.emit( message )
+        event = getattr( self.events, message['type'],None)
+        if event:
+            event.emit( message )
 
 class ListenerMain( QtGui.QMainWindow ):
     """Main application window for listener"""
@@ -77,6 +77,7 @@ class ListenerMain( QtGui.QMainWindow ):
         
         self.pipeline.events.partial.connect( self.on_partial )
         self.pipeline.events.final.connect( self.on_final )
+        self.pipeline.events.level.connect( self.on_level )
     
     @property
     def view_frame( self ):
@@ -103,6 +104,19 @@ class ListenerMain( QtGui.QMainWindow ):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(exitAction)
+    
+    ZERO_LEVEL_AUDIO = math.log( 60 )
+    def on_level( self, record ):
+        """Interpret recording level in manner useful to user...
+        
+        Really need to get this to be a useful tool; basically it 
+        *seems* like the pocketsphinx stuff works fine with full-volume
+        input, but in noisy environments the vader won't pick up the 
+        end of the utterance
+        """
+#        translated = max((0,1.0 - math.log( abs(record['level']))/self.ZERO_LEVEL_AUDIO))
+#        translated = min((1.0,translated))
+#        print( 'Level %0.1f%%'%(translated*100) )
     
     def on_partial( self, record ):
         self.statusBar().showMessage( record['text'] )
