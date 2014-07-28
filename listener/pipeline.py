@@ -115,6 +115,7 @@ class Pipeline( object ):
                     '!',
                 'pocketsphinx',
                     'name=sphinx', 
+                    'nbest-size=10',
                     'lm="%s"'%(self.context.language_model_file,),
                     'dict="%s"'%(self.context.dictionary_file,), '!',
                 'fakesink',
