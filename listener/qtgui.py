@@ -1,5 +1,5 @@
 """Qt GUI wrapper"""
-import sys,logging,Queue,cgi, os,json
+import sys,logging,Queue,cgi, os,json, pprint
 from . import pipeline, context
 try:
     from PySide import (
@@ -25,10 +25,11 @@ class QtPipelineGenerator( QtCore.QObject ):
 
 class JavascriptBridge( QtCore.QObject ):
     """A QObject that can process clicks"""
-    js_event = QtCore.Signal(str)
+    js_event = QtCore.Signal(dict)
     
     @QtCore.Slot(str)
     def send_event( self, event ):
+        log.info( 'Received event from javascript' )
         return self.js_event.emit( json.loads(event) )
 
 class QtPipeline(pipeline.Pipeline):
@@ -124,7 +125,17 @@ class ListenerMain( QtGui.QMainWindow ):
         )
     @QtCore.Slot()
     def on_js_event( self, event ):
-        print( 'JS Event %s'%(event,))
+        log.info( 'Received event from javascript: %s', event )
+        if event['action'] == 'listen':
+            record = event['record']
+            if record['files']:
+                for file in record['files']:
+                    log.info( 'Playing file %s', file )
+                    self.context.rawplay( file )
+            else:
+                log.error( 'No files were present: %s', pprint.pformat(event))
+        else:
+            log.info( 'Unrecognized action: %s', pprint.pformat( event ))
     
 def main():
     logging.basicConfig( level=logging.DEBUG )
