@@ -100,8 +100,11 @@ class Pipeline( object ):
         return [
                 'alsasrc', 'name=source', '!',
                 'audioconvert', '!',
-                'audioresample', 
-                '!',
+                'audioresample', '!',
+                'level', 
+                    'name=monitor', 
+                    'interval=%s'%int(.01 * 10.**9),
+                    'message=true','!',
                 'audio/x-raw-int,width=16,depth=16,channels=1,rate=8000', 
                 '!',
                 'tee', 'name=tee', '!',
@@ -131,6 +134,12 @@ class Pipeline( object ):
             sphinx.connect('partial_result', self.sphinx_partial_result)
             sphinx.connect('result', self.sphinx_result)
             sphinx.set_property('configured', True)
+            
+            self.monitor = self._pipeline.get_by_name( 'monitor' )
+            
+            bus = self._pipeline.get_bus()
+            bus.add_signal_watch()
+            bus.connect( 'message', self.on_level )
             
 #            # connect up to the tee after negotiation
 #            tee = self._pipeline.get_by_name( 'tee' )
@@ -168,7 +177,15 @@ class Pipeline( object ):
         sphinx.set_property('lm', source)
         sphinx.set_property('configured', True)
         self.start_listening()
-        
+    
+    def on_level( self, bus, message ):
+        """Level message was received"""
+        if message.src == self.monitor and message.type==gst.MESSAGE_ELEMENT:
+            self.send( {
+                'type':'level',
+                'level': message.structure['rms'][0],
+            })
+    
     def sphinx_partial_result(self, sphinx, text, uttid):
         """Forward partial result signals via our queue"""
         self.send( {
