@@ -253,11 +253,22 @@ class Context( object ):
                 pass 
     
     def rawplay(self, filename):
+        """Play the given filename 
+        
+        filename -- either an absolute path to the filename or 
+            a "basename" for the filename present in our recordings 
+            directory 
+        """
         log.info( 'Playing raw file: %s', filename )
+        if os.path.basename(filename) == filename:
+            filename = os.path.join( self.buffer_directory, filename)
+        if not os.path.exists( filename ):
+            log.info( 'No such file: %s', filename )
+            return 
         subprocess.Popen( [
             'gst-launch',
             'filesrc','location=%s'%(
-                os.path.join( self.buffer_directory, filename),
+                filename,
             ),'!',
             'audioparse',
                 'width=16','depth=16',

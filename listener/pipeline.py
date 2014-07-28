@@ -222,13 +222,8 @@ def main():
             else:
                 print( '%(type) 7s #%(uttid)05s %(text)s'%result )
                 
-
 def rawplay():
-    subprocess.Popen( [
-        'gst-launch',
-        'filesrc','location=%s'%(sys.argv[1]),'!',
-        'audioparse','width=16','rate=8000','depth=16','signed=true','channels=1','!',
-        'audiorate','!',
-        'audioconvert','!',
-        'alsasink'
-    ]).communicate()
+    """Play file from the default context (or an absolute pathname)"""
+    context = context.Context( 'default' )
+    filename = sys.argv[1]
+    return context.rawplay( filename )
