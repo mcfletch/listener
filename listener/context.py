@@ -252,3 +252,21 @@ class Context( object ):
             except Exception as err:
                 pass 
     
+    def rawplay(self, filename):
+        log.info( 'Playing raw file: %s', filename )
+        subprocess.Popen( [
+            'gst-launch',
+            'filesrc','location=%s'%(
+                os.path.join( self.buffer_directory, filename),
+            ),'!',
+            'audioparse',
+                'width=16','depth=16',
+                'signed=true',
+                'rate=8000',
+                'channels=1',
+                '!',
+            'audiorate','!',
+            'audioconvert','!',
+            'alsasink'
+        ]).communicate()
+        log.info( 'Finished playing' )
