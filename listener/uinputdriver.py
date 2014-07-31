@@ -173,15 +173,15 @@ class UInput( object ):
 def main():
     logging.basicConfig( level=logging.INFO )
     uinput = UInput()
-    with uinput.key_pressed( 'LEFTALT' ):
-        with uinput.key_pressed( 'TAB' ):
-            log.info( 'Switching to another window' )
-    uinput.sync()
-    # sigh, again, takes a while to switch and the input system 
-    # doesn't take into account that alt-tab was intended to switch 
-    # focus to a new window :( 
-    time.sleep( .1 )
     try:
+        with uinput.key_pressed( 'LEFTALT' ):
+            with uinput.key_pressed( 'TAB' ):
+                log.info( 'Switching to another window' )
+        uinput.sync()
+        # sigh, again, takes a while to switch and the input system 
+        # doesn't take into account that alt-tab was intended to switch 
+        # focus to a new window :( 
+        time.sleep( .1 )
         for char in 'hello world':
             uinput.send_keypress(char)
     finally:
