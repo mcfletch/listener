@@ -192,6 +192,14 @@ def rebuild_mapping():
     content = json.dumps( mapping )
     with open( KEY_MAPPING_FILE,'w' ) as fh:
         fh.write( content )
+    # TODO: use user's key-map file to add mappings from 
+    # common characters to the key+modifier 
+    # e.g. /usr/share/rdesktop/keymaps/en-us
+    # Or use libxkbcommon, which is supposed to be X/Wayland 
+    # compatible and *looks* like it may provide the functions
+    # we need (i.e. map from "keysym to utf-8" and some way to 
+    # iterate over all keysyms checking if they have a utf-8 
+    # representation)
 
 if __name__ == "__main__":
     main()
