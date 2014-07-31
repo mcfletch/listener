@@ -1,7 +1,9 @@
 """Spike test for uinput generation of key events"""
-import os, sys, logging, select, fcntl, time
+import os, sys, logging, select, fcntl, time, json
 import ctypes
 log = logging.getLogger( __name__ )
+HERE = os.path.dirname( __file__ )
+KEY_MAPPING_FILE = os.path.join( HERE, 'uinput-mapping.json' )
 
 ABS_MAX = 0x3f
 ABS_CNT = ABS_MAX + 1
@@ -142,24 +144,33 @@ def main():
             raise RuntimeError( 'Unable to cleanly shut down device' )
 
 KEY_MAPPING = None
-def get_key_mapping():
+def get_key_mapping(force_rescan=False):
     global KEY_MAPPING
     if KEY_MAPPING is None:
-        lines = open( '/usr/include/linux/input.h' ).readlines()
-        mapping = {}
-        for key,value in [
-            line[8:].strip().split()[:2] 
-            for line in lines if line.startswith( '#define KEY_' )
-        ]:
-            try:
-                value = int(value)
-            except ValueError as err:
-                pass 
-            else:
-                mapping[key[4:]] = value 
-        mapping[' '] = mapping['SPACE']
-        KEY_MAPPING = mapping
+        if (not force_rescan) and os.path.exists( KEY_MAPPING_FILE ):
+            KEY_MAPPING = json.loads( open(KEY_MAPPING_FILE).read())
+        else:
+            lines = open( '/usr/include/linux/input.h' ).readlines()
+            mapping = {}
+            for key,value in [
+                line[8:].strip().split()[:2] 
+                for line in lines if line.startswith( '#define KEY_' )
+            ]:
+                try:
+                    value = int(value)
+                except ValueError as err:
+                    pass 
+                else:
+                    mapping[key[4:]] = value 
+            mapping[' '] = mapping['SPACE']
+            KEY_MAPPING = mapping
     return KEY_MAPPING
+
+def rebuild_mapping():
+    mapping = get_key_mapping(force_rescan=True)
+    content = json.dumps( mapping )
+    with open( KEY_MAPPING_FILE,'w' ) as fh:
+        fh.write( content )
 
 if __name__ == "__main__":
     main()

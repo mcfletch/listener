@@ -43,6 +43,9 @@ if __name__ == "__main__":
                 'listener-arpa=listener.ipatoarpabet:translate_main',
                 
                 'listener-qt=listener.qtgui:main',
+                
+                'listener-uinput-device=listener.uinputdriver:main',
+                'listener-uinput-rebuild-mapping=listener.uinputdriver:rebuild_mapping',
             ],
         ),
         zip_safe=False,
