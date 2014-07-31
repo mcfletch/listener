@@ -190,6 +190,9 @@ class UInput( object ):
         '"':'SHIFT+APOSTROPHE',
         '`':'GRAVE',
         '~':'SHIFT+GRAVE',
+        'ALT':'LEFTALT',
+        'CTRL':'LEFTCTRL',
+        'META': 'LEFTMETA',
     }
     @classmethod
     def get_key_mapping(cls,force_rescan=False):
@@ -209,6 +212,10 @@ class UInput( object ):
                         pass 
                     else:
                         mapping[key[4:]] = [ value ]
+                for key,value in mapping.items():
+                    if len(key) == 1:
+                        mapping[key.lower()] = value 
+                        mapping[key] = mapping['LEFTSHIFT'] + value
                 mapping['SHIFT'] = mapping['LEFTSHIFT']
                 for key,alias in cls.MANUAL_MAPPING.items():
                     to_type = []
@@ -220,23 +227,82 @@ class UInput( object ):
     def close( self ):
         if fcntl.ioctl(self.fd, UI_DEV_DESTROY) < 0:
             raise RuntimeError( 'Unable to cleanly shut down device' )
-        
+
+    def char_translate( self, char ):
+        mapping = self.get_key_mapping()
+        if char in mapping:
+            return mapping[char]
+        elif char.upper() in mapping:
+            if len(char) == 1:
+                # alpha character lowercase
+                return [mapping['SHIFT'][0]]+mapping[char.upper()]
+            else:
+                # special character spelled lower-case
+                return mapping[char.upper()]
+        else:
+            raise ValueError( 'Unrecognized key: %s', char )
+    
+    def run_input_string( self, input ):
+        strokes = self.parse_input_string( input )
+        for stroke in strokes:
+            if stroke:
+                with self.key_pressed( stroke ):
+                    log.info( 'Sending: %s', stroke )
+                self.sync()
+            else:
+                time.sleep( .1 )
+            
+    def parse_input_string( self, input ):
+        """Given an input string, produce set of things to send"""
+        result = []
+        mapping = self.get_key_mapping()
+        while input:
+            if input.startswith( '<>>' ):
+                input = input[3:]
+                result.append( mapping['>'])
+            elif input.startswith( '<<>' ):
+                result.append( mapping['<'])
+                input = input[3:]
+            elif input.startswith( '<' ):
+                stop = input.index('>')
+                name = input[1:stop]
+                input = input[stop+1:]
+                
+                if name == 'PAUSE':
+                    result.append( [] )
+                else:
+                    sub_result = []
+                    for element in name.split('+'):
+                        try:
+                            sub_result.extend( self.char_translate(element) )
+                        except ValueError as err:
+                            log.warn( 'Could not type %s', name )
+                    result.append( sub_result )
+            else:
+                try:
+                    result.append( self.char_translate( input[0] ))
+                except ValueError as err:
+                    log.warn( 'Cannot type character: %s', input[0])
+                input = input[1:]
+        log.info( 'Translated commands: %s', result )
+        return result
     
 def main():
     logging.basicConfig( level=logging.DEBUG )
     uinput = UInput()
     try:
-        with uinput.key_pressed( 'LEFTALT' ):
-            with uinput.key_pressed( 'TAB' ):
-                log.info( 'Switching to another window' )
-        uinput.sync()
-        # sigh, again, takes a while to switch and the input system 
-        # doesn't take into account that alt-tab was intended to switch 
-        # focus to a new window :( 
-        time.sleep( .1 )
-        for char in '#!@#$%^&*()_+':
-            uinput.send_keypress(char)
-        uinput.sync()
+        uinput.run_input_string( '''<alt+tab><PAUSE>Hello world<ENTER>''' )
+#        with uinput.key_pressed( 'LEFTALT' ):
+#            with uinput.key_pressed( 'TAB' ):
+#                log.info( 'Switching to another window' )
+#        uinput.sync()
+#        # sigh, again, takes a while to switch and the input system 
+#        # doesn't take into account that alt-tab was intended to switch 
+#        # focus to a new window :( 
+#        time.sleep( .1 )
+#        for char in '#!@#$%^&*()_+':
+#            uinput.send_keypress(char)
+#        uinput.sync()
     finally:
         uinput.close()
 
