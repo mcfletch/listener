@@ -1,6 +1,7 @@
 """Spike test for uinput generation of key events"""
 import os, sys, logging, select, fcntl, time, json
 import ctypes
+import contextlib
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 KEY_MAPPING_FILE = os.path.join( HERE, 'uinput-mapping.json' )
@@ -106,6 +107,12 @@ def _send_event( fd, type=EV_KEY, code=65, value=1 ):
     as_string = ctypes.string_at( ctypes.addressof(event),ctypes.sizeof(event))
     write_bytes( fd, as_string )
 
+@contextlib.contextmanager
+def key_pressed( fd, code ):
+    _send_event( fd, code=code, value=1 )
+    yield 
+    _send_event( fd, code=code, value=0 )
+    
 def send_keypress( fd, key='a'):
     mapping = get_key_mapping()
     uc = key.upper()
@@ -116,18 +123,17 @@ def send_keypress( fd, key='a'):
         return
     if not key.islower():
         # we want to be able to pass explicit command codes as uppercase too
-        log.debug( 'Setting shift' )
-        _send_event( fd, code=mapping['RIGHTSHIFT'], value=1 )
-    log.debug( 'Sending key %r(%r)', key, code )
-    _send_event( fd, code=code, value=1 )
-    _send_event( fd, code=code, value=0 )
-    if not key.islower():
-        # we want to be able to pass explicit command codes as uppercase too
-        _send_event( fd, code=mapping['RIGHTSHIFT'], value=0 )
-
+        with key_pressed(fd,code=mapping['RIGHTSHIFT']):
+            with key_pressed(fd,code=code):
+                log.debug( 'Sending key %r(%r)', key, code )
+                pass
+    else:
+        with key_pressed(fd,code=code):
+            log.debug( 'Sending key %r(%r)', key, code )
+            pass
+        
 def sync(fd):
     _send_event( fd, type=EV_SYN, code=SYN_REPORT,value=0)
-    _send_event( fd, type=EV_SYN, code=SYN_REPORT,value=1)
         
 def main():
     logging.basicConfig( level=logging.INFO )
@@ -136,6 +142,12 @@ def main():
     # able to send events... but there doesn't seem to be a way to 
     # get a notification when it is over...
     time.sleep( .01 )
+    mapping = get_key_mapping()
+    with key_pressed( fd, code=mapping['LEFTALT']):
+        with key_pressed( fd, code=mapping['TAB'] ):
+            log.info( 'Switching to another window' )
+    sync(fd)
+    time.sleep( .1 )
     try:
         for char in 'hello world':
             send_keypress(fd,char)
