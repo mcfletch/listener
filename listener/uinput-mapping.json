@@ -1,1 +1,859 @@
-{"SCROLLLOCK": 70, "DOCUMENTS": 235, "MOVE": 175, "HANGEUL": 122, "UWB": 239, "F23": 193, "F22": 192, "F21": 191, "F20": 190, "DASHBOARD": 204, "FILE": 144, "F24": 194, "KBDILLUMDOWN": 229, "MINUS": 12, "NEXTSONG": 163, "PAUSECD": 201, "DIRECTION": 153, "POWER": 116, "PLAYCD": 200, "PAGEUP": 104, "CALC": 140, "0": 11, "4": 5, "TAB": 15, "FRONT": 132, "8": 9, "RO": 89, "PLAYPAUSE": 164, "SENDFILE": 145, "COMPOSE": 127, "EJECTCLOSECD": 162, "D": 32, "RFKILL": 247, "H": 35, "HANJA": 123, "L": 38, "BACK": 158, "P": 25, "CAPSLOCK": 58, "RIGHTALT": 100, "T": 20, "SLASH": 53, "ENTER": 28, "X": 45, "KATAKANA": 90, "SWITCHVIDEOMODE": 227, "BRIGHTNESS_ZERO": 244, "STOP": 128, "YEN": 124, "EDIT": 176, "MENU": 139, "SEND": 231, "KPASTERISK": 55, "CONNECT": 218, "BRIGHTNESS_CYCLE": 243, "WAKEUP": 143, "MAIL": 155, "BOOKMARKS": 156, "SAVE": 234, "DELETE": 111, "SOUND": 213, "PROG1": 148, "SCALE": 120, "KPEQUAL": 117, "HELP": 138, "SETUP": 141, "PLAY": 207, "DOWN": 108, "WLAN": 238, "PAUSE": 119, "BACKSPACE": 14, "NEW": 181, "PRINT": 210, "RIGHTSHIFT": 54, "DISPLAY_OFF": 245, "FIND": 136, "KP0": 82, "KP1": 79, "KP2": 80, "KP3": 81, "KP4": 75, "KP5": 76, "KP6": 77, "KP7": 71, "KP8": 72, "KP9": 73, "SPACE": 57, "EMAIL": 215, "PHONE": 169, "3": 4, "CAMERA": 212, "KPJPCOMMA": 95, "7": 8, "SPORT": 220, "DELETEFILE": 146, "C": 46, "MUHENKAN": 94, "END": 107, "G": 34, " ": 57, "MEDIA": 226, "K": 37, "RIGHTBRACE": 27, "O": 24, "KPDOT": 83, "RIGHTCTRL": 97, "VIDEO_PREV": 242, "S": 31, "F19": 189, "REFRESH": 173, "W": 17, "F12": 88, "F13": 183, "F10": 68, "KPPLUS": 78, "LEFTMETA": 125, "KPLEFTPAREN": 179, "F14": 184, "F15": 185, "WWW": 150, "LEFTBRACE": 26, "CLOSECD": 160, "BRIGHTNESSUP": 225, "UP": 103, "WWAN": 246, "LEFTSHIFT": 42, "MICMUTE": 248, "ZENKAKUHANKAKU": 85, "U": 22, "FASTFORWARD": 208, "KPSLASH": 98, "RIGHTMETA": 126, "MSDOS": 151, "MUTE": 113, "UNKNOWN": 240, "RESERVED": 0, "CYCLEWINDOWS": 154, "FORWARD": 159, "KPPLUSMINUS": 118, "CHAT": 216, "HOME": 102, "XFER": 147, "OPEN": 134, "DOT": 52, "F11": 87, "F16": 186, "FINANCE": 219, "SEMICOLON": 39, "HIRAGANA": 91, "REDO": 182, "BACKSLASH": 43, "KPRIGHTPAREN": 180, "2": 3, "6": 7, "CLOSE": 206, "HP": 211, "LEFT": 105, "AGAIN": 129, "F17": 187, "B": 48, "F": 33, "FORWARDMAIL": 233, "J": 36, "N": 49, "R": 19, "V": 47, "REPLY": 232, "Z": 44, "102ND": 86, "VOLUMEUP": 115, "F1": 59, "F2": 60, "F3": 61, "F4": 62, "F5": 63, "F6": 64, "F7": 65, "F8": 66, "F9": 67, "KPENTER": 96, "BASSBOOST": 209, "STOPCD": 166, "EXIT": 174, "REWIND": 168, "LEFTCTRL": 29, "SHOP": 221, "COFFEE": 152, "KPMINUS": 74, "EQUAL": 13, "UNDO": 131, "KPCOMMA": 121, "CUT": 137, "BRIGHTNESSDOWN": 224, "KBDILLUMTOGGLE": 228, "EJECTCD": 161, "INSERT": 110, "SUSPEND": 205, "VIDEO_NEXT": 241, "KATAKANAHIRAGANA": 93, "HOMEPAGE": 172, "QUESTION": 214, "1": 2, "RECORD": 167, "5": 6, "PAGEDOWN": 109, "9": 10, "SCROLLUP": 177, "PASTE": 135, "GRAVE": 41, "A": 30, "ISO": 170, "PROG3": 202, "HENKAN": 92, "E": 18, "PROG4": 203, "LEFTALT": 56, "I": 23, "MACRO": 112, "M": 50, "SEARCH": 217, "Q": 16, "COMPUTER": 157, "ESC": 1, "PROPS": 130, "Y": 21, "VOLUMEDOWN": 114, "COPY": 133, "PROG2": 149, "RIGHT": 106, "KBDILLUMUP": 230, "BATTERY": 236, "CONFIG": 171, "LINEFEED": 101, "BLUETOOTH": 237, "PREVIOUSSONG": 165, "SCROLLDOWN": 178, "SLEEP": 142, "SYSRQ": 99, "CANCEL": 223, "F18": 188, "APOSTROPHE": 40, "NUMLOCK": 69, "COMMA": 51, "ALTERASE": 222}
+{
+  "\t": [
+    15
+  ], 
+  "\n": [
+    28
+  ], 
+  "\r": [
+    28
+  ], 
+  " ": [
+    57
+  ], 
+  "!": [
+    42, 
+    2
+  ], 
+  "\"": [
+    42, 
+    40
+  ], 
+  "#": [
+    42, 
+    4
+  ], 
+  "$": [
+    42, 
+    5
+  ], 
+  "%": [
+    42, 
+    6
+  ], 
+  "&": [
+    42, 
+    8
+  ], 
+  "'": [
+    40
+  ], 
+  "(": [
+    42, 
+    10
+  ], 
+  ")": [
+    42, 
+    11
+  ], 
+  "*": [
+    42, 
+    9
+  ], 
+  "+": [
+    42, 
+    13
+  ], 
+  ",": [
+    51
+  ], 
+  "-": [
+    12
+  ], 
+  ".": [
+    52
+  ], 
+  "/": [
+    53
+  ], 
+  "0": [
+    11
+  ], 
+  "1": [
+    2
+  ], 
+  "102ND": [
+    86
+  ], 
+  "2": [
+    3
+  ], 
+  "3": [
+    4
+  ], 
+  "4": [
+    5
+  ], 
+  "5": [
+    6
+  ], 
+  "6": [
+    7
+  ], 
+  "7": [
+    8
+  ], 
+  "8": [
+    9
+  ], 
+  "9": [
+    10
+  ], 
+  ":": [
+    42, 
+    39
+  ], 
+  ";": [
+    39
+  ], 
+  "<": [
+    42, 
+    51
+  ], 
+  "=": [
+    13
+  ], 
+  ">": [
+    42, 
+    52
+  ], 
+  "?": [
+    42, 
+    53
+  ], 
+  "@": [
+    42, 
+    3
+  ], 
+  "A": [
+    30
+  ], 
+  "AGAIN": [
+    129
+  ], 
+  "ALTERASE": [
+    222
+  ], 
+  "APOSTROPHE": [
+    40
+  ], 
+  "B": [
+    48
+  ], 
+  "BACK": [
+    158
+  ], 
+  "BACKSLASH": [
+    43
+  ], 
+  "BACKSPACE": [
+    14
+  ], 
+  "BASSBOOST": [
+    209
+  ], 
+  "BATTERY": [
+    236
+  ], 
+  "BLUETOOTH": [
+    237
+  ], 
+  "BOOKMARKS": [
+    156
+  ], 
+  "BRIGHTNESSDOWN": [
+    224
+  ], 
+  "BRIGHTNESSUP": [
+    225
+  ], 
+  "BRIGHTNESS_CYCLE": [
+    243
+  ], 
+  "BRIGHTNESS_ZERO": [
+    244
+  ], 
+  "C": [
+    46
+  ], 
+  "CALC": [
+    140
+  ], 
+  "CAMERA": [
+    212
+  ], 
+  "CANCEL": [
+    223
+  ], 
+  "CAPSLOCK": [
+    58
+  ], 
+  "CHAT": [
+    216
+  ], 
+  "CLOSE": [
+    206
+  ], 
+  "CLOSECD": [
+    160
+  ], 
+  "COFFEE": [
+    152
+  ], 
+  "COMMA": [
+    51
+  ], 
+  "COMPOSE": [
+    127
+  ], 
+  "COMPUTER": [
+    157
+  ], 
+  "CONFIG": [
+    171
+  ], 
+  "CONNECT": [
+    218
+  ], 
+  "COPY": [
+    133
+  ], 
+  "CUT": [
+    137
+  ], 
+  "CYCLEWINDOWS": [
+    154
+  ], 
+  "D": [
+    32
+  ], 
+  "DASHBOARD": [
+    204
+  ], 
+  "DELETE": [
+    111
+  ], 
+  "DELETEFILE": [
+    146
+  ], 
+  "DIRECTION": [
+    153
+  ], 
+  "DISPLAY_OFF": [
+    245
+  ], 
+  "DOCUMENTS": [
+    235
+  ], 
+  "DOT": [
+    52
+  ], 
+  "DOWN": [
+    108
+  ], 
+  "E": [
+    18
+  ], 
+  "EDIT": [
+    176
+  ], 
+  "EJECTCD": [
+    161
+  ], 
+  "EJECTCLOSECD": [
+    162
+  ], 
+  "EMAIL": [
+    215
+  ], 
+  "END": [
+    107
+  ], 
+  "ENTER": [
+    28
+  ], 
+  "EQUAL": [
+    13
+  ], 
+  "ESC": [
+    1
+  ], 
+  "EXIT": [
+    174
+  ], 
+  "F": [
+    33
+  ], 
+  "F1": [
+    59
+  ], 
+  "F10": [
+    68
+  ], 
+  "F11": [
+    87
+  ], 
+  "F12": [
+    88
+  ], 
+  "F13": [
+    183
+  ], 
+  "F14": [
+    184
+  ], 
+  "F15": [
+    185
+  ], 
+  "F16": [
+    186
+  ], 
+  "F17": [
+    187
+  ], 
+  "F18": [
+    188
+  ], 
+  "F19": [
+    189
+  ], 
+  "F2": [
+    60
+  ], 
+  "F20": [
+    190
+  ], 
+  "F21": [
+    191
+  ], 
+  "F22": [
+    192
+  ], 
+  "F23": [
+    193
+  ], 
+  "F24": [
+    194
+  ], 
+  "F3": [
+    61
+  ], 
+  "F4": [
+    62
+  ], 
+  "F5": [
+    63
+  ], 
+  "F6": [
+    64
+  ], 
+  "F7": [
+    65
+  ], 
+  "F8": [
+    66
+  ], 
+  "F9": [
+    67
+  ], 
+  "FASTFORWARD": [
+    208
+  ], 
+  "FILE": [
+    144
+  ], 
+  "FINANCE": [
+    219
+  ], 
+  "FIND": [
+    136
+  ], 
+  "FORWARD": [
+    159
+  ], 
+  "FORWARDMAIL": [
+    233
+  ], 
+  "FRONT": [
+    132
+  ], 
+  "G": [
+    34
+  ], 
+  "GRAVE": [
+    41
+  ], 
+  "H": [
+    35
+  ], 
+  "HANGEUL": [
+    122
+  ], 
+  "HANJA": [
+    123
+  ], 
+  "HELP": [
+    138
+  ], 
+  "HENKAN": [
+    92
+  ], 
+  "HIRAGANA": [
+    91
+  ], 
+  "HOME": [
+    102
+  ], 
+  "HOMEPAGE": [
+    172
+  ], 
+  "HP": [
+    211
+  ], 
+  "I": [
+    23
+  ], 
+  "INSERT": [
+    110
+  ], 
+  "ISO": [
+    170
+  ], 
+  "J": [
+    36
+  ], 
+  "K": [
+    37
+  ], 
+  "KATAKANA": [
+    90
+  ], 
+  "KATAKANAHIRAGANA": [
+    93
+  ], 
+  "KBDILLUMDOWN": [
+    229
+  ], 
+  "KBDILLUMTOGGLE": [
+    228
+  ], 
+  "KBDILLUMUP": [
+    230
+  ], 
+  "KP0": [
+    82
+  ], 
+  "KP1": [
+    79
+  ], 
+  "KP2": [
+    80
+  ], 
+  "KP3": [
+    81
+  ], 
+  "KP4": [
+    75
+  ], 
+  "KP5": [
+    76
+  ], 
+  "KP6": [
+    77
+  ], 
+  "KP7": [
+    71
+  ], 
+  "KP8": [
+    72
+  ], 
+  "KP9": [
+    73
+  ], 
+  "KPASTERISK": [
+    55
+  ], 
+  "KPCOMMA": [
+    121
+  ], 
+  "KPDOT": [
+    83
+  ], 
+  "KPENTER": [
+    96
+  ], 
+  "KPEQUAL": [
+    117
+  ], 
+  "KPJPCOMMA": [
+    95
+  ], 
+  "KPLEFTPAREN": [
+    179
+  ], 
+  "KPMINUS": [
+    74
+  ], 
+  "KPPLUS": [
+    78
+  ], 
+  "KPPLUSMINUS": [
+    118
+  ], 
+  "KPRIGHTPAREN": [
+    180
+  ], 
+  "KPSLASH": [
+    98
+  ], 
+  "L": [
+    38
+  ], 
+  "LEFT": [
+    105
+  ], 
+  "LEFTALT": [
+    56
+  ], 
+  "LEFTBRACE": [
+    26
+  ], 
+  "LEFTCTRL": [
+    29
+  ], 
+  "LEFTMETA": [
+    125
+  ], 
+  "LEFTSHIFT": [
+    42
+  ], 
+  "LINEFEED": [
+    101
+  ], 
+  "M": [
+    50
+  ], 
+  "MACRO": [
+    112
+  ], 
+  "MAIL": [
+    155
+  ], 
+  "MEDIA": [
+    226
+  ], 
+  "MENU": [
+    139
+  ], 
+  "MICMUTE": [
+    248
+  ], 
+  "MINUS": [
+    12
+  ], 
+  "MOVE": [
+    175
+  ], 
+  "MSDOS": [
+    151
+  ], 
+  "MUHENKAN": [
+    94
+  ], 
+  "MUTE": [
+    113
+  ], 
+  "N": [
+    49
+  ], 
+  "NEW": [
+    181
+  ], 
+  "NEXTSONG": [
+    163
+  ], 
+  "NUMLOCK": [
+    69
+  ], 
+  "O": [
+    24
+  ], 
+  "OPEN": [
+    134
+  ], 
+  "P": [
+    25
+  ], 
+  "PAGEDOWN": [
+    109
+  ], 
+  "PAGEUP": [
+    104
+  ], 
+  "PASTE": [
+    135
+  ], 
+  "PAUSE": [
+    119
+  ], 
+  "PAUSECD": [
+    201
+  ], 
+  "PHONE": [
+    169
+  ], 
+  "PLAY": [
+    207
+  ], 
+  "PLAYCD": [
+    200
+  ], 
+  "PLAYPAUSE": [
+    164
+  ], 
+  "POWER": [
+    116
+  ], 
+  "PREVIOUSSONG": [
+    165
+  ], 
+  "PRINT": [
+    210
+  ], 
+  "PROG1": [
+    148
+  ], 
+  "PROG2": [
+    149
+  ], 
+  "PROG3": [
+    202
+  ], 
+  "PROG4": [
+    203
+  ], 
+  "PROPS": [
+    130
+  ], 
+  "Q": [
+    16
+  ], 
+  "QUESTION": [
+    214
+  ], 
+  "R": [
+    19
+  ], 
+  "RECORD": [
+    167
+  ], 
+  "REDO": [
+    182
+  ], 
+  "REFRESH": [
+    173
+  ], 
+  "REPLY": [
+    232
+  ], 
+  "RESERVED": [
+    0
+  ], 
+  "REWIND": [
+    168
+  ], 
+  "RFKILL": [
+    247
+  ], 
+  "RIGHT": [
+    106
+  ], 
+  "RIGHTALT": [
+    100
+  ], 
+  "RIGHTBRACE": [
+    27
+  ], 
+  "RIGHTCTRL": [
+    97
+  ], 
+  "RIGHTMETA": [
+    126
+  ], 
+  "RIGHTSHIFT": [
+    54
+  ], 
+  "RO": [
+    89
+  ], 
+  "S": [
+    31
+  ], 
+  "SAVE": [
+    234
+  ], 
+  "SCALE": [
+    120
+  ], 
+  "SCROLLDOWN": [
+    178
+  ], 
+  "SCROLLLOCK": [
+    70
+  ], 
+  "SCROLLUP": [
+    177
+  ], 
+  "SEARCH": [
+    217
+  ], 
+  "SEMICOLON": [
+    39
+  ], 
+  "SEND": [
+    231
+  ], 
+  "SENDFILE": [
+    145
+  ], 
+  "SETUP": [
+    141
+  ], 
+  "SHIFT": [
+    42
+  ], 
+  "SHOP": [
+    221
+  ], 
+  "SLASH": [
+    53
+  ], 
+  "SLEEP": [
+    142
+  ], 
+  "SOUND": [
+    213
+  ], 
+  "SPACE": [
+    57
+  ], 
+  "SPORT": [
+    220
+  ], 
+  "STOP": [
+    128
+  ], 
+  "STOPCD": [
+    166
+  ], 
+  "SUSPEND": [
+    205
+  ], 
+  "SWITCHVIDEOMODE": [
+    227
+  ], 
+  "SYSRQ": [
+    99
+  ], 
+  "T": [
+    20
+  ], 
+  "TAB": [
+    15
+  ], 
+  "U": [
+    22
+  ], 
+  "UNDO": [
+    131
+  ], 
+  "UNKNOWN": [
+    240
+  ], 
+  "UP": [
+    103
+  ], 
+  "UWB": [
+    239
+  ], 
+  "V": [
+    47
+  ], 
+  "VIDEO_NEXT": [
+    241
+  ], 
+  "VIDEO_PREV": [
+    242
+  ], 
+  "VOLUMEDOWN": [
+    114
+  ], 
+  "VOLUMEUP": [
+    115
+  ], 
+  "W": [
+    17
+  ], 
+  "WAKEUP": [
+    143
+  ], 
+  "WLAN": [
+    238
+  ], 
+  "WWAN": [
+    246
+  ], 
+  "WWW": [
+    150
+  ], 
+  "X": [
+    45
+  ], 
+  "XFER": [
+    147
+  ], 
+  "Y": [
+    21
+  ], 
+  "YEN": [
+    124
+  ], 
+  "Z": [
+    44
+  ], 
+  "ZENKAKUHANKAKU": [
+    85
+  ], 
+  "[": [
+    26
+  ], 
+  "\\": [
+    43
+  ], 
+  "]": [
+    27
+  ], 
+  "^": [
+    42, 
+    7
+  ], 
+  "_": [
+    42, 
+    12
+  ], 
+  "`": [
+    41
+  ], 
+  "{": [
+    42, 
+    26
+  ], 
+  "}": [
+    42, 
+    27
+  ], 
+  "~": [
+    42, 
+    41
+  ]
+}

@@ -117,9 +117,18 @@ class UInput( object ):
     def key_pressed( self, code ):
         if isinstance( code, (str,unicode)):
             code = self.get_key_mapping()[code]
-        self._send_event( code=code, value=1 )
-        yield 
-        self._send_event( code=code, value=0 )
+        if isinstance( code, (int,long)):
+            self._send_event( code=code, value=1 )
+            yield 
+            self._send_event( code=code, value=0 )
+        else:
+            log.debug( 'Keys: %s', code )
+            for i in code:
+                self._send_event( code=i, value=1 )
+            yield 
+            for i in code[::-1]:
+                self._send_event( code=i, value=0 )
+            
     
     def send_keypress( self, key='a'):
         mapping = self.get_key_mapping()
@@ -131,7 +140,7 @@ class UInput( object ):
             return
         if not key.islower():
             # we want to be able to pass explicit command codes as uppercase too
-            with self.key_pressed(code=mapping['RIGHTSHIFT']):
+            with self.key_pressed(code=mapping['LEFTSHIFT']):
                 with self.key_pressed(code=code):
                     log.debug( 'Sending key %r(%r)', key, code )
                     pass
@@ -144,6 +153,44 @@ class UInput( object ):
         self._send_event( type=EV_SYN, code=SYN_REPORT,value=0)
     
     KEY_MAPPING = None
+    MANUAL_MAPPING = {
+        # US-english manual key-mapping, yech
+        ' ':'SPACE',
+        ',':'COMMA',
+        ';':'SEMICOLON',
+        ':':'SHIFT+SEMICOLON',
+        '\\':'BACKSLASH',
+        '/':'SLASH',
+        '\n':'ENTER',
+        '\r':'ENTER',
+        '\t':'TAB',
+        '.': 'DOT',
+        '[': 'LEFTBRACE',
+        ']': 'RIGHTBRACE',
+        '{': 'SHIFT+LEFTBRACE',
+        '}': 'SHIFT+RIGHTBRACE',
+        '=': 'EQUAL',
+        '!': 'SHIFT+1',
+        '@': 'SHIFT+2',
+        '#': 'SHIFT+3',
+        '$': 'SHIFT+4',
+        '%': 'SHIFT+5',
+        '^': 'SHIFT+6',
+        '&': 'SHIFT+7',
+        '*': 'SHIFT+8',
+        '(': 'SHIFT+9',
+        ')': 'SHIFT+0',
+        '<': 'SHIFT+COMMA',
+        '>': 'SHIFT+DOT',
+        '_': 'SHIFT+MINUS',
+        '?': 'SHIFT+SLASH',
+        '-': 'MINUS',
+        '+': 'SHIFT+EQUAL',
+        "'":'APOSTROPHE',
+        '"':'SHIFT+APOSTROPHE',
+        '`':'GRAVE',
+        '~':'SHIFT+GRAVE',
+    }
     @classmethod
     def get_key_mapping(cls,force_rescan=False):
         if cls.KEY_MAPPING is None:
@@ -161,8 +208,13 @@ class UInput( object ):
                     except ValueError as err:
                         pass 
                     else:
-                        mapping[key[4:]] = value 
-                mapping[' '] = mapping['SPACE']
+                        mapping[key[4:]] = [ value ]
+                mapping['SHIFT'] = mapping['LEFTSHIFT']
+                for key,alias in cls.MANUAL_MAPPING.items():
+                    to_type = []
+                    for item in alias.split('+'):
+                        to_type += mapping[item]
+                    mapping[key] = to_type
                 cls.KEY_MAPPING = mapping
         return cls.KEY_MAPPING
     def close( self ):
@@ -171,7 +223,7 @@ class UInput( object ):
         
     
 def main():
-    logging.basicConfig( level=logging.INFO )
+    logging.basicConfig( level=logging.DEBUG )
     uinput = UInput()
     try:
         with uinput.key_pressed( 'LEFTALT' ):
@@ -182,14 +234,15 @@ def main():
         # doesn't take into account that alt-tab was intended to switch 
         # focus to a new window :( 
         time.sleep( .1 )
-        for char in 'hello world':
+        for char in '#!@#$%^&*()_+':
             uinput.send_keypress(char)
+        uinput.sync()
     finally:
         uinput.close()
 
 def rebuild_mapping():
     mapping = UInput.get_key_mapping(force_rescan=True)
-    content = json.dumps( mapping )
+    content = json.dumps( mapping, indent=2,sort_keys=True )
     with open( KEY_MAPPING_FILE,'w' ) as fh:
         fh.write( content )
     # TODO: use user's key-map file to add mappings from 
