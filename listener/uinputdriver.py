@@ -122,7 +122,6 @@ class UInput( object ):
             yield 
             self._send_event( code=code, value=0 )
         else:
-            log.debug( 'Keys: %s', code )
             for i in code:
                 self._send_event( code=i, value=1 )
             yield 
@@ -233,12 +232,8 @@ class UInput( object ):
         if char in mapping:
             return mapping[char]
         elif char.upper() in mapping:
-            if len(char) == 1:
-                # alpha character lowercase
-                return [mapping['SHIFT'][0]]+mapping[char.upper()]
-            else:
-                # special character spelled lower-case
-                return mapping[char.upper()]
+            # special key spelled lower-case
+            return mapping[char.upper()]
         else:
             raise ValueError( 'Unrecognized key: %s', char )
     
@@ -279,6 +274,8 @@ class UInput( object ):
                             log.warn( 'Could not type %s', name )
                     result.append( sub_result )
             else:
+                # TODO: could allow strings-of-letters to be dictated 
+                # in blocks (i.e. skip sync between them)
                 try:
                     result.append( self.char_translate( input[0] ))
                 except ValueError as err:
@@ -291,18 +288,7 @@ def main():
     logging.basicConfig( level=logging.DEBUG )
     uinput = UInput()
     try:
-        uinput.run_input_string( '''<alt+tab><PAUSE>Hello world<ENTER>''' )
-#        with uinput.key_pressed( 'LEFTALT' ):
-#            with uinput.key_pressed( 'TAB' ):
-#                log.info( 'Switching to another window' )
-#        uinput.sync()
-#        # sigh, again, takes a while to switch and the input system 
-#        # doesn't take into account that alt-tab was intended to switch 
-#        # focus to a new window :( 
-#        time.sleep( .1 )
-#        for char in '#!@#$%^&*()_+':
-#            uinput.send_keypress(char)
-#        uinput.sync()
+        uinput.run_input_string( '''<alt+tab><PAUSE>Hello world<ENTER><PAUSE><tab>Boo!''' )
     finally:
         uinput.close()
 
