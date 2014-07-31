@@ -15,14 +15,14 @@ Setup
 
 Dependencies::
 
-	$ apt-get install gstreamer0.10-pocketsphinx build-essential \
+    $ apt-get install gstreamer0.10-pocketsphinx build-essential \
         libsphinxbase1 sphinxbase-utils sphinxtrain \
         pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
         espeak
 
 Listener is a python library (using setuptools), use::
 
-	setup.py develop --user
+    setup.py develop --user
 
 to install.
 
