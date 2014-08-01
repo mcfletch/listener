@@ -166,6 +166,11 @@ TODO Items for Listener
       provided at the platform/desktop level
 
     * System tray icon for bringing up the GUI
+    
+    * Eliminate use of HTML control, i.e. create native Qt controls for 
+      everything
+    
+    * Raw-file playout is currently happening in the GUI thread
 
 * Email Interface Prototype
 

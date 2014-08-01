@@ -1,14 +1,17 @@
-Scratchpad for Pocketsphinx-based Linux Voice Dictation
-=======================================================
-
-What's the Idea?
-================
+Pocketsphinx-based Linux Voice Dictation Service
+================================================
 
 The basic idea is to see if `CMU Pocketsphinx`_ (a BSD-licensed continuous 
-voice recognition system) can be used to create a programmer's file editor
-that uses voice dictation not to eliminate use of the hands, but to allow them
-to be used far less by allowing text entry. While editing/navigation/command 
-and control will likely be looked at some time, they aren't a priority.
+voice recognition system) can be used to create a voice dictation service 
+reasonable enough to be used to drive a programmer's IDE/editor; not to 
+completely eliminate the use of hands, but to augment them such that most 
+identifiers and common code constructs can be dictated without touching the 
+keyboard.
+
+While editing/navigation/command and control will likely be looked at 
+some time, they aren't a priority. The basic approach *should* work for any 
+dictation task, it is just that the first task I want to work on is the 
+one for which I need a solution.
 
 Big Caveats:
 
@@ -19,7 +22,7 @@ Big Caveats:
  * This project is Linux-only.I am targetting modern (K)ubuntu desktops.
  * The use of pocketsphinx is actually somewhat incidental. While we are using 
    pocketsphinx right now, we should be able to switch out the engine for 
-   another at some point with little change to the GUI and related services.
+   another at some point with little change to the GUI and services.
    The reason I'm using Pocketsphinx is that it comes nicely packaged under 
    Ubuntu and provides pre-packaged language models for English-US dictation.
 
@@ -28,6 +31,10 @@ Big Caveats:
 
 Setup
 =====
+
+This is still very much a programmers/contributors only task. That said,
+these instructions *should* get you a working setup on a Kubuntu 14.04 
+machine.
 
 Dependencies::
 
@@ -48,8 +55,8 @@ Listener is a python library (using setuptools), use::
 
 to install.
 
-Utilities
-=========
+Executables
+===========
 
 `listener-qt`
 
@@ -151,5 +158,5 @@ more restrictive licenses.
       Licensed under the BSD License.
       https://github.com/yui/pure/blob/master/LICENSE.md
     
-    * normalize.css v1.1.3 | MIT License | git.io/normalize
+    * normalize.css v1.1.3 | MIT License | http://git.io/normalize
       Copyright (c) Nicolas Gallagher and Jonathan Neal
