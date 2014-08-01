@@ -84,9 +84,6 @@ class Context( object ):
     def audio_context_directory( self ):
         return os.path.join( self.directory, 'audiocontexts' )
     @one_shot
-    def recording_directory( self ):
-        return os.path.join( self.directory, 'recordings' )
-    @one_shot
     def buffer_directory( self ):
         return os.path.join( self.directory, 'buffer' )
     @one_shot
@@ -151,8 +148,6 @@ class Context( object ):
             raise RuntimeError( 
                 """We appear to be missing the ubuntu/debian package pocketsphinx-hmm-en-hub4wsj""" 
             )
-        if not os.path.exists( self.recording_directory ):
-            os.mkdir( self.recording_directory )
         if not os.path.exists( self.buffer_directory ):
             os.mkdir( self.buffer_directory )
         return self.directory
@@ -228,6 +223,9 @@ class AudioContext( object ):
     @one_shot
     def base_config_directory( self ):
         return os.path.join( self.context.audio_context_directory, self.key )
+    @one_shot
+    def recording_directory( self ):
+        return os.path.join( self.base_config_directory, 'recordings' )
     @one_shot
     def settings_file( self ):
         return os.path.join( self.base_config_directory, 'settings.json' )
@@ -328,7 +326,7 @@ class AudioContext( object ):
                 pass
     def training_records( self, private=True ):
         for json_file in glob.glob( 
-            os.path.join( self.context.recording_directory, '*.json' )
+            os.path.join( self.recording_directory, '*.json' )
         ):
             try:
                 record = json.loads( open( json_file ).read())
@@ -342,8 +340,8 @@ class AudioContext( object ):
                 pass 
     def transcription_filename( self, transcription ):
         """This isn't "safe" in the universal sense, but it's safe enough for now"""
-        if not os.path.exists( self.context.recording_directory ):
-            os.makedirs( self.context.recording_directory )
+        if not os.path.exists( self.recording_directory ):
+            os.makedirs( self.recording_directory )
         prefix = '_'.join([
             fragment for fragment in 
             ''.join([ c if c.isalnum() else '_' for c in transcription ]).split(
@@ -354,7 +352,7 @@ class AudioContext( object ):
         handle,filename = tempfile.mkstemp(
             suffix='.raw',
             prefix=prefix,
-            dir=self.context.recording_directory,
+            dir=self.recording_directory,
         )
         os.close( handle )
         return filename

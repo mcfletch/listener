@@ -19,8 +19,6 @@ class ContextTests( TestCase ):
         assert os.path.exists( self.context.language_model_directory )
     def test_hmm_directory( self ):
         assert os.path.exists( self.context.hmm_directory )
-    def test_recording_directory( self ):
-        assert os.path.exists( self.context.recording_directory )
     def test_buffer_directory( self ):
         assert os.path.exists( self.context.buffer_directory )
     def test_language_model_file( self ):
@@ -57,3 +55,5 @@ class AudioContextTests( TestCase ):
         assert os.path.exists( filename )
         base = os.path.basename( filename )
         assert base.startswith( 'this_is_a_test-' ), base
+        assert os.path.exists( self.audio_context.recording_directory )
+        
