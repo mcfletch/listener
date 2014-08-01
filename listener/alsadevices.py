@@ -8,7 +8,9 @@ def get_inputs( ):
     """Get alsa inputs (relies on having arecord present)"""
     output = subprocess.check_output( ['arecord','-l'] )
     cards = [line for line in output.splitlines() if line.startswith( 'card ' )]
-    results = []
+    results = [
+        ('Use Default','default'),
+    ]
     for line in cards:
         match = CARD_MATCH.match( line )
         if match:
@@ -20,7 +22,9 @@ def get_inputs( ):
 def get_outputs( ):
     output = subprocess.check_output( ['aplay','-l'] )
     cards = [line for line in output.splitlines() if line.startswith( 'card ' )]
-    results = []
+    results = [
+        ('Use Default','default'),
+    ]
     for line in cards:
         match = CARD_MATCH.match( line )
         if match:

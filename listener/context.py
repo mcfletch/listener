@@ -96,6 +96,14 @@ class Context( object ):
     def dictionary_file( self ):
         return os.path.join( self.language_model_directory, 'dictionary.dict' )
     
+    def available_alsa_devices( self ):
+        """Report the description,id for all available alsa devices"""
+        from . import alsadevices
+        return {
+            'input': alsadevices.get_inputs(),
+            'output': alsadevices.get_outputs(),
+        }
+    
     def get_audio_context( self, key=None ):
         """Should only be done on root context..."""
         key = key or 'default'
