@@ -51,7 +51,8 @@ Dependencies::
 
 Listener is a python library (using setuptools), use::
 
-    setup.py develop --user
+    $ git clone https://github.com/mcfletch/listener.git
+    $ python2.7 setup.py develop --user
 
 to install.
 
