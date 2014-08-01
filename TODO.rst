@@ -50,6 +50,10 @@ TODO Items for Listener
 
 * Audio training (started, but never tested)
 
+* Investigate whether we could use e.g. laptop mikes to do noise cancelling 
+  (i.e. subtract the signals such that the delta between the boom-mic and the 
+  ambient mic is what we feed to pocketsphinx)
+
 * Move the `uinput` device into a (system) DBus service with access 
   control to only allow `console` users to access it (access control file 
   already written, but packaging is needed)
