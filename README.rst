@@ -32,7 +32,7 @@ Big Caveats:
 Setup
 =====
 
-This is still very much a programmers/contributors only task. That said,
+This is still very much a programmers/contributors only project. That said,
 these instructions *should* get you a working setup on a Kubuntu 14.04 
 machine.
 
