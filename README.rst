@@ -19,6 +19,12 @@ Dependencies::
         libsphinxbase1 sphinxbase-utils sphinxtrain \
         pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
         espeak
+    
+    # for the Qt-based GUI
+    $ apt-get install python-pyside.qtcore python-pyside.qtwebkit
+
+    # for the Desktop service (uinput), currently unimplemented
+    $ apt-get install python-dbus
 
 Listener is a python library (using setuptools), use::
 
@@ -54,6 +60,17 @@ Utilities
 
     Re-extract IPA -> ARPABet statistical map, should the algorithm 
     be improved
+
+`listener-uinput-device`
+
+    Test case that tries to do a uinput "send keys like" operation
+
+`listener-uinput-rebuild-mapping`
+
+    Rebuilds the mapping from character to keystrokes. Currently this 
+    just reads a kernel header and applies some hand-coded keyboard 
+    mappings for a US-english keyboard. Eventually should use users 
+    local xkb mappings.
     
 Where are we Going?
 ===================

@@ -31,6 +31,11 @@ this script you may be further restricted than the rest of the package.
 import dbus
 from . import uinputdriver
 
+class UInputService( object ):
+    # one shot property to get the uinput and wait for initialization
+    def run_input_string( self, input_string ):
+        self.uinput.run_input_string( input_string )
+
 class ListenerService( object ):
     def context( self, key ):
         """Retrieve reference to the given listening context raise AttributeError on failure"""
