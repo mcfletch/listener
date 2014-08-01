@@ -4,7 +4,7 @@ Scratchpad for Pocketsphinx-based Linux Voice Dictation
 What's the Idea?
 ================
 
-The basic idea is to see if CMU Pocketsphinx (a BSD-licensed continuous 
+The basic idea is to see if `CMU Pocketsphinx`_ (a BSD-licensed continuous 
 voice recognition system) can be used to create a programmer's file editor
 that uses voice dictation not to eliminate use of the hands, but to allow them
 to be used far less by allowing text entry. While editing/navigation/command 
@@ -24,6 +24,7 @@ Big Caveats:
    Ubuntu and provides pre-packaged language models for English-US dictation.
 
 .. _`The TODO List`: ./TODO.rst
+.. _`CMU Pocketsphinx`: http://cmusphinx.sourceforge.net/pocketsphinx
 
 Setup
 =====
@@ -60,7 +61,6 @@ Utilities
     
     Note: this will download a *large* language model on first run. Currently
     that's done *before* the GUI starts, so the process will just seem to hang.
-    
 
 `listener-pipe`
 
