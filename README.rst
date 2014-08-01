@@ -13,7 +13,7 @@ and control will likely be looked at some time, they aren't a priority.
 Big Caveats:
 
  * This is a *very* early stage project
- * Seriously, it *does not* do anything yet See "The TODO List"_
+ * Seriously, it *does not* do anything yet See `The TODO List`_
  * This project is currently English-only (and English-US keyboard only). 
    It would be nice to support other languages, but it is not a priority for me
  * This project is Linux-only.I am targetting modern (K)ubuntu desktops.
@@ -23,7 +23,7 @@ Big Caveats:
    The reason I'm using Pocketsphinx is that it comes nicely packaged under 
    Ubuntu and provides pre-packaged language models for English-US dictation.
 
-.. _"The TODO List": ./TODO.rst
+.. _`The TODO List`: ./TODO.rst
 
 Setup
 =====
