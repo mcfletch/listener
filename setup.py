@@ -10,7 +10,7 @@ version = [
 if __name__ == "__main__":
     setup(
         name='listener',
-        version='1.0.0',
+        version=version,
         description='listener',
         long_description='listener',
         classifiers=[
