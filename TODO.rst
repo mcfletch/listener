@@ -46,9 +46,32 @@ TODO Items for Listener
     * should have button to "retrain" (add to the training repository)
       for each utterance (and particularly when correcting)
 
-* Language model recompilation (unstarted)
+* Language model recompilation
 
-* Audio training (started)
+* Audio training http://cmusphinx.sourceforge.net/wiki/tutorialadapt
+
+    * Provide an explicit training process to start
+    
+        * User reads prepared corpus
+        
+        * Preferably we run a *very* tightly limited language model that 
+          *just* recognizes the words in each sentence so that we can detect
+          that the user is reading each word (provide visual feedback that 
+          the user's words were recognized)
+        
+        * Preferably be able to let the user pause/rest while doing the reading 
+          such that they don't have to constantly re-start the sentence 
+        
+    * Once we have the prepared corpus, run the audio training process (started)
+    
+    * Allow for user's utterances to be used as further training data
+    
+        * Basically as the user uses the system, record the audio such that they 
+          can train automatically going forward...
+          
+        * investigate whether we could encode with e.g. opus to compress the 
+          results (especially if we're going to save-by-default for every 
+          corrected sentance)
 
 * Use `alsadevices` to let user choose which input and output devices to use 
 
@@ -56,6 +79,8 @@ TODO Items for Listener
     
     * gui control, preferably one that is populated on interaction to allow 
       for plugging in new hardware
+    
+    * defaults to `default` so out of the box it is system/pulseaudio controlled
 
 * Use an indexed format for the dictionary file so that we can quickly lookup
   whether a given word is known/unknown
