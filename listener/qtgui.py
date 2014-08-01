@@ -35,7 +35,6 @@ class JavascriptBridge( QtCore.QObject ):
 
 class QtPipeline(pipeline.Pipeline):
     """Pipeline that sends messages through Qt Events"""
-    @property 
     @context.one_shot
     def events( self ):
         return QtPipelineGenerator()
@@ -150,6 +149,8 @@ class ListenerMain( QtGui.QMainWindow ):
                 log.error( 'No files were present: %s', pprint.pformat(event))
         else:
             log.info( 'Unrecognized action: %s', pprint.pformat( event ))
+    
+    
     
 def main():
     logging.basicConfig( level=logging.DEBUG )
