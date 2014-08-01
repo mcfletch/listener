@@ -69,7 +69,7 @@ TODO Items for Listener
         * Basically as the user uses the system, record the audio such that they 
           can train automatically going forward...
           
-        * investigate whether we could encode with e.g. opus to compress the 
+        * investigate whether we could encode with e.g. Opus_ to compress the 
           results (especially if we're going to save-by-default for every 
           corrected sentance)
 
@@ -226,3 +226,5 @@ TODO Items for Listener
 * Investigate whether we could use e.g. laptop mikes to do noise cancelling 
   (i.e. subtract the signals such that the delta between the boom-mic and the 
   ambient mic is what we feed to pocketsphinx)
+
+.. _Opus: http://www.opus-codec.org/
