@@ -305,8 +305,6 @@ class AudioContext( object ):
     
     def add_training_data( self, recording, transcription, private=False ):
         name = self.transcription_filename( transcription )
-        if os.path.exists( name ):
-            raise RuntimeError( 'Delete the file %s before calling add_training_data' )
         shutil.copy( recording, name )
         description = name + '.json'
         record = { 
@@ -330,7 +328,7 @@ class AudioContext( object ):
         ):
             try:
                 record = json.loads( open( json_file ).read())
-                if os.path.exists( record['filename'] ):
+                if os.path.exists( record['filename'] ) and os.stat( record['filename'] ).st_size:
                     if private or not record['private']:
                         yield record 
                 else:

@@ -56,4 +56,15 @@ class AudioContextTests( TestCase ):
         base = os.path.basename( filename )
         assert base.startswith( 'this_is_a_test-' ), base
         assert os.path.exists( self.audio_context.recording_directory )
-        
+
+    def test_add_training_data( self ):
+        sample = os.path.join( self.workdir, 'test.raw' )
+        context.twrite( sample, 'Moo' )
+        transcription = 'this_is_a_test'
+        record = self.audio_context.add_training_data( sample, transcription )
+        assert os.path.exists(record['filename']), record 
+        assert record['transcription'] == transcription, record 
+    
+        records = list(self.audio_context.training_records())
+        assert records == [ record ], records 
+    
