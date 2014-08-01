@@ -4,8 +4,10 @@ from listener import context
 
 class ContextTests( TestCase ):
     def setUp( self ):
-        self.workdir = tempfile.mkdtemp( prefix='listener-', suffix='-test' )
-        self.context = context.Context('default', directory=self.workdir)
+        self.workdir = tempfile.mkdtemp( 
+            prefix='listener-', suffix='-test', dir='/dev/shm' 
+        )
+        self.context = context.Context('default', directory=os.path.join(self.workdir,'config'))
     def tearDown( self ):
         shutil.rmtree( self.workdir, True ) # ignore errors
     
