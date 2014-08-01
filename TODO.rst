@@ -48,11 +48,21 @@ TODO Items for Listener
 
 * Language model recompilation (unstarted)
 
-* Audio training (started, but never tested)
+* Audio training (started)
 
-* Investigate whether we could use e.g. laptop mikes to do noise cancelling 
-  (i.e. subtract the signals such that the delta between the boom-mic and the 
-  ambient mic is what we feed to pocketsphinx)
+* Use `alsadevices` to let user choose which input and output devices to use 
+
+    * store that in audio-context storage
+    
+    * gui control, preferably one that is populated on interaction to allow 
+      for plugging in new hardware
+
+* Use an indexed format for the dictionary file so that we can quickly lookup
+  whether a given word is known/unknown
+  
+    * sqlite would work, but maybe overkill
+    
+    * bsddb might be more appropriate
 
 * Move the `uinput` device into a (system) DBus service with access 
   control to only allow `console` users to access it (access control file 
@@ -170,6 +180,8 @@ TODO Items for Listener
     
     * Choice of input/output ALSA devices
     
+    * GUI for per-app context editing
+    
     * Potentially a "restore volume" mechanism, though that might be best 
       provided at the platform/desktop level
 
@@ -184,4 +196,8 @@ TODO Items for Listener
 
     * parse a user's (sent) email to get an idea of how they normally speak
     
-    * create a sub-context from their contacts' names (guessed pronunciation)
+    * create a context from their contacts' names (guessed pronunciation)
+
+* Investigate whether we could use e.g. laptop mikes to do noise cancelling 
+  (i.e. subtract the signals such that the delta between the boom-mic and the 
+  ambient mic is what we feed to pocketsphinx)
