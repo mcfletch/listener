@@ -33,7 +33,7 @@ Dependencies::
         pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
         espeak
     
-    # for the Qt-based GUI
+    # for the Qt-based GUI (Note: pyside is LGPL)
     $ apt-get install python-pyside.qtcore python-pyside.qtwebkit python-jinja2
 
     # for the Desktop service (uinput), currently unimplemented
@@ -182,3 +182,45 @@ The model is (and this is just a sketch so far):
           possibly even include a "say nothing for a moment, now say this" setup 
           so that we can dynamically adjust to messy environments
         
+License
+=======
+
+`Listener`'s code is licensed under the BSD license (as is Pocketsphinx). 
+You have accepted the licenses for the Ubuntu/Debian packages used by 
+installing them above. 
+
+Note that when combined with other software `Listener` may fall under 
+more restrictive licenses.
+
+    © 2014, Copyright by VRPlumber Consulting Inc. and the Contributors;
+    All Rights Reserved.
+
+    Permission to use, copy, modify, and distribute this software 
+    and its documentation for any purpose and without fee or royalty
+    is hereby granted, provided that the above copyright notice appear
+    in all copies and that both the copyright notice and this 
+    permission notice appear in supporting documentation or portions 
+    thereof, including modifications, that you make.
+
+    THE AUTHOR VRPlumber Consulting Inc. and the Contributors 
+    DISCLAIMS ALL WARRANTIES WITH REGARD
+    TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF 
+    MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL THE AUTHOR BE 
+    LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY 
+    DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, 
+    WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS 
+    ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+    PERFORMANCE OF THIS SOFTWARE!
+
+`Listener` includes copies of:
+
+    * jQuery v2.1.1 | (c) 2005, 2014 jQuery Foundation, Inc. | 
+      http://jquery.org/license
+    
+    * Pure v0.5.0
+      Copyright 2014 Yahoo! Inc. All rights reserved.
+      Licensed under the BSD License.
+      https://github.com/yui/pure/blob/master/LICENSE.md
+    
+    * normalize.css v1.1.3 | MIT License | git.io/normalize
+      Copyright (c) Nicolas Gallagher and Jonathan Neal
