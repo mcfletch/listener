@@ -50,8 +50,12 @@ TODO Items for Listener
 
 * Audio training (started, but never tested)
 
-* Move the `uinput` device into a DBus service with access control to 
-  only allow `console` users to access it
+* Move the `uinput` device into a (system) DBus service with access 
+  control to only allow `console` users to access it (access control file 
+  already written, but packaging is needed)
+  
+* Move the audio pipes and context management into a Session DBus service
+  to decouple it and make it easy for other processes to access it
 
 * Separate out the "hardware/audio context" from the language model 
   context. If we are on the same hardware we likely want to use and 
