@@ -48,13 +48,28 @@ to install.
 Utilities
 =========
 
+`listener-qt`
+
+    Launches the (not-very-useful) Qt Listener GUI. You can dictate and see 
+    the results of each dictation. You can also click a button to review the 
+    raw audio captured for each utterance. Runs the code from `listener-pipe`
+    in a background thread and uses Qt messages to communicate.  Eventually 
+    the code from `listener-pipe` should be moved to a DBus service.
+    
+    Note: this will download a *large* language model on first run. Currently
+    that's done *before* the GUI starts, so the process will just seem to hang.
+    
+
 `listener-pipe`
 
     Attempt to setup a gstreamer pipeline using a downloaded language model 
     that matches the hub4wsj package. 
-    The pipeline will store utterances into 
+    The pipeline will store the raw audio of utterances into 
     `~/.config/listener/default/recordings` 
     and print out the partial and final results to the console.
+
+    Note: this will download a *large* language model on first run. Currently
+    that's done *before* anything else, so expect a hang.
 
 `listener-rawplay <filename>`
 
