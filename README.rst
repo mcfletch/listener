@@ -41,7 +41,7 @@ Dependencies::
     $ apt-get install gstreamer0.10-pocketsphinx build-essential \
         libsphinxbase1 sphinxbase-utils sphinxtrain \
         pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
-        espeak
+        espeak alsa-utils
     
     # for the Qt-based GUI (Note: pyside is LGPL)
     $ apt-get install python-pyside.qtcore python-pyside.qtwebkit python-jinja2
