@@ -15,6 +15,12 @@ class ContextTests( TestCase ):
     
     def test_init( self ):
         pass 
+    def test_user_default( self ):
+        directory = context.base_config_directory()
+        if 'XDG_CONFIG_HOME' in os.environ:
+            assert directory.startswith( os.environ['XDG_CONFIG_HOME'] ), directory 
+        else:
+            assert directory.startswith( os.path.expanduser( '~' )), directory
     def test_language_model_directory( self ):
         assert os.path.exists( self.context.language_model_directory )
     def test_hmm_directory( self ):
@@ -37,7 +43,7 @@ class AudioContextTests( TestCase ):
     def setUp( self ):
         self.workdir = tempfile.mkdtemp( prefix='listener-', suffix='-test' )
         self.context = context.Context('default', directory=self.workdir)
-        self.audio_context = context.AudioContext( self.context, 'moo' )
+        self.audio_context = self.context.get_audio_context( 'moo' )
     def tearDown( self ):
         shutil.rmtree( self.workdir, True ) # ignore errors
     def test_save_settings( self ):
@@ -68,3 +74,7 @@ class AudioContextTests( TestCase ):
         records = list(self.audio_context.training_records())
         assert records == [ record ], records 
     
+        self.audio_context.remove_training_data( record )
+        records = list(self.audio_context.training_records())
+        assert records == [ ], records 
+        

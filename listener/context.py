@@ -38,7 +38,7 @@ def twrite( filename, data ):
     if isinstance( data, unicode ):
         data = data.encode('utf-8')
     elif not isinstance( data, bytes ):
-        data = json.dumps( data )
+        data = json.dumps( data, indent=2, sort_keys=True )
         if isinstance( data, unicode ):
             data = data.encode('utf-8')
     directory = os.path.dirname( filename )
@@ -315,11 +315,12 @@ class AudioContext( object ):
         }
         twrite( description, record )
         return record
-    def remove_training_data( self, transcription ):
-        name = self.transcription_filename( transcription )
+    def remove_training_data( self, record ):
+        name = os.path.basename( record['filename'] )
+        name = os.path.join( self.recording_directory, name )
         for n in (name+'.json', name ):
             try:
-                os.remove( name + '.json' )
+                os.remove( n )
             except (IOError,OSError) as err:
                 pass
     def training_records( self, private=True ):
