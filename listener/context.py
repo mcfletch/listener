@@ -312,7 +312,9 @@ class AudioContext( object ):
         shutil.copy( recording, name )
         description = name + '.json'
         record = { 
-            'filename': name, 'transcription': transcription, 'timestamp': time.time(),
+            'filename': name, 
+            'transcription': transcription, 
+            'timestamp': time.time(),
             'private': private,
         }
         twrite( description, record )
@@ -325,7 +327,9 @@ class AudioContext( object ):
             except (IOError,OSError) as err:
                 pass
     def training_records( self, private=True ):
-        for json_file in glob.glob( os.path.join( self.context.recording_directory, '*.json' )):
+        for json_file in glob.glob( 
+            os.path.join( self.context.recording_directory, '*.json' )
+        ):
             try:
                 record = json.loads( open( json_file ).read())
                 if os.path.exists( record['filename'] ):
@@ -337,8 +341,20 @@ class AudioContext( object ):
             except Exception as err:
                 pass 
     def transcription_filename( self, transcription ):
-        name = os.path.join( 
-            self.context.recording_directory, 
-            ''.join([ c if c.isalnum() else '_' for c in transcription ]) + '.wav'
+        """This isn't "safe" in the universal sense, but it's safe enough for now"""
+        if not os.path.exists( self.context.recording_directory ):
+            os.makedirs( self.context.recording_directory )
+        prefix = '_'.join([
+            fragment for fragment in 
+            ''.join([ c if c.isalnum() else '_' for c in transcription ]).split(
+                '_'
+            )
+            if fragment 
+        ]) + '-'
+        handle,filename = tempfile.mkstemp(
+            suffix='.raw',
+            prefix=prefix,
+            dir=self.context.recording_directory,
         )
-        return name
+        os.close( handle )
+        return filename

@@ -27,6 +27,13 @@ class ContextTests( TestCase ):
         assert os.path.exists( self.context.language_model_file )
     def test_dictionary_file( self ):
         assert os.path.exists( self.context.dictionary_file )
+    
+    def test_alsa_devices( self ):
+        devices = self.context.available_alsa_devices()
+        # obviously these *could* be false, but then you're running on a machine
+        # that couldn't run the task...
+        assert devices['input'], devices 
+        assert devices['output'], devices
 
 class AudioContextTests( TestCase ):
     def setUp( self ):
@@ -45,4 +52,8 @@ class AudioContextTests( TestCase ):
         assert os.path.exists( self.audio_context.settings_file )
         new_context = context.AudioContext( self.context, 'moo' )
         assert new_context.settings['moo'] == 'this'
-    
+    def test_transcription_filename( self ):
+        filename = self.audio_context.transcription_filename( '  this/../:is a _+=| test ' )
+        assert os.path.exists( filename )
+        base = os.path.basename( filename )
+        assert base.startswith( 'this_is_a_test-' ), base
