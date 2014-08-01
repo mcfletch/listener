@@ -41,7 +41,14 @@ def twrite( filename, data ):
     return filename
 
 class Context( object ):
-    """Holds a dictation context from which we attempt to recognize"""
+    """Holds a dictation context from which we attempt to recognize
+    
+    TODO: need to allow the user to specify a specific alsa device
+    to use for the dictation and playback.
+    
+    TODO: need to allow the user to specify levels for recording playback 
+    independent of general desktop levels (KDE settings are not reliable)
+    """
     def __init__( self, key, parent=None ):
         if not key.isalnum():
             raise ValueError( "Need an alpha-numeric name for the context" )
@@ -219,7 +226,6 @@ class Context( object ):
             ''.join([ c if c.isalnum() else '_' for c in transcription ]) + '.wav'
         )
         return name
-    
     def add_training_data( self, recording, transcription, private=False ):
         name = self.transcription_filename( transcription )
         if os.path.exists( name ):
@@ -265,6 +271,9 @@ class Context( object ):
         if not os.path.exists( filename ):
             log.info( 'No such file: %s', filename )
             return 
+        # TODO: this should *not* be running in the GUI thread!
+        # the context should be running out-of-process and the 
+        # playback should be a separate operation
         subprocess.Popen( [
             'gst-launch',
             'filesrc','location=%s'%(
