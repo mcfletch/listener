@@ -16,7 +16,6 @@ from . import context
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 
-
 class Pipeline( object ):
     """Holds the PocketSphinx Pipeline we'll use for recognition
     
@@ -81,9 +80,10 @@ class Pipeline( object ):
         http://cmusphinx.sourceforge.net/wiki/tutorialadapt
 
     """
-    def __init__( self, context ):
+    def __init__( self, context, audio_context=None ):
         """Initialize our pipeline using the given working-directory"""
         self.context = context
+        self.audio_context = audio_context or context.audio_context()
         if os.path.exists( context.buffer_directory ):
             for filename in os.listdir( context.buffer_directory ):
                 os.remove( os.path.join( context.buffer_directory, filename ))
@@ -100,6 +100,7 @@ class Pipeline( object ):
         return [
                 'alsasrc', 
                     'name=source', 
+                    'device=%s'%(self.audio_context.settings['input_device']),
                     #'device=hw:2,0', # setting somewhere or other...
                     '!',
                 'audioconvert', '!',

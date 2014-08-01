@@ -41,6 +41,9 @@ def twrite( filename, data ):
         data = json.dumps( data )
         if isinstance( data, unicode ):
             data = data.encode('utf-8')
+    directory = os.path.dirname( filename )
+    if not os.path.exists( directory ):
+        os.makedirs( directory )
     with open( filename+ '~', 'wb' ) as fh:
         fh.write( data )
     os.rename( filename + '~', filename )
@@ -78,6 +81,9 @@ class Context( object ):
     def hmm_directory( self ):
         return os.path.join( self.directory, 'hmm' )
     @one_shot
+    def audio_context_directory( self ):
+        return os.path.join( self.directory, 'audiocontexts' )
+    @one_shot
     def recording_directory( self ):
         return os.path.join( self.directory, 'recordings' )
     @one_shot
@@ -89,6 +95,11 @@ class Context( object ):
     @one_shot
     def dictionary_file( self ):
         return os.path.join( self.language_model_directory, 'dictionary.dict' )
+    
+    def get_audio_context( self, key=None ):
+        """Should only be done on root context..."""
+        key = key or 'default'
+        return AudioContext( self, key )
     
     def initial_working_directory( self,  ):
         """Create an initial working directory by cloning the pocketsphinx default models"""
@@ -163,6 +174,9 @@ class Context( object ):
         filename -- either an absolute path to the filename or 
             a "basename" for the filename present in our recordings 
             directory 
+        
+        TODO: this doesn't belong on the context... not sure where it should
+        be
         """
         log.info( 'Playing raw file: %s', filename )
         if os.path.basename(filename) == filename:
@@ -199,9 +213,29 @@ class AudioContext( object ):
     device, and maybe the machine... and maybe the abstract "environment"
     in which dictation is occurring...
     """
-    def __init__( self, root_context ):
+    def __init__( self, root_context, key=None ):
         """Initialize the audio context connected to a root context"""
-        self.context = context
+        self.context = root_context
+        self.key = key or 'default'
+    @one_shot
+    def base_config_directory( self ):
+        return os.path.join( self.context.audio_context_directory, self.key )
+    @one_shot
+    def settings_file( self ):
+        return os.path.join( self.base_config_directory, 'settings.json' )
+    def save_settings( self ):
+        content = json.dumps( self.settings, indent=2, sort_keys=True )
+        twrite( self.settings_file, content )
+    @one_shot
+    def settings( self ):
+        if os.path.exists( self.settings_file ):
+            content = json.loads( open( self.settings_file ).read() )
+        else:
+            content = {
+                'input_device': 'default',
+                'output_device': 'default',
+            }
+        return content
     # We may *also* want to move the user-specific HMM into 
     # its own directory (separate from the downloaded/base HMM)?
     

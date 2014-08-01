@@ -7,7 +7,9 @@ class ContextTests( TestCase ):
         self.workdir = tempfile.mkdtemp( 
             prefix='listener-', suffix='-test', dir='/dev/shm' 
         )
-        self.context = context.Context('default', directory=os.path.join(self.workdir,'config'))
+        self.context = context.Context(
+            'default', directory=os.path.join(self.workdir,'config')
+        )
     def tearDown( self ):
         shutil.rmtree( self.workdir, True ) # ignore errors
     
@@ -30,7 +32,17 @@ class AudioContextTests( TestCase ):
     def setUp( self ):
         self.workdir = tempfile.mkdtemp( prefix='listener-', suffix='-test' )
         self.context = context.Context('default', directory=self.workdir)
-        self.audio_context = context.AudioContext( self.context )
+        self.audio_context = context.AudioContext( self.context, 'moo' )
     def tearDown( self ):
         shutil.rmtree( self.workdir, True ) # ignore errors
+    def test_save_settings( self ):
+        self.audio_context.save_settings()
+        assert os.path.exists( self.audio_context.settings_file )
+    def test_round_trip_settings( self ):
+        base = self.audio_context.settings
+        base['moo'] = 'this'
+        self.audio_context.save_settings()
+        assert os.path.exists( self.audio_context.settings_file )
+        new_context = context.AudioContext( self.context, 'moo' )
+        assert new_context.settings['moo'] == 'this'
     
