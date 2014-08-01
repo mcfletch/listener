@@ -98,7 +98,10 @@ class Pipeline( object ):
         # TODO: add an audio pre-processing stage to filter out background noise and 
         # require a clear signal before cutting in
         return [
-                'alsasrc', 'name=source', '!',
+                'alsasrc', 
+                    'name=source', 
+                    #'device=hw:2,0', # setting somewhere or other...
+                    '!',
                 'audioconvert', '!',
                 'audioresample', '!',
                 'level', 

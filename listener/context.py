@@ -187,6 +187,7 @@ class Context( object ):
             'audiorate','!',
             'audioconvert','!',
             'alsasink'
+                #'device=hw:2,0', # from a setting somewhere
         ]).communicate()
         log.info( 'Finished playing' )
 
