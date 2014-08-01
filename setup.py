@@ -15,19 +15,20 @@ if __name__ == "__main__":
         long_description='listener',
         classifiers=[
             "Programming Language :: Python",
+            "Environment :: X11 Applications :: Qt",
+            "Environment :: Console",
+            "License :: OSI Approved :: BSD License",
+            "Natural Language :: English",
+            "Operating System :: POSIX :: Linux",
+            "Topic :: Multimedia :: Sound/Audio :: Speech",
         ],
         author='VRPlumber Consulting Inc.',
         author_email='mcfletch@vrplumber.com',
-        url='http://www.vrplumber.com/programming/project/listener',
-        keywords='',
+        url='https://github.com/mcfletch/listener',
+        keywords='Speech, Pocketsphinx, GUI',
         packages=find_packages(),
         include_package_data=True,
         license='BSD', # Pocketsphinx is BSD-like
-        # Dev-only requirements:
-        # nose
-        # pychecker
-        # coverage
-        # globalsub
         install_requires=[
         ],
         scripts = [
