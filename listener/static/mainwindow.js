@@ -1,5 +1,8 @@
 $(document).ready( function() {
     var final_results = $( '.final-results' );
+    var gui_event = function( message ) {
+        window.gui_bridge.send_event( JSON.stringify( message ));
+    };
     var configure_final_result = function( display, record ) {
         display.data('final-result-record', record);
         display.find( '[data-property=uttid]').text( record.uttid);
@@ -7,11 +10,36 @@ $(document).ready( function() {
         display.find( '[data-action]').each( function( clickable ) {
             var element = $(this);
             element.click( function( evt ) {
-                window.gui_bridge.send_event( JSON.stringify({
+                gui_event({
                     'action': element.attr('data-action'),
                     'record': record
-                }));
+                });
             });
+        });
+        display.find( '.original-recognition' ).on(
+            'blur',
+            function( evt ) {
+                var element = $(this);
+                var new_text = element.text();
+                //new_text = new_text.replace( '\x1b','');
+                if ( new_text !== record.text) {
+                    gui_event({
+                        'action': 'correction',
+                        'record': 'record',
+                        'text': new_text
+                    });
+                    element.addClass( 'corrected' );
+                    record.text = new_text;
+                };
+            }
+        ).on( 'keypress', function( evt ) {
+            if(evt.which == 27) {
+                var element = $(this);
+                element.text( record.text );
+                return false;
+            } else {
+                return true;
+            }
         });
         return display;
     };
