@@ -201,9 +201,6 @@ class AudioContext( object ):
     def __init__( self, root_context ):
         """Initialize the audio context connected to a root context"""
         self.context = context
-    # Only a root context should *likely* be doing acoustic training 
-    # so it's likely we shouldn't have the acoustic training files 
-    # present in the non-root contexts...
     # We may *also* want to move the user-specific HMM into 
     # its own directory (separate from the downloaded/base HMM)?
     
