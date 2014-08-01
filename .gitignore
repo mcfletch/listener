@@ -2,3 +2,4 @@
 *.egg-info
 *.e4?
 dist
+.coverage

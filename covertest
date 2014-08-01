@@ -1,0 +1,7 @@
+#! /bin/bash
+
+set -e
+
+coverage erase
+nosetests-2.7 -v --with-cov
+coverage report -m
