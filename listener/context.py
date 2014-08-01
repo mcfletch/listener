@@ -60,7 +60,7 @@ class Context( object ):
         if not key.isalnum():
             raise ValueError( "Need an alpha-numeric name for the context" )
         self.key = key 
-        if directory is None:
+        if directory is not None:
             self.directory = directory
         if not os.path.exists( self.directory ):
             if not parent:
