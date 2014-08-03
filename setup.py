@@ -47,6 +47,8 @@ if __name__ == "__main__":
                 
                 'listener-uinput-device=listener.uinputdriver:main',
                 'listener-uinput-rebuild-mapping=listener.uinputdriver:rebuild_mapping',
+                
+                'listener-dictionary-cache=listener.dictionarycache:main',
             ],
         ),
         zip_safe=False,

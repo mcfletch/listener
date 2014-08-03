@@ -1,6 +1,7 @@
 """Qt GUI wrapper"""
 import sys,logging,Queue,cgi, os,json, pprint, math
 from . import pipeline, context
+from .oneshot import one_shot
 try:
     from PySide import (
         QtCore, QtGui, QtWebKit
@@ -35,7 +36,7 @@ class JavascriptBridge( QtCore.QObject ):
 
 class QtPipeline(pipeline.Pipeline):
     """Pipeline that sends messages through Qt Events"""
-    @context.one_shot
+    @one_shot
     def events( self ):
         return QtPipelineGenerator()
     def send( self, message ):
