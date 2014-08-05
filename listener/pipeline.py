@@ -13,6 +13,7 @@ import gst
 import gobject
 import Queue
 from . import context
+from . import sourcedescription
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 
@@ -97,7 +98,9 @@ class Pipeline( object ):
     @property 
     def source( self ):
         if self._source is None:
-            self._source = SourceDescription( 'alsa://%s'%(self.audio_context.settings['input_device']))
+            self._source = sourcedescription.SourceDescription( 
+                'alsa://%s'%(self.audio_context.settings['input_device'])
+            )
         return self._source
     
     @source.setter
@@ -114,7 +117,9 @@ class Pipeline( object ):
         performing resampling and the like.
         """
         if source:
-            self._source = SourceDescription( source )
+            self._source = sourcedescription.SourceDescription( 
+                source 
+            )
             # validate that we can calculate a gstreamer fragment from it...
             self._source.gst_fragment()
         else:
@@ -244,60 +249,6 @@ class Pipeline( object ):
         })
     def send( self, message ):
         raise NotImplemented( 'Must have a send method on pipelines' )
-
-class SourceDescription( object ):
-    def __init__( self, url ):
-        self.url = urlparse.urlparse( url )
-    @property 
-    def continuous( self ):
-        return self.scheme in ('alsa','pulse')
-    def gst_fragment( self ):
-        if self.url.scheme in ('file',''):
-            source = [
-                'filesrc',
-                    'name=source',
-                    'location=%s'%(self.url.path,),
-                '!',
-            ]
-            name = os.path.basename( self.url.path )
-            if name.endswith( '.opus' ):
-                source += [
-                    'opusdec',
-                    '!',
-                ]
-            elif name.endswith( '.raw' ):
-                source += [
-                    'audioparse',
-                        'width=16','depth=16',
-                        'signed=true',
-                        'rate=8000',
-                        'channels=1',
-                        '!',
-                ]
-            elif name.endswith( '.wav' ):
-                source += [
-                    'wavparse',
-                        '!',
-                ]
-            else:
-                raise ValueError(
-                    "Unknown source type: %s"%( name, )
-                )
-            return source 
-        elif self.url.scheme == 'alsa':
-            return [
-                'alsasrc', 
-                    'name=source', 
-                    'device=%s'%(self.url.netloc),
-                    #'device=hw:2,0', # setting somewhere or other...                
-                '!',
-            ]
-        else:
-            raise ValueError(
-                "Unsupported source protocol (file/alsa only at the moment): %r"%(
-                    self.url.scheme,
-                )
-            )
 
 class QueuePipeline( Pipeline ):
     """Sub-class of Pipeline using Python Queues for comm"""

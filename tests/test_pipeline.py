@@ -1,6 +1,6 @@
 from unittest import TestCase
 import tempfile, shutil, os, time
-from listener import pipeline,context
+from listener import pipeline,context,sourcedescription
 HERE = os.path.dirname( __file__ )
 
 class PipelineTests( TestCase ):
@@ -26,7 +26,7 @@ class PipelineTests( TestCase ):
             'file:///tmp/test/moo.opus',
             'file:///tmp/test/moo.raw',
         ]:
-            description = pipeline.SourceDescription( url )
+            description = sourcedescription.SourceDescription( url )
             fragment = description.gst_fragment()
             assert fragment[-1] == '!', fragment 
     
