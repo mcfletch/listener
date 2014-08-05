@@ -59,11 +59,19 @@ class CodetoWordsTests( TestCase ):
             ),
             (
                 '"""this"""',
-                [['"""triple-quote','this','"""triple-quote']],
+                [[
+                    '"""triple-quote',
+                    #'this',
+                    '"""triple-quote'
+                ]],
             ),
             (
                 "'''this'''",
-                [["'''triple-single-quote",'this',"'''triple-single-quote"]],
+                [[
+                    "'''triple-single-quote",
+                    #'this',
+                    "'''triple-single-quote"
+                ]],
             ),
         ]
         for line,expected in expected:

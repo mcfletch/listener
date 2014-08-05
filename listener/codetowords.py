@@ -185,19 +185,19 @@ def codetowords( lines, dictionary=None ):
         elif type == tokenize.STRING:
             if token.startswith( '"""' ):
                 current_line.extend( ['"""triple-quote'] )
-                current_line.append( token[3:-3] )
+                #current_line.append( token[3:-3] )
                 current_line.extend( ['"""triple-quote'] )
             elif token.startswith( "'''" ):
                 current_line.extend( ["'''triple-single-quote"] )
-                current_line.append( token[3:-3] )
+                #current_line.append( token[3:-3] )
                 current_line.extend( ["'''triple-single-quote"] )
             elif token.startswith( '"' ):
                 current_line.extend( ['"quote'] )
-                current_line.append( token[3:-3] )
+                #current_line.append( token[3:-3] )
                 current_line.extend( ['"quote'] )
             elif token.startswith( "'" ):
                 current_line.extend( ["'single-quote"] )
-                current_line.append( token[3:-3] )
+                #current_line.append( token[3:-3] )
                 current_line.extend( ["'single-quote"] )
             else:
                 current_line.append( token )
