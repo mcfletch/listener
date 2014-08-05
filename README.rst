@@ -41,7 +41,8 @@ Dependencies::
     $ apt-get install gstreamer0.10-pocketsphinx build-essential \
         libsphinxbase1 sphinxbase-utils sphinxtrain \
         pocketsphinx-hmm-en-hub4wsj pocketsphinx-utils \
-        espeak alsa-utils python-gst0.10 python-gobject-2
+        espeak alsa-utils python-gst0.10 python-gobject-2 \
+        python-sqlite build-essential
     
     # for the Qt-based GUI (Note: pyside is LGPL)
     $ apt-get install python-pyside.qtcore python-pyside.qtwebkit python-jinja2
@@ -162,3 +163,15 @@ more restrictive licenses.
     
     * normalize.css v1.1.3 | MIT License | http://git.io/normalize
       Copyright (c) Nicolas Gallagher and Jonathan Neal
+
+`Listener` will download the following software/models when run:
+
+    * `CMU HUB4 Language Model`_ -- which provides a few extra files that 
+      are needed to update/modify the acoustic model over the files distributed 
+      in the Ubuntu repository
+    
+    * `CMU CLM TK`_ -- which provides the command line tools required to 
+      update a language model for use with Sphinx
+
+.. _`CMU HUB4 Language Model`: https://sourceforge.net/projects/cmusphinx/files/Acoustic%20and%20Language%20Models/US%20English%20HUB4WSJ%20Acoustic%20Model/hub4wsj_sc_8k.tar.gz/download
+.. _`CMU CLM TK`: https://downloads.sourceforge.net/project/cmusphinx/cmuclmtk/0.7/cmuclmtk-0.7.tar.gz?r=&ts=1407260026&use_mirror=hivelocity
