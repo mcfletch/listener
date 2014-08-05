@@ -92,7 +92,36 @@ def _create_op_names( ):
 OP_NAMES = _create_op_names()
 
 def parse_camel( name ):
-    return re.sub(r'([A-Z]+)', r' \1', name).strip().split()
+    expanded = re.sub(r'([A-Z]+)', r' \1', name)
+    expanded = re.sub(r'([0-9]+)', r' \1', expanded )
+    split = expanded.strip().split()
+    all_caps = [x.upper() for x in split] == split
+    cap_camel_case = [x.title() for x in split] == split 
+    camel_case = [x.title() for x in split[1:]] == split[1:]
+    words = [x for x in split if not x.isdigit()]
+    split_expanded = []
+    for item in split:
+        if item.isdigit():
+            split_expanded.extend( [digit(x) for x in item])
+        else:
+            split_expanded.append( item )
+
+    if len(words) == 0:
+        # e.g. numeric fragment of a name...
+        pass
+    elif len(words) == 1:
+        if words[0].isupper():
+            split_expanded = ['all','caps'] + split_expanded
+        elif words[0].title() == words[0]:
+            split_expanded = ['cap']+split_expanded
+    else:
+        if all_caps:
+            split_expanded = ['all', 'caps'] + split_expanded
+        elif cap_camel_case:
+            split_expanded = ['cap','camel'] + split_expanded
+        elif camel_case and len(split) > 1:
+            split_expanded = ['camel'] + split_expanded
+    return split_expanded
 
 DIGITS = {
     '0':'zero',
@@ -130,6 +159,7 @@ def break_down_name( name, dictionary=None ):
         return result
     elif '_' in name:
         fragments = [x for x in name.split('_')]
+        # TODO: provide a under-name x y z -> x_y_z
         for fragment in fragments[:-1]:
             if fragment:
                 result.extend( break_down_name(fragment))
@@ -138,20 +168,6 @@ def break_down_name( name, dictionary=None ):
             result.extend( break_down_name(fragments[-1]))
         return result
     possibles = parse_camel( name )
-    if len(possibles) == 1:
-        if possibles[0].isupper():
-            return ['all','caps',possibles[0]]
-        elif possibles[0].islower():
-            return possibles 
-        elif possibles[0][0].isupper():
-            return ['cap',possibles[0]]
-        else:
-            raise ValueError( "Doesn't seem to be an identifier" )
-    start_caps = [x for x in possibles if (x[0].isupper() and x[1:].islower())]
-    if start_caps == possibles:
-        return ['cap','camel']+possibles
-    elif start_caps == possibles[1:]:
-        return ['camel']+possibles 
     return possibles
     
 def codetowords( lines, dictionary=None ):
@@ -166,6 +182,25 @@ def codetowords( lines, dictionary=None ):
             new_lines.append( current_line )
         elif type == tokenize.NUMBER:
             current_line.extend( ['number']+ [digit(x) for x in token]+['end number'] )
+        elif type == tokenize.STRING:
+            if token.startswith( '"""' ):
+                current_line.extend( ['"""triple-quote'] )
+                current_line.append( token[3:-3] )
+                current_line.extend( ['"""triple-quote'] )
+            elif token.startswith( "'''" ):
+                current_line.extend( ["'''triple-single-quote"] )
+                current_line.append( token[3:-3] )
+                current_line.extend( ["'''triple-single-quote"] )
+            elif token.startswith( '"' ):
+                current_line.extend( ['"quote'] )
+                current_line.append( token[3:-3] )
+                current_line.extend( ['"quote'] )
+            elif token.startswith( "'" ):
+                current_line.extend( ["'single-quote"] )
+                current_line.append( token[3:-3] )
+                current_line.extend( ["'single-quote"] )
+            else:
+                current_line.append( token )
         elif type in (tokenize.ENDMARKER,tokenize.INDENT,tokenize.DEDENT):
             pass
         elif type == tokenize.NAME:

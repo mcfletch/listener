@@ -49,6 +49,22 @@ class CodetoWordsTests( TestCase ):
                 'class VeridianEgg:',
                 [['class', 'cap', 'camel', 'Veridian', 'Egg', ':colon']],
             ),
+            (
+                'newItem34',
+                [['camel','new','Item','three','four']],
+            ),
+            (
+                'new_item_34',
+                [['new','under','item','under','three','four']],
+            ),
+            (
+                '"""this"""',
+                [['"""triple-quote','this','"""triple-quote']],
+            ),
+            (
+                "'''this'''",
+                [["'''triple-single-quote",'this',"'''triple-single-quote"]],
+            ),
         ]
         for line,expected in expected:
             result = codetowords.codetowords([line])
