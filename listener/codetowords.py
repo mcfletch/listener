@@ -86,6 +86,8 @@ def _create_op_names( ):
         '%': '%percent',
         '@': '@at',
         '*': '*asterisk',
+        '+': '+plus',
+        '_': '_under',
     })
 
     return result
@@ -180,6 +182,9 @@ def codetowords( lines, dictionary=None ):
         elif type == tokenize.NEWLINE:
             current_line = []
             new_lines.append( current_line )
+        elif type == tokenize.NL:
+            # newline without new source-code-line
+            current_line.extend([ 'new','line'])
         elif type == tokenize.NUMBER:
             current_line.extend( ['number']+ [digit(x) for x in token]+['end number'] )
         elif type == tokenize.STRING:
