@@ -6,7 +6,7 @@ You may modify and redistribute this file under the same terms as
 the CMU Sphinx system.  See 
 http://cmusphinx.sourceforge.net/html/LICENSE for more information.
 """
-import sys, os, shutil, logging, pprint,subprocess
+import sys, os, shutil, logging, pprint,subprocess, urlparse
 import pygst
 pygst.require("0.10")
 import gst
@@ -80,7 +80,7 @@ class Pipeline( object ):
         http://cmusphinx.sourceforge.net/wiki/tutorialadapt
 
     """
-    def __init__( self, context, audio_context=None ):
+    def __init__( self, context, audio_context=None, source=None ):
         """Initialize our pipeline using the given working-directory"""
         self.context = context
         self.audio_context = audio_context or context.audio_context()
@@ -88,6 +88,35 @@ class Pipeline( object ):
             for filename in os.listdir( context.buffer_directory ):
                 os.remove( os.path.join( context.buffer_directory, filename ))
         self.existing_utterances = set()
+        if source is not None:
+            self.source = source
+    
+    _source = None
+    @property 
+    def source( self ):
+        if self._source is None:
+            self._source = SourceDescription( 'alsa://%s'%(self.audio_context.settings['input_device']))
+        return self._source
+    
+    @source.setter
+    def source( self, source ):
+        """Set our source from a string in URL format
+        
+        alsa://hw:2,0
+        file:///path/to/file.raw
+        file:///path/to/file.opus
+        file:///path/to/file.wav
+        
+        From the source we will decide how to play the audio 
+        file in order to get the audio into the format we need,
+        performing resampling and the like.
+        """
+        if source:
+            self._source = SourceDescription( source )
+            # validate that we can calculate a gstreamer fragment from it...
+            self._source.gst_fragment()
+        else:
+            self._source = None 
 
     @property
     def pipeline_command( self ): 
@@ -97,12 +126,7 @@ class Pipeline( object ):
         # stream, potentially having multiple pocket-sphinxs running at the same time
         # TODO: add an audio pre-processing stage to filter out background noise and 
         # require a clear signal before cutting in
-        return [
-                'alsasrc', 
-                    'name=source', 
-                    'device=%s'%(self.audio_context.settings['input_device']),
-                    #'device=hw:2,0', # setting somewhere or other...
-                    '!',
+        return self.source.gst_fragment() + [
                 'audioconvert', '!',
                 'audioresample', '!',
                 'level', 
@@ -215,6 +239,57 @@ class Pipeline( object ):
         })
     def send( self, message ):
         raise NotImplemented( 'Must have a send method on pipelines' )
+
+class SourceDescription( object ):
+    def __init__( self, url ):
+        self.url = urlparse.urlparse( url )
+    def gstreamer_fragment( self ):
+        if self.url.scheme == 'file':
+            source = [
+                'filesrc',
+                    'name=source',
+                    'location=%s'%(self.url.path,),
+                '!',
+            ]
+            name = os.path.basename( self.url.path )
+            if name.endswith( '.opus' ):
+                source += [
+                    'opusdec',
+                    '!',
+                ]
+            elif name.endswith( '.raw' ):
+                source += [
+                    'audioparse',
+                        'width=16','depth=16',
+                        'signed=true',
+                        'rate=8000',
+                        'channels=1',
+                        '!',
+                ]
+            elif name.endswith( '.wav' ):
+                source += [
+                    'wavparse',
+                        '!',
+                ]
+            else:
+                raise ValueError(
+                    "Unknown source type: %s"%( name, )
+                )
+            return source 
+        elif self.url.scheme == 'alsa':
+            return [
+                'alsasrc', 
+                    'name=source', 
+                    'device=%s'%(self.url.netloc),
+                    #'device=hw:2,0', # setting somewhere or other...                
+                '!',
+            ]
+        else:
+            raise ValueError(
+                "Unsupported source protocol (file/alsa only at the moment): %s"%(
+                    self.url.scheme,
+                )
+            )
 
 class QueuePipeline( Pipeline ):
     """Sub-class of Pipeline using Python Queues for comm"""
