@@ -87,6 +87,8 @@ class Pipeline( object ):
         if os.path.exists( context.buffer_directory ):
             for filename in os.listdir( context.buffer_directory ):
                 os.remove( os.path.join( context.buffer_directory, filename ))
+        else:
+            os.makedirs( self.context.buffer_directory )
         self.existing_utterances = set()
         if source is not None:
             self.source = source
@@ -170,13 +172,6 @@ class Pipeline( object ):
             bus.add_signal_watch()
             bus.connect( 'message', self.on_level )
             
-#            # connect up to the tee after negotiation
-#            tee = self._pipeline.get_by_name( 'tee' )
-#            wave = self._pipeline.get_by_name( 'wave' )
-#            tee.link( wave )
-
-#            import ipdb
-#            ipdb.set_trace()
             self.pipeline.set_state(gst.STATE_PAUSED)
 
         return self._pipeline
@@ -195,6 +190,12 @@ class Pipeline( object ):
     def stop_listening( self ):
         """Stop listening"""
         self.pipeline.set_state(gst.STATE_PAUSED)
+    
+    def close( self ):
+        """Close and cleanup our pipeline entirely"""
+        if self._pipeline:
+            self.stop_listening()
+        self._pipeline = None
     
     def update_language_model( self, source ):
         """Update our language model from a given source
@@ -226,10 +227,14 @@ class Pipeline( object ):
     def sphinx_result(self, asr, text, uttid):
         """Forward result signals via our send() method"""
         new = []
-        for filename in os.listdir( self.context.buffer_directory ):
-            if filename not in self.existing_utterances:
-                self.existing_utterances.add( filename )
-                new.append( filename )
+        try:
+            for filename in os.listdir( self.context.buffer_directory ):
+                if filename not in self.existing_utterances:
+                    self.existing_utterances.add( filename )
+                    new.append( filename )
+        except (OSError,IOError) as err:
+            log.warning( 'Unable to read buffer directory?' )
+            pass 
         self.send( {
             'type':'final',
             'text': text,
@@ -243,8 +248,11 @@ class Pipeline( object ):
 class SourceDescription( object ):
     def __init__( self, url ):
         self.url = urlparse.urlparse( url )
-    def gstreamer_fragment( self ):
-        if self.url.scheme == 'file':
+    @property 
+    def continuous( self ):
+        return self.scheme in ('alsa','pulse')
+    def gst_fragment( self ):
+        if self.url.scheme in ('file',''):
             source = [
                 'filesrc',
                     'name=source',
@@ -286,7 +294,7 @@ class SourceDescription( object ):
             ]
         else:
             raise ValueError(
-                "Unsupported source protocol (file/alsa only at the moment): %s"%(
+                "Unsupported source protocol (file/alsa only at the moment): %r"%(
                     self.url.scheme,
                 )
             )

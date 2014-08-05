@@ -43,7 +43,7 @@ class AudioContextTests( TestCase ):
     def setUp( self ):
         self.workdir = tempfile.mkdtemp( prefix='listener-', suffix='-test' )
         self.context = context.Context('default', directory=self.workdir)
-        self.audio_context = self.context.get_audio_context( 'moo' )
+        self.audio_context = self.context.audio_context( 'moo' )
     def tearDown( self ):
         shutil.rmtree( self.workdir, True ) # ignore errors
     def test_save_settings( self ):
@@ -64,7 +64,7 @@ class AudioContextTests( TestCase ):
         assert os.path.exists( self.audio_context.recording_directory )
 
     def test_add_training_data( self ):
-        sample = os.path.join( self.workdir, 'test.raw' )
+        sample = 'file://'+os.path.abspath(os.path.join( self.workdir, 'test.raw' ))
         context.twrite( sample, 'Moo' )
         transcription = 'this_is_a_test'
         record = self.audio_context.add_training_data( sample, transcription )

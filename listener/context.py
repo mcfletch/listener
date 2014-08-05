@@ -85,7 +85,7 @@ class Context( object ):
             'output': alsadevices.get_outputs(),
         }
     
-    def get_audio_context( self, key=None ):
+    def audio_context( self, key=None ):
         """Should only be done on root context..."""
         key = key or 'default'
         return AudioContext( self, key )
