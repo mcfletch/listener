@@ -49,6 +49,7 @@ if __name__ == "__main__":
                 'listener-uinput-rebuild-mapping=listener.uinputdriver:rebuild_mapping',
                 
                 'listener-dictionary-cache=listener.dictionarycache:main',
+                'listener-install-lm-tools=listener.context:install_lm_tools',
             ],
         ),
         zip_safe=False,

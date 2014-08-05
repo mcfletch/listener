@@ -76,6 +76,15 @@ class Context( object ):
     @one_shot
     def dictionary_file( self ):
         return os.path.join( self.language_model_directory, 'dictionary.dict' )
+    @one_shot
+    def base_dictionary_file( self ):
+        return os.path.join( self.language_model_directory, 'base.dict' )
+    @one_shot
+    def custom_dictionary_file( self ):
+        return os.path.join( self.language_model_directory, 'custom.dict' )
+    @one_shot
+    def custom_language_model( self ):
+        return os.path.join( self.language_model_directory, 'statements.txt' )
     
     def available_alsa_devices( self ):
         """Report the description,id for all available alsa devices"""
@@ -123,11 +132,16 @@ class Context( object ):
                     dic,
                     self.dictionary_file,
                 )
+                shutil.copy(
+                    dic,
+                    self.base_dictionary_file,
+                )
                 shutil.copytree( 
                     hmm,
                     self.hmm_directory,
                 )
                 found = True 
+        open( self.custom_dictionary_file, 'a')
         if not found:
             raise RuntimeError( 
                 """We appear to be missing the ubuntu/debian package pocketsphinx-hmm-en-hub4wsj""" 
@@ -154,6 +168,14 @@ class Context( object ):
     HMM_URL = 'https://sourceforge.net/projects/cmusphinx/files/Acoustic%20and%20Language%20Models/US%20English%20HUB4WSJ%20Acoustic%20Model/hub4wsj_sc_8k.tar.gz/download'
     def download_hmm_archive( self ):
         return self.download_url( self.HMM_URL, 'hub4_wsj_language_model.tar.gz' )
+    
+    CLM_TK_URL = "https://downloads.sourceforge.net/project/cmusphinx/cmuclmtk/0.7/cmuclmtk-0.7.tar.gz?r=&ts=1407260026&use_mirror=hivelocity"
+    def download_langauge_model_tools( self ):
+        """Download the CMU CLM Toolkit
+        
+        Why isn't this packaged for Ubuntu, I don't know...
+        """
+        return self.download_url( self.HMM_URL, 'cmuclmtk-0.7.tar.gz' )
     
     def rawplay(self, filename):
         """Play the given filename 
@@ -192,7 +214,112 @@ class Context( object ):
         ]).communicate()
         log.info( 'Finished playing' )
 
+    def transcriptions( self, words, guess=False ):
+        """Retrieve (known/guessed) transcriptions for the given words
         
+        TODO: we should actually *test* the guesses by updating the 
+        language model and seeing which guess matches when processing 
+        the audio being corrected... that will need quite a bit of work,
+        as we'll need to space-pad the files, generate temporary lms and 
+        process the audio N times... that likely needs to be 
+        offline/hidden/background processing
+        """
+        from . import dictionarycache, ipatoarpabet
+        cached = dictionarycache.DictionaryDB( self ).have_words( *words )
+        if guess:
+            for word in words:
+                if not cached.get( word ):
+                    cached[word] = ipatoarpabet.translate( word )
+        return cached
+    
+    def add_custom_word( self, word, arpabet ):
+        """Add a custom word to our dictionary"""
+        if isinstance( word, unicode ):
+            word = word.encode('utf-8')
+        if isisstance( arpabet, unicode ):
+            # this actually shouldn't happen save in the trivial case where 
+            # it's an ascii-compatible value...
+            arpabet = arpabet.encode('utf-8')
+        with open( self.custom_dictionary_file, 'a' ) as fh:
+            fh.write( '%s\t%s\n'%( word, arpabet ))
+    
+    LM_TOOLS_PREFIX = os.path.expanduser( '~/.local/lib/listener/cmutk' )
+    LM_BIN_DIRECTORY = os.path.join( LM_TOOLS_PREFIX, 'bin' )
+    # Language model updates...
+    def ensure_lm_tools( self ):
+        if os.path.exists( os.path.join( self.LM_BIN_DIRECTORY, 'idngram2lm') ):
+            log.info( 'Installed' )
+            return
+        # okay, so need to download, unpack and build...
+        log.warn( 'Need to get the language model tools to compile new model' )
+        archive = self.download_langauge_model_tools()
+        build = tempfile.mkdtemp( prefix='listener-cmu-', suffix='-build' )
+        try:
+            subprocess.check_call( [
+                'tar', '-zxf', archive 
+            ], cwd=build)
+            expected = os.path.join( build, 'cmuclmtk-0.7' )
+            if not os.path.exists( expected ):
+                raise RuntimeError( "Didn't unpack the expected directory" )
+            subprocess.check_call([
+                os.path.join(expected,'configure'), '--prefix=%s'%(os.path.abspath( self.LM_TOOLS_PREFIX )),
+            ], cwd=expected)
+            subprocess.check_call([
+                'make', 'install',
+            ], cwd=expected)
+        finally:
+            shutil.rmtree( build )
+    
+    
+    
+    def add_statements( self, texts ):
+        """Add a bit of text to our language model description"""
+        with open( self.custom_language_model, 'a' ) as fh:
+            # TODO: sanitize the text...
+            for text in texts:
+                content = '<s> %s </s>\n'%( text, )
+                fh.write( content )
+    
+    def regenerate_language_model( self ):
+        """Regenerate our language model"""
+        self.ensure_lm_tools()
+        bin = self.LM_BIN_DIRECTORY
+        subprocess.check_call(
+            '%s < %s | %s > %s'%(
+                os.path.join( bin, 'text2wfreq' ),
+                self.custom_language_model,
+                os.path.join( bin, 'wfreq2vocab' ),
+                self.custom_language_model+'.vocab',
+            ),
+            shell=True,
+        )
+        subprocess.check_call(
+            '%s -vocab %s -idngram %s < %s'%(
+                os.path.join( bin, 'text2idngram' ),
+                self.custom_language_model+'.vocab',
+                self.custom_language_model+'.idngram',
+                self.custom_language_model,
+            ),
+            shell=True,
+        )
+        subprocess.check_call(
+            '%s -vocab_type 0 -idngram %s -vocab %s -arpa %s'%(
+                os.path.join( bin, 'idngram2lm' ),
+                self.custom_language_model+'.idngram',
+                self.custom_language_model+'.vocab',
+                self.custom_language_model+'.arpa',
+            ),
+            shell=True,
+        )
+        subprocess.check_call(
+            'sphinx_lm_convert -i %s -o %s'%(
+                self.custom_language_model+'.arpa',
+                self.language_model_file + '~',
+            ),
+            shell=True,
+        )
+        os.rename( self.language_model_file + '~', self.language_model_file )
+
 class AudioContext( object ):
     """Audio/hardware/user context used to do acoustic adaptation
     
@@ -339,3 +466,9 @@ class AudioContext( object ):
         )
         os.close( handle )
         return filename
+
+
+def install_lm_tools( ):
+    logging.basicConfig( level = logging.INFO )
+    context = Context('default')
+    context.ensure_lm_tools()

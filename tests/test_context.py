@@ -38,7 +38,36 @@ class ContextTests( TestCase ):
         # that couldn't run the task...
         assert devices['input'], devices 
         assert devices['output'], devices
-
+    
+    def test_transcriptions_noguess( self ):
+        context.twrite( self.context.dictionary_file, 'goodbye\tG UH D B AY' )
+        known = self.context.transcriptions( [ 'toodles','goodbye' ] )
+        assert known['goodbye'], known 
+        assert not known['toodles'], known 
+    def test_transcriptions_guess( self ):
+        context.twrite( self.context.dictionary_file, 'goodbye\tG UH D B AY' )
+        known = self.context.transcriptions( [ 'toodles','goodbye' ], guess=True )
+        assert known['goodbye'], known 
+        assert known['toodles'], known 
+    
+    def test_create_small_context( self ):
+        self.context.add_statements([
+            'one',
+            'two',
+            'three',
+            'four',
+            'five',
+            'six',
+            'seven',
+            'eight',
+            'nine',
+            'ten',
+            'eleven',
+            'twelve',
+        ])
+        self.context.regenerate_language_model()
+        
+    
 class AudioContextTests( TestCase ):
     def setUp( self ):
         self.workdir = tempfile.mkdtemp( prefix='listener-', suffix='-test' )
