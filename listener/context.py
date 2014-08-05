@@ -148,6 +148,12 @@ class Context( object ):
             )
         if not os.path.exists( self.buffer_directory ):
             os.mkdir( self.buffer_directory )
+        self.add_custom_word(
+            '[left-bracket','L EH F T B R AE K IH T',
+        )
+        self.add_custom_word(
+            ']right-bracket','R AY T B R AE K IH T',
+        )
         return self.directory
 
     def download_url( self, url, filename ):
@@ -236,7 +242,7 @@ class Context( object ):
         """Add a custom word to our dictionary"""
         if isinstance( word, unicode ):
             word = word.encode('utf-8')
-        if isisstance( arpabet, unicode ):
+        if isinstance( arpabet, unicode ):
             # this actually shouldn't happen save in the trivial case where 
             # it's an ascii-compatible value...
             arpabet = arpabet.encode('utf-8')
