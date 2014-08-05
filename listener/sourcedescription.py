@@ -5,7 +5,7 @@ class SourceDescription( object ):
         self.url = urlparse.urlparse( url )
     @property 
     def continuous( self ):
-        return self.scheme in ('alsa','pulse')
+        return self.url.scheme in ('alsa','pulse')
     def gst_fragment( self ):
         if self.url.scheme in ('file',''):
             source = [
