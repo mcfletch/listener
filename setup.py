@@ -35,7 +35,7 @@ if __name__ == "__main__":
         ],
         entry_points = dict(
             console_scripts = [
-                "text2wfreq=listener.text2wfreq:main",
+                #"text2wfreq=listener.text2wfreq:main",
                 "listener-pipe=listener.pipeline:main",
                 'listener-code-to-words-py=listener.codetowords:main',
                 'listener-rawplay=listener.pipeline:rawplay',
