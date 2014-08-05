@@ -93,7 +93,7 @@ class AudioContextTests( TestCase ):
         assert os.path.exists( self.audio_context.recording_directory )
 
     def test_add_training_data( self ):
-        sample = 'file://'+os.path.abspath(os.path.join( self.workdir, 'test.raw' ))
+        sample = os.path.abspath(os.path.join( self.workdir, 'test.raw' ))
         context.twrite( sample, 'Moo' )
         transcription = 'this_is_a_test'
         record = self.audio_context.add_training_data( sample, transcription )

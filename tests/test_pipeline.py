@@ -21,10 +21,10 @@ class PipelineTests( TestCase ):
     def test_source_description_parsing( self ):
         for url in [
             'alsa://hw:2,0',
-            'file:///tmp/test/this.wav',
+            '/tmp/test/this.wav',
             #'file:///tmp/test/moo.ogg',
-            'file:///tmp/test/moo.opus',
-            'file:///tmp/test/moo.raw',
+            '/tmp/test/moo.opus',
+            '/tmp/test/moo.raw',
         ]:
             description = sourcedescription.SourceDescription( url )
             fragment = description.gst_fragment()

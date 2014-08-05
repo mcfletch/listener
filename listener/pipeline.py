@@ -108,9 +108,9 @@ class Pipeline( object ):
         """Set our source from a string in URL format
         
         alsa://hw:2,0
-        file:///path/to/file.raw
-        file:///path/to/file.opus
-        file:///path/to/file.wav
+        /path/to/file.raw
+        /path/to/file.opus
+        /path/to/file.wav
         
         From the source we will decide how to play the audio 
         file in order to get the audio into the format we need,
