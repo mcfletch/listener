@@ -220,6 +220,11 @@ class Context( object ):
         ]).communicate()
         log.info( 'Finished playing' )
 
+    @one_shot
+    def dictionary_cache( self ):
+        from . import dictionarycache, ipatoarpabet
+        return dictionarycache.DictionaryDB( self )
+        
     def transcriptions( self, words, guess=False ):
         """Retrieve (known/guessed) transcriptions for the given words
         
@@ -230,8 +235,7 @@ class Context( object ):
         process the audio N times... that likely needs to be 
         offline/hidden/background processing
         """
-        from . import dictionarycache, ipatoarpabet
-        cached = dictionarycache.DictionaryDB( self ).have_words( *words )
+        cached = self.dictionary_cache.have_words( *words )
         if guess:
             for word in words:
                 if not cached.get( word ):

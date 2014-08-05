@@ -57,16 +57,19 @@ class DictionaryDB( object ):
         cursor = self.connection.cursor()
         results = {}
         for word in words:
+            if isinstance( word, bytes ):
+                word = word.decode('utf-8')
+            if not word:
+                continue
+            word = word.lower()
             results[word] = []
             cursor.execute( 
-                "SELECT arpa from dictionary where word LIKE ?",
+                "SELECT arpa from dictionary where word = ?",
                 [word],
             )
             for row in cursor.fetchall():
                 results[word].append( row[0] )
         return results
-    
-    
 
 def main():
     from . import context 

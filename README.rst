@@ -72,6 +72,13 @@ Executables
     Note: this will download a *large* language model on first run. Currently
     that's done *before* the GUI starts, so the process will just seem to hang.
 
+`listener-code-to-words-py *.py`
+
+    Attempts to do a code-to-words translation (for building a language model)
+    based on a hand-coded Python code transformation. Still needs to get 
+    support for "runtogether" words to be able to produce even a basic 
+    mapping.
+    
 `listener-pipe`
 
     Attempt to setup a gstreamer pipeline using a downloaded language model 

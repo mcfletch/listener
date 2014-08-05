@@ -86,6 +86,7 @@ def _create_op_names( ):
         '%': '%percent',
         '@': '@at',
         '*': '*asterisk',
+        '**': '**asterisk-asterisk',
         '+': '+plus',
         '_': '_under',
     })
@@ -216,6 +217,24 @@ def codetowords( lines, dictionary=None ):
 
 
 def main():
-    lines = open( sys.argv[1] ).readlines()
+    logging.basicConfig(level=logging.INFO)
+    from . import context
+    translated = []
+    for filename in sys.argv[1:]:
+        log.info('Translating: %s', filename )
+        lines = open( filename ).readlines()
+        translated.extend( codetowords( lines ) )
+    context = context.Context('default')
+    unmapped = set()
+    all_words = set()
+    for line in translated:
+        all_words |= set(line)
+    log.info( 'Checking %s words for transcriptions', len(all_words))
+    transcriptions = context.transcriptions( sorted(all_words) )
+    for word,arpa in transcriptions.items():
+        if not arpa:
+            unmapped.add( word )
+    log.info( '%s words unmapped', len(unmapped))
     import pprint
-    pprint.pprint(codetowords( lines ))
+    pprint.pprint( sorted(unmapped))
+    

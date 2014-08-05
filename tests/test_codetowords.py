@@ -77,3 +77,4 @@ class CodetoWordsTests( TestCase ):
         for line,expected in expected:
             result = codetowords.codetowords([line])
             assert result == expected, (line, result)
+    
