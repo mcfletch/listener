@@ -93,8 +93,29 @@ OP_NAMES = _create_op_names()
 
 def parse_camel( name ):
     return re.sub(r'([A-Z]+)', r' \1', name).strip().split()
+
+DIGITS = {
+    '0':'zero',
+    '1':'one',
+    '2':'two',
+    '3':'three',
+    '4':'four',
+    '5':'five',
+    '6':'six',
+    '7':'seven',
+    '8':'eight',
+    '9':'nine',
+    'x':'x',
+    'X':'x',
+    '-':'minus',
+    '+':'plus',
+    'e':'e',
+    '.':'.dot',
+}
+def digit( c ):
+    return DIGITS.get(c)
     
-def break_down_name( name ):
+def break_down_name( name, dictionary=None ):
     result = []
     if name.startswith( '__' ) and name.endswith( '__'):
         return ['dunder'] + break_down_name( name[2:-4] )
@@ -133,7 +154,7 @@ def break_down_name( name ):
         return ['camel']+possibles 
     return possibles
     
-def codetowords( lines ):
+def codetowords( lines, dictionary=None ):
     """Tokenize a given line for further processing"""
     current_line = []
     new_lines = [current_line]
@@ -143,10 +164,12 @@ def codetowords( lines ):
         elif type == tokenize.NEWLINE:
             current_line = []
             new_lines.append( current_line )
+        elif type == tokenize.NUMBER:
+            current_line.extend( ['number']+ [digit(x) for x in token]+['end number'] )
         elif type in (tokenize.ENDMARKER,tokenize.INDENT,tokenize.DEDENT):
             pass
         elif type == tokenize.NAME:
-            current_line.extend( break_down_name( token ) )
+            current_line.extend( break_down_name( token, dictionary=dictionary ) )
         else:
             current_line.append( token )
     return new_lines

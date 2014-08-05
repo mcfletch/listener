@@ -21,8 +21,7 @@ class CodetoWordsTests( TestCase ):
         ]:
             result = codetowords.break_down_name( input )
             assert result == expected, (input,result)
-        
-        
+
     def test_tokens(self):
         expected = [
             (
@@ -40,11 +39,11 @@ class CodetoWordsTests( TestCase ):
             ),
             (
                 'objectReference.attributeReference = 34 * deltaValue',
-                [['camel', 'object', 'Reference', '.dot', 'camel', 'attribute', 'Reference', '=equals', '34', '*asterisk', 'camel', 'delta', 'Value']],
+                [['camel', 'object', 'Reference', '.dot', 'camel', 'attribute', 'Reference', '=equals', 'number', 'three','four', 'end number', '*asterisk', 'camel', 'delta', 'Value']],
             ),
             (
                 'GLUT_SOMETHING_HERE = 0x234',
-                [['all', 'caps', 'GLUT', 'under', 'all', 'caps', 'SOMETHING', 'under', 'all', 'caps', 'HERE', '=equals', '0x234']],
+                [['all', 'caps', 'GLUT', 'under', 'all', 'caps', 'SOMETHING', 'under', 'all', 'caps', 'HERE', '=equals', 'number', 'zero', 'x', 'two', 'three', 'four', 'end number']],
             ),
             (
                 'class VeridianEgg:',
