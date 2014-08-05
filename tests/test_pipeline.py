@@ -48,3 +48,13 @@ class PipelineTests( TestCase ):
         assert result['text']
         assert 'hello world' in result['text'], result
     
+    def test_pipeline_default_source_is_alsa( self ):
+        self.pipeline = pipeline.QueuePipeline(context=self.context)
+        assert self.pipeline.source.continuous
+        fragment = self.pipeline.source.gst_fragment()
+        assert 'alsasrc' in fragment, fragment
+        
+        self.pipeline.source = None 
+        assert self.pipeline._source is None 
+    
+    
