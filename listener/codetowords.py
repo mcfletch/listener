@@ -9,24 +9,87 @@ import re, tokenize, sys
 import logging
 log = logging.getLogger( __name__ )
 
-OP_NAMES = {
-    '(':'open paren',
-    ')':'close paren',
-    '[':'open bracket',
-    ']':'close bracket',
-    '{': 'open brace',
-    '}': 'close brace',
-    '<': 'less than',
-    '>': 'greater than',
-    ':':'colon',
-    '=':'equals',
-    '==':'equal equal',
-    '!=':'not equal',
-    '.': 'dot',
-    ',': 'comma',
-    '%': 'percent',
-    '@': 'at',
-}
+OP_PARSER = re.compile(r'(\W+)(.+)')
+def parse_op( op ):
+    op = op.split('\t')[0]
+    return OP_PARSER.match( op ).groups()[0], op
+
+def _create_op_names( ):
+    result = {}
+    for o in [
+        '!exclamation-point\tEH K S K L AH M EY SH AH N P OY N T\n',
+        '"double-quote\tD AH B AH L K W OW T\n',
+        '"end-of-quote\tEH N D AH V K W OW T\n',
+        '"end-quote\tEH N D K W OW T\n',
+        '"quote\tK W OW T\n',
+        '"unquote\tAH N K W OW T\n',
+        '#sharp-sign\tSH AA R P S AY N\n',
+        '%percent\tP ER S EH N T\n',
+        '&ampersand\tAE M P ER S AE N D\n',
+        "'quote\tK W OW T\n",
+        "'single-quote\tS IH NG G AH L K W OW T\n",
+        #'(begin-parens\tB IH G IH N P ER EH N Z\n',
+        '(left-paren\tL EH F T P ER EH N\n',
+        '(open-parentheses\tOW P AH N P ER EH N TH AH S IY Z\n',
+        '(paren\tP ER EH N\n',
+        '(parens\tP ER EH N Z\n',
+        '(parentheses\tP ER EH N TH AH S IY Z\n',
+#        ')close-paren\tK L OW Z P ER EH N\n',
+#        ')close-parentheses\tK L OW Z P ER EH N TH AH S IY Z\n',
+#        ')end-paren\tEH N D P ER EH N\n',
+#        ')end-parens\tEH N D P ER EH N Z\n',
+#        ')end-parentheses\tEH N D P ER EH N TH AH S IY Z\n',
+#        ')end-the-paren\tEH N D DH AH P ER EH N\n',
+#        ')paren\tP ER EH N\n',
+#        ')parens\tP ER EH N Z\n',
+        ')right-paren\tR AY T P ER EH N\n',
+        ')un-parentheses\tAH N P ER EH N TH AH S IY Z\n',
+        ',comma\tK AA M AH\n',
+        '-dash\tD AE SH\n',
+        '-hyphen\tHH AY F AH N\n',
+        '...ellipsis\tIH L IH P S IH S\n',
+        '.dot\tD AA T\n',
+        '.decimal\tD EH S AH M AH L\n',
+        '.full-stop\tF UH L S T AA P\n',
+        '.period\tP IH R IY AH D\n',
+        '.point\tP OY N T\n',
+        '/slash\tS L AE SH\n',
+        ':colon\tK OW L AH N\n',
+        ';semi-colon\tS EH M IY K OW L AH N\n',
+        '?question-mark\tK W EH S CH AH N M AA R K\n',
+        '{brace\tB R EY S\n',
+        '{left-brace\tL EH F T B R EY S\n',
+        '}close-brace\tK L OW Z B R EY S\n',
+        '}right-brace\tR AY T B R EY S\n',
+        # custom...
+        '[left-bracket\tL EH F T B R AE K IH T',
+        ']right-bracket\tR AY T B R AE K IH T',
+    ]:
+        punc,name = parse_op( o )
+        if punc not in result:
+            result[punc] = name
+    result.update({
+        '(':'(open-paren',
+        ')':')close-paren',
+        '[':'[open-bracket',
+        ']':']close-bracket',
+        '{': '{open-brace',
+        '}': '}close-brace',
+        '<': '<less-than',
+        '>': '>greater-than',
+        ':':':colon',
+        '=':'=equals',
+        '==':'==equal-equal',
+        '!=':'!=not-equal',
+        '.': '.dot',
+        ',': ',comma',
+        '%': '%percent',
+        '@': '@at',
+        '*': '*asterisk',
+    })
+
+    return result
+OP_NAMES = _create_op_names()
 
 def parse_camel( name ):
     return re.sub(r'([A-Z]+)', r' \1', name).strip().split()
@@ -88,47 +151,6 @@ def codetowords( lines ):
             current_line.append( token )
     return new_lines
 
-def test_names():
-    for input,expected in [
-        ('thisTest',['camel', 'this', 'Test']),
-        ('ThisTest',['cap','camel', 'This', 'Test']),
-        ('that_test',['that','under','test']),
-    ]:
-        result = break_down_name( input )
-        assert result == expected, (input,result)
-    
-    
-def test_tokens():
-    expected = [
-        (
-            'test[this]',
-            [['test','open bracket','this','close bracket',]]
-        ),
-        (
-            'this.test(this,that)',
-            [['this','dot','test','open paren','this','comma','that','close paren']],
-        ),
-        
-        (
-            'class Veridian(object):',
-            [['class', 'cap', 'Veridian', 'open paren', 'object', 'close paren', 'colon']],
-        ),
-        (
-            'objectReference.attributeReference = 34 * deltaValue',
-            [['camel', 'object', 'Reference', 'dot', 'camel', 'attribute', 'Reference', 'equals', '34', '*', 'camel', 'delta', 'Value']],
-        ),
-        (
-            'GLUT_SOMETHING_HERE = 0x234',
-            [['all', 'caps', 'GLUT', 'under', 'all', 'caps', 'SOMETHING', 'under', 'all', 'caps', 'HERE', 'equals', '0x234']],
-        ),
-        (
-            'class VeridianEgg:',
-            [['class', 'cap', 'camel', 'Veridian', 'Egg', 'colon']],
-        ),
-    ]
-    for line,expected in expected:
-        result = codetowords([line])
-        assert result == expected, (line, result)
 
 def main():
     lines = open( sys.argv[1] ).readlines()
