@@ -3,5 +3,5 @@
 set -e
 
 coverage erase
-nosetests-2.7 -v --with-cov
+nosetests-2.7 -v --with-cov $*
 coverage report -m
