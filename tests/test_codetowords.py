@@ -39,11 +39,11 @@ class CodetoWordsTests( TestCase ):
             ),
             (
                 'objectReference.attributeReference = 34 * deltaValue',
-                [['camel', 'object', 'Reference', '.dot', 'camel', 'attribute', 'Reference', '=equals', 'number', 'three','four', 'end number', '*asterisk', 'camel', 'delta', 'Value']],
+                [['camel', 'object', 'Reference', '.dot', 'camel', 'attribute', 'Reference', '=equals', 'three','four', '*asterisk', 'camel', 'delta', 'Value']],
             ),
             (
-                'GLUT_SOMETHING_HERE = 0x234',
-                [['all', 'caps', 'GLUT', 'under', 'all', 'caps', 'SOMETHING', 'under', 'all', 'caps', 'HERE', '=equals', 'number', 'zero', 'x', 'two', 'three', 'four', 'end number']],
+                'GLUT_SOMETHING_HERE = 0x234A',
+                [['all', 'caps', 'GLUT', 'under', 'all', 'caps', 'SOMETHING', 'under', 'all', 'caps', 'HERE', '=equals', 'zero', 'x', 'two', 'three', 'four', 'cap a',]],
             ),
             (
                 'class VeridianEgg:',
@@ -71,6 +71,12 @@ class CodetoWordsTests( TestCase ):
                     "'''triple-single-quote",
                     'this',
                     "'''triple-single-quote"
+                ]],
+            ),
+            (
+                "testruntogether=2",
+                [[
+                    "no-space", "test", "run", "together", '=equals', 'two'
                 ]],
             ),
         ]

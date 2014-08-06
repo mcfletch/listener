@@ -145,11 +145,21 @@ DIGITS = {
     '7':'seven',
     '8':'eight',
     '9':'nine',
+    'a':'a',
+    'A':'cap a',
+    'b':'b',
+    'c':'c',
+    'C':'cap c',
+    'd':'d',
+    'D':'cap D',
+    'e':'e',
+    'E':'cap E',
+    'f':'f',
+    'F':'cap F',
     'x':'x',
     'X':'x',
     '-':'minus',
     '+':'plus',
-    'e':'e',
     '.':'.dot',
 }
 def digit( c ):
@@ -161,36 +171,36 @@ def break_down_name( name, dictionary=None ):
     if split:
         return split
     if name.startswith( '__' ) and name.endswith( '__'):
-        return ['dunder'] + break_down_name( name[2:-2] )
+        return ['dunder'] + break_down_name( name[2:-2], dictionary=dictionary )
     elif '__' in name:
         fragments = [x for x in name.split('__')]
         for fragment in fragments[:-1]:
             if fragment:
-                result.extend( break_down_name(fragment))
+                result.extend( break_down_name(fragment,dictionary=dictionary))
             result.extend( ['under','under'] )
         if fragments[-1]:
-            result.extend( break_down_name(fragments[-1]))
+            result.extend( break_down_name(fragments[-1],dictionary=dictionary))
         return result
     elif '_' in name:
         fragments = [x for x in name.split('_')]
         # TODO: provide a under-name x y z -> x_y_z
         for fragment in fragments[:-1]:
             if fragment:
-                result.extend( break_down_name(fragment))
+                result.extend( break_down_name(fragment,dictionary=dictionary))
             result.extend( ['under'] )
         if fragments[-1]:
-            result.extend( break_down_name(fragments[-1]))
+            result.extend( break_down_name(fragments[-1],dictionary=dictionary))
         return result
     possibles = parse_camel( name )
     return possibles
 
 TEXT_SPLITTER = re.compile( r"""(\w+[']\w+)|\w+|[^\w\s]+|[\n]""", re.U|re.M )
-def textual_content( content ):
+def textual_content( content, dictionary=None ):
     """Break down textual content (strings, comments) into dictation"""
     words = [x.group(0) for x in TEXT_SPLITTER.finditer(content)]
     result = []
     for word in words:
-        result.extend( break_down_name( word ))
+        result.extend( break_down_name( word, dictionary=dictionary ))
     return result
 
 def operator( token ):
@@ -217,36 +227,34 @@ def codetowords( lines, dictionary=None ):
             # newline without new source-code-line
             current_line.extend([ 'new','line'])
         elif type == tokenize.NUMBER:
-            current_line.extend( ['number']+ [digit(x) for x in token]+['end number'] )
+            current_line.extend( [digit(x) for x in token] )
         elif type == tokenize.COMMENT:
             match = CODING.search( token )
             if match:
                 encoding = match.group(1)
-            current_line.extend( textual_content( token ))
+            current_line.extend( textual_content( token, dictionary=dictionary ))
         elif type == tokenize.STRING:
             if token[0].isalpha():
                 log.warn( 'Prefixed String: %r', token )
             while token and token[0].isalpha():
                 current_line.append( token[0] )
                 token = token[1:]
-            if token.startswith( '"""' ):
-                current_line.extend( ['"""triple-quote'] )
-                current_line.extend( textual_content( token[3:-3].decode(encoding) ) )
-                current_line.extend( ['"""triple-quote'] )
-            elif token.startswith( "'''" ):
-                current_line.extend( ["'''triple-single-quote"] )
-                current_line.extend( textual_content( token[3:-3].decode(encoding) ) )
-                current_line.extend( ["'''triple-single-quote"] )
-            elif token.startswith( '"' ):
-                current_line.extend( ['"quote'] )
-                current_line.extend( textual_content( token[1:-1].decode(encoding) ) )
-                current_line.extend( ['"quote'] )
-            elif token.startswith( "'" ):
-                current_line.extend( ["'single-quote"] )
-                current_line.extend( textual_content( token[1:-1].decode(encoding) ) )
-                current_line.extend( ["'single-quote"] )
-            else:
-                raise RuntimeError( 'Unknown string format: %r'%( token,) )
+            
+            for quote_type,name in [
+                ('"""','"""triple-quote'),
+                ("'''","'''triple-single-quote"),
+                ('"', '"quote'),
+                ("'", "'single-quote")
+            ]:
+                if token.startswith( quote_type ):
+                    
+                    token = token[len(quote_type):-len(quote_type)]
+                    current_line.append( name )
+                    current_line.extend( textual_content( 
+                        token.decode(encoding), 
+                        dictionary=dictionary 
+                    ) )
+                    current_line.append( name )
         elif type == tokenize.DEDENT:
             current_line.append( 'dedent' )
         elif type == tokenize.INDENT:
