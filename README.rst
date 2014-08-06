@@ -77,7 +77,13 @@ Executables
     Attempts to do a code-to-words translation (for building a language model)
     based on a hand-coded Python code transformation. Still needs to get 
     support for "runtogether" words to be able to produce even a basic 
-    mapping.
+    mapping. Writes .py.dictation files next to the source files currently.
+
+`listener-missing-words *.py`
+
+    Performs code-to-words translations and reports all words/tokens not in 
+    the default dictionary. This is mostly for use in improving the 
+    code to words code.
     
 `listener-pipe`
 
