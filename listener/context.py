@@ -45,6 +45,12 @@ class Context( object ):
     TODO: need to allow the user to specify levels for recording playback 
     independent of general desktop levels (KDE settings are not reliable)
     """
+    TEMPLATE_FILES = [
+        os.path.join( HERE, 'punctuation.csv' ),
+        os.path.join( HERE, 'meta-commands.csv' ),
+        os.path.join( HERE, 'commonshortforms.csv' ),
+    ]
+    
     def __init__( self, key, parent=None, directory=None ):
         if not key.isalnum():
             raise ValueError( "Need an alpha-numeric name for the context" )
@@ -151,33 +157,32 @@ class Context( object ):
             # this should likely be a mechanism to allow the user 
             # to mix-in various utility dictionaries, but these
             # are *so* common we likely always need them...
-            self.copy_template_to_dictionary(
-                os.path.join( HERE, 'punctuation.csv' ),
-                self.custom_dictionary_file,
-            )
-            self.copy_template_to_dictionary(
-                os.path.join( HERE, 'meta-commands.csv' ),
-                self.custom_dictionary_file,
-            )
-            self.copy_template_to_dictionary(
-                os.path.join( HERE, 'commonshortforms.csv' ),
-                self.custom_dictionary_file,
-            )
+            for template in self.TEMPLATE_FILES:
+                self.copy_template_to_dictionary(
+                    template,
+                    self.custom_dictionary_file,
+                )
+            self.copy_template_statements()
             if not os.path.exists( self.buffer_directory ):
                 os.mkdir( self.buffer_directory )
             return self.directory
         finally:
             shutil.rmtree( tempdir )
     
-    def copy_template_to_dictionary( self, template, dictionary, separator=','):
+    def iter_template_words( self, template, separator=','):
         lines = [
             line.split(separator,1)
             for line in open( template ).read().splitlines()
             if line.strip()
         ]
+        for line in lines:
+            yield line
+    
+    def copy_template_to_dictionary( self, template, dictionary, separator=','):
         written_counts = {}
         with open( dictionary, 'a') as fh:
-            for line in lines:
+            words = []
+            for line in self.iter_template_words( template, dictionary, separator ):
                 try:
                     count = written_counts.get( line[0],0)
                     count += 1
@@ -188,7 +193,14 @@ class Context( object ):
                 except Exception as err:
                     err.args += (line,)
                     raise
-        
+    def copy_template_statements(self):
+        words = set()
+        for template in self.TEMPLATE_FILES:
+            for line in self.iter_template_words( 
+                template, self.custom_dictionary_file,
+            ):
+                words.add(line[0])
+        self.add_statements( words )
 
     def download_url( self, url, filename ):
         """Download given URL to a local filename in our cache directory 
@@ -330,6 +342,15 @@ class Context( object ):
     def regenerate_language_model( self ):
         """Regenerate our language model"""
         self.ensure_lm_tools()
+        
+        subprocess.check_call(
+            'cat %s %s > %s'%(
+                self.base_dictionary_file, 
+                self.custom_dictionary_file,
+                self.dictionary_file,
+            ),
+            shell=True,
+        )
         bin = self.LM_BIN_DIRECTORY
         subprocess.check_call(
             '%s < %s | %s > %s'%(
