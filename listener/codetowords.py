@@ -102,7 +102,50 @@ def _create_op_names( ):
     return result
 OP_NAMES = _create_op_names()
 
-def parse_camel( name ):
+def parse_run_together( name, dictionary=None ):
+    if not dictionary:
+        return [name]
+    # split up the name looking for runtogether words...
+    name = name.lower()
+    if name in dictionary:
+        return [name]
+    # anything smaller than 1 is *always* in the dictionary...
+    prefixes = [name[:i] for i in range(1,len(name))]
+    mapped = dictionary.have_words( *prefixes )
+    possibles = []
+    for (prefix,translations) in sorted(mapped.items(),key=lambda x: len(x[0]),reverse=True):
+        if translations:
+            suffix = name[len(prefix):]
+            if suffix in dictionary:
+                return [prefix,suffix]
+            remaining = parse_run_together( suffix, dictionary )
+            if len(prefix) > 1 and remaining != [suffix]:
+                return [prefix]+remaining
+            possibles.append( [ prefix ] + remaining )
+    suffixes = [name[-i:] for i in range(1,len(name))]
+    mapped = dictionary.have_words( *suffixes )
+    possibles = []
+    for (suffix,translations) in sorted(mapped.items(),key=lambda x: len(x[0]),reverse=True):
+        if translations:
+            prefix = name[:-len(suffix)]
+            if prefix in dictionary:
+                return [prefix,suffix]
+            remaining = parse_run_together( prefix, dictionary )
+            if len(suffix) > 1 and remaining != [prefix]:
+                return remaining+[suffix]
+            possibles.append( remaining+[suffix] )
+    if len(name) < 3:
+        return list(name)
+    return [name]
+
+def parse_run_together_with_markup( name, dictionary ):
+    base =parse_run_together( name, dictionary )
+    if len(base) > 1:
+        return ['no-space']+base+['spaces']
+    return base
+    
+
+def parse_camel( name, dictionary=None ):
     expanded = re.sub(r'([A-Z]+|[0-9]+)', r' \1', name)
     split = expanded.strip().split()
     all_caps = [x.upper() for x in split] == split
@@ -117,22 +160,27 @@ def parse_camel( name ):
         else:
             split_expanded.append( item )
 
+    run_together_expansion = sum([
+        parse_run_together_with_markup(x,dictionary) 
+        for x in split_expanded
+    ],[])
+    result = run_together_expansion
     if len(words) == 0:
         # e.g. numeric fragment of a name...
         pass
     elif len(words) == 1:
         if words[0].isupper():
-            split_expanded = ['all','caps'] + split_expanded
+            result = ['all','caps'] + run_together_expansion
         elif words[0].title() == words[0]:
-            split_expanded = ['cap']+split_expanded
+            result = ['cap']+run_together_expansion
     else:
         if all_caps:
-            split_expanded = ['all', 'caps'] + split_expanded
+            result = ['all', 'caps'] + run_together_expansion
         elif cap_camel_case:
-            split_expanded = ['cap','camel'] + split_expanded
+            result = ['cap','camel'] + run_together_expansion
         elif camel_case and len(split) > 1:
-            split_expanded = ['camel'] + split_expanded
-    return split_expanded
+            result = ['camel'] + run_together_expansion
+    return result
 
 DIGITS = {
     '0':'zero',
@@ -191,7 +239,7 @@ def break_down_name( name, dictionary=None ):
         if fragments[-1]:
             result.extend( break_down_name(fragments[-1],dictionary=dictionary))
         return result
-    possibles = parse_camel( name )
+    possibles = parse_camel( name, dictionary=dictionary )
     return possibles
 
 TEXT_SPLITTER = re.compile( r"""(\w+[']\w+)|\w+|[^\w\s]+|[\n]""", re.U|re.M )

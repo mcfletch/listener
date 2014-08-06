@@ -43,14 +43,17 @@ class DictionaryDB( object ):
         log.warn( 'Dictionary cache created' )
         return connection
     
-    def add_dictionary_file( self, dictionary_file ):
+    def add_dictionary_iterable( self, iterable ):
+        """Add words from the given iterable"""
         connection = self.connection
         cursor = connection.cursor()
         cursor.executemany(
             "INSERT INTO dictionary( word, arpa ) VALUES (?,?)",
-            self.dictionary_iterator( dictionary_file ),
+            iterable,
         )
         connection.commit()
+    def add_dictionary_file( self, dictionary_file ):
+        return self.add_dictionary_iterable( self.dictionary_iterator( dictionary_file ) )
     
     def have_words( self, *words ):
         """For each word in word, report all arpa values for them"""
@@ -70,10 +73,17 @@ class DictionaryDB( object ):
             for row in cursor.fetchall():
                 results[word].append( row[0] )
         return results
+    def __contains__( self, word ):
+        return bool(self.have_words( word ).get(word))
 
+usage = 'listener-dictionary-cache <words>\n'
 def main():
     from . import context 
+    import pprint, sys
+    if not sys.argv[1:]:
+        sys.stdout.write( usage )
+        sys.exit(1)
     c = context.Context('default')
     db = DictionaryDB( c )
-    print db.have_words( 'abductee','two','too','to' )
+    pprint.pprint( db.have_words( *sys.argv[1:] ))
     db.connection.close()

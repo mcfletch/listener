@@ -1,13 +1,15 @@
 from unittest import TestCase
 import tempfile, shutil, os, time
-from listener import codetowords
+from listener import codetowords,context
 HERE = os.path.dirname( __file__ )
 
-class CodetoWordsTests( TestCase ):
+class CodeToWordsTests( TestCase ):
     def setUp( self ):
         self.workdir = tempfile.mkdtemp( 
             prefix='listener-', suffix='-test', dir='/dev/shm' 
         )
+        self.context = context.Context('default')
+
     def tearDown( self ):
         shutil.rmtree( self.workdir, True ) # ignore errors
     def test_ops_parsed( self ):
@@ -23,6 +25,11 @@ class CodetoWordsTests( TestCase ):
             assert result == expected, (input,result)
 
     def test_tokens(self):
+        dictionary = self.context.dictionary_cache
+        dictionary.add_dictionary_iterable([
+            ('veridian','MOO'),
+            ('glut','MOO'),
+        ])
         expected = [
             (
                 'test[this]',
@@ -43,15 +50,15 @@ class CodetoWordsTests( TestCase ):
             ),
             (
                 'GLUT_SOMETHING_HERE = 0x234A',
-                [['all', 'caps', 'GLUT', 'under', 'all', 'caps', 'SOMETHING', 'under', 'all', 'caps', 'HERE', '=equals', 'zero', 'x', 'two', 'three', 'four', 'cap a',]],
+                [['all', 'caps', 'glut', 'under', 'all', 'caps', 'something', 'under', 'all', 'caps', 'here', '=equals', 'zero', 'x', 'two', 'three', 'four', 'cap a',]],
             ),
             (
                 'class VeridianEgg:',
-                [['class', 'cap', 'camel', 'Veridian', 'Egg', ':colon']],
+                [['class', 'cap', 'camel', 'veridian', 'egg', ':colon']],
             ),
             (
                 'newItem34',
-                [['camel','new','Item','three','four']],
+                [['camel','new','item','three','four']],
             ),
             (
                 'new_item_34',
@@ -81,6 +88,25 @@ class CodetoWordsTests( TestCase ):
             ),
         ]
         for line,expected in expected:
-            result = codetowords.codetowords([line])
+            result = codetowords.codetowords([line], dictionary=dictionary)
             assert result == expected, (line, result)
     
+    def test_run_together( self ):
+        dictionary = self.context.dictionary_cache
+        dictionary.add_dictionary_iterable([
+            ('kde','K D IY'),
+            ('veridian','MOO'),
+        ])
+        for run_together, expected in [
+            ('om',['o','m']),
+            ('buildthis',['build','this']),
+            ('Moveoverage',['move','over','age']),
+            ('generateov',['generate','o','v']),
+            ('qapplication',['q','application']),
+            ('kdebuildingwindow',['kde','building','window']),
+            ('VeridianEgg',['veridian','egg']),
+            ('Veridian',['veridian']),
+        ]:
+            result = codetowords.parse_run_together( run_together, dictionary )
+            assert result== expected, (run_together,result)
+        
