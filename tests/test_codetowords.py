@@ -19,7 +19,7 @@ class CodeToWordsTests( TestCase ):
         for input,expected in [
             ('thisTest',['camel', 'this', 'test']),
             ('ThisTest',['cap','camel', 'this', 'test']),
-            ('that_test',['that','under','test']),
+            ('that_test',['that','_under-score','test']),
             #('oneshot',['no-space','one','shot','spaces']), # would need statistical model
         ]:
             result = codetowords.break_down_name( input, dictionary=self.context.dictionary_cache )
@@ -51,7 +51,7 @@ class CodeToWordsTests( TestCase ):
             ),
             (
                 'GLUT_SOMETHING_HERE = 0x234A',
-                [['all', 'caps', 'glut', 'under', 'all', 'caps', 'something', 'under', 'all', 'caps', 'here', '=equals', 'zero', 'x', 'two', 'three', 'four', 'cap a',]],
+                [['all', 'caps', 'glut', '_under-score', 'all', 'caps', 'something', '_under-score', 'all', 'caps', 'here', '=equals', 'zero', 'x', 'two', 'three', 'four', 'cap a',]],
             ),
             (
                 'class VeridianEgg:',
@@ -63,7 +63,7 @@ class CodeToWordsTests( TestCase ):
             ),
             (
                 'new_item_34',
-                [['new','under','item','under','three','four']],
+                [['new','_under-score','item','_under-score','three','four']],
             ),
             (
                 '"""this"""',
