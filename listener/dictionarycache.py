@@ -29,12 +29,14 @@ class DictionaryDB( object ):
     
     def dictionary_iterator( self, dictionary_file, separator='\t' ):
         for i,line in enumerate(open(dictionary_file)):
-            word,description = line.strip().split(separator,1)
-            if word.endswith(')'):
-                word = word.rsplit('(',1)[0]
-            word = as_unicode(word)
-            description = as_unicode(description)
-            yield word.lower(),description.upper()
+            line = line.strip()
+            if line:
+                word,description = line.strip().split(separator,1)
+                if word.endswith(')'):
+                    word = word.rsplit('(',1)[0]
+                word = as_unicode(word)
+                description = as_unicode(description)
+                yield word.lower(),description.upper()
 
     def initialize( self, connection ):
         log.warn( 'Creating dictionary cache, may take a few seconds' )

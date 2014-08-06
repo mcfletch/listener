@@ -187,6 +187,55 @@ def context_from_project():
     working_context.regenerate_language_model()
 
 @with_logging
+def subset_dictionary(  ):
+    """Create a subset dictionary from working context's dictionary
+    
+    This is a bit useless, so not recommended for use. Average person 
+    has ~35,000 word vocabulary. The default dictionary is ~130,000
+    words, way too large and full of lots of stuff you're not likely 
+    to actually want to dictate.
+    """
+    log = logging.getLogger( 'subset' )
+    parser = base_arguments('Create a dictionary subset of highest-frequency words from an NLTK corpus')
+    parser.add_argument(
+        '--corpus',type=bytes,default='webtext',
+        help="NLTK corpus to download and process",
+    )
+    parser.add_argument(
+        '--count',type=int,default=10000,
+        help="Number of items to include in dictionary",
+    )
+    arguments = parser.parse_args()
+    working_context = context.Context( arguments.context )
+    import nltk, nltk.corpus
+    nltk.download( arguments.corpus )
+    corpus = getattr( nltk.corpus, arguments.corpus )
+    total = corpus.words()
+    log.info( '%s words in corpus', len(total))
+    fd =nltk.FreqDist([
+        as_unicode(w).lower()
+        for w in total
+        if w.isalnum()
+    ])
+    all_items = list(fd.iteritems())
+    log.info( '%s distinct words', len(all_items))
+    translations = working_context.dictionary_cache.have_words(
+        *[x[0] for x in all_items[:int(arguments.count*1.5)]]
+    )
+    count = 0
+    items = []
+    for (word,frequency) in fd.iteritems():
+        if translations.get( word ):
+            count += 0
+            for t in translations.get(word):
+                items.append( (word,t))
+            if count >= arguments.count:
+                break 
+    items.sort()
+    for word,translation in items:
+        print '%s\t%s'%(as_bytes(word),as_bytes(translation))
+
+@with_logging
 def qt_gui():
     parser = base_arguments('Run the qt-based listener GUI client')
     arguments = parser.parse_args()

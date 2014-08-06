@@ -43,6 +43,7 @@ if __name__ == "__main__":
                 'listener-dictionary-cache=listener.dictionarycache:main',
                 'listener-context-from-project=listener.cli:context_from_project',
                 'listener-qt=listener.cli:qt_gui',
+                'listener-dictionary-subset=listener.cli:subset_dictionary',
                 
                 'listener-rawplay=listener.pipeline:rawplay',
                 
