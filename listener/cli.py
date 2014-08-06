@@ -176,6 +176,8 @@ def context_from_project():
     )
     arguments = parser.parse_args()
     if arguments.context == 'default':
+        arguments.context = os.path.basename(os.path.abspath(arguments.directory))
+    if arguments.context == 'default':
         raise RuntimeError( "You can't create a new default context" )
     working_context = context.Context( arguments.context )
     files = get_python_files( arguments.directory )
@@ -192,6 +194,8 @@ def context_from_project():
             ])
             fh.write( composed )
             fh.write( '\n' )
+    if arguments.clean:
+        working_context.copy_template_statements()
     for word,pron in iter_unmapped_words( all_lines, working_context ):
         log.info( 'Adding word: %r -> %r', word,pron )
         working_context.add_custom_word( as_unicode(word),as_unicode(pron) )
@@ -259,5 +263,16 @@ def qt_gui():
     
     app.exec_()
 
-if __name__ == "__main__":
-    main()
+@with_logging
+def dictionary_lookup():
+    from . import context 
+    import pprint
+    parser = base_arguments('Lookup word pronunciation in dictionary')
+    parser.add_argument(
+        'words',metavar='WORD',type=bytes,nargs="+",
+        help="The words to lookup",
+    )
+    arguments = parser.parse_args()
+    working_context = context.Context( arguments.context )
+    db = working_context.dictionary_cache
+    pprint.pprint( db.have_words( *arguments.words ))
