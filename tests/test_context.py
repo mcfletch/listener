@@ -1,6 +1,6 @@
 from unittest import TestCase
 import tempfile, shutil, os
-from listener import context
+from listener import context, codetowords
 
 class ContextTests( TestCase ):
     def setUp( self ):
@@ -66,6 +66,17 @@ class ContextTests( TestCase ):
             'twelve',
         ])
         self.context.regenerate_language_model()
+    def test_punctuation_added( self ):
+        names = codetowords.OP_NAMES.values()
+        expanded = []
+        for name in names:
+            if ' ' in name:
+                expanded.extend( name.split( ' '))
+            else:
+                expanded.append( name )
+        mapping = self.context.transcriptions( expanded )
+        for name,translated in mapping.items():
+            assert translated, name
         
     
 class AudioContextTests( TestCase ):
@@ -107,3 +118,5 @@ class AudioContextTests( TestCase ):
         records = list(self.audio_context.training_records())
         assert records == [ ], records 
         
+
+    

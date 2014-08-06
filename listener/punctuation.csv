@@ -4,8 +4,8 @@
 <less-than,L EH S DH AH N
 >greater-than,G R EY T ER  DH AH N
 =equals,iy k w ah l z
-=equals-equals,iy k w ah l z iy k w ah l z
-=equal-equal,iy k w ah l iy k w ah l
+==equals-equals,iy k w ah l z iy k w ah l z
+==equal-equal,iy k w ah l iy k w ah l
 !=not-equals,N AA T IY K W AH L Z
 !=not-equal,N AA T IY K W AH L
 {open-brace,OW P AH N B R EY S
@@ -16,7 +16,10 @@
 '''triple-single-quote,T R IH P AH L S IH NG G AH L K W OW T
 "quote,K W OW T
 'single-quote,S IH NG G AH L K W OW T
+*asterisk,AE S T ER IH S K
 **asterisk-asterisk,AE S T ER IH S K AE S T ER IH S K
+*star,S T AA R
+**star-star,S T AA R S T AA R
 $dollar-sign,D AA L ER S AY N
 $dollar-sign,D AO L ER S AY N
 _under,AH N D ER
@@ -25,3 +28,9 @@ _under,AH N D ER
 [open-bracket,OW P AH N B R AE K IH T
 ]close-bracket,K L OW S  B R AE K IH T
 ]close-bracket,K L OW Z  B R AE K IH T
+\back-slash,B AE K S L AE SH
+`back-tick,B AE K T IH K
++plus,P L AH S
+-minus,M AY N AH S
+(open-paren,OW P AH N P AH R EH N
+)close-paren,K L OW S P AH R EH N
