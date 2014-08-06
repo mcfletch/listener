@@ -93,6 +93,10 @@ class CodeToWordsTests( TestCase ):
                     'no-space', 'address', 'of', 'spaces','(open-paren', 'two', ')close-paren',
                 ]],
             ),
+            (
+                "1",
+                [["one"]],
+            ),
         ]
         for line,expected in expected:
             result = codetowords.codetowords([line], dictionary=dictionary)

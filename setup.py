@@ -37,12 +37,12 @@ if __name__ == "__main__":
             console_scripts = [
                 #"text2wfreq=listener.text2wfreq:main",
                 "listener-pipe=listener.pipeline:main",
-                'listener-code-to-words-py=listener.codetowords:main',
-                'listener-missing-words=listener.codetowords:missing_words',
+                'listener-code-to-words-py=listener.cli:code_to_words',
+                'listener-missing-words=listener.cli:missing_words',
                 'listener-rawplay=listener.pipeline:rawplay',
                 
                 'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',
-                'listener-arpa=listener.ipatoarpabet:translate_main',
+                'listener-arpa-guess=listener.cli:arpabet_guess',
                 
                 'listener-qt=listener.qtgui:main',
                 

@@ -158,6 +158,10 @@ class Context( object ):
                 os.path.join( HERE, 'meta-commands.csv' ),
                 self.custom_dictionary_file,
             )
+            self.copy_template_to_dictionary(
+                os.path.join( HERE, 'commonshortforms.csv' ),
+                self.custom_dictionary_file,
+            )
             if not os.path.exists( self.buffer_directory ):
                 os.mkdir( self.buffer_directory )
             return self.directory

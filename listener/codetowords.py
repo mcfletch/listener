@@ -92,7 +92,7 @@ def _create_op_names( ):
         '+': '+plus',
         '_': '_under',
         '://': ':colon /slash /slash',
-        '\n': 'new line',
+        '\n': 'new-line',
         '`': '`back-tick',
         '\\': '\\back-slash',
         '^': '^caret',
@@ -109,6 +109,8 @@ def parse_run_together( name, dictionary=None ):
     name = name.lower()
     if name in dictionary:
         return [name]
+    if name.isdigit():
+        return [digit(n) for n in name]
     # TODO: use statistics to decide which sub-words are the most 
     # *likely* to occur, rather than always searching for a longer match...
     
@@ -138,7 +140,7 @@ def parse_run_together( name, dictionary=None ):
                 return remaining+[suffix]
             possibles.append( remaining+[suffix] )
     if len(name) < 3:
-        return list(name)
+        return [(digit(c) or c) for c in name]
     return [name]
 
 def parse_run_together_with_markup( name, dictionary ):
@@ -218,6 +220,8 @@ def digit( c ):
     
 def break_down_name( name, dictionary=None ):
     result = []
+    if name.isdigit():
+        return [digit(n) for n in name]
     split = operator( name )
     if split:
         return split
@@ -273,10 +277,11 @@ def codetowords( lines, dictionary=None ):
             current_line.extend( split_up )
         elif type == tokenize.NEWLINE:
             current_line = []
+            current_line.extend([ 'new-line'])
             new_lines.append( current_line )
         elif type == tokenize.NL:
             # newline without new source-code-line
-            current_line.extend([ 'new','line'])
+            current_line.extend([ 'new-line'])
         elif type == tokenize.NUMBER:
             current_line.extend( [digit(x) for x in token] )
         elif type == tokenize.COMMENT:
@@ -285,8 +290,6 @@ def codetowords( lines, dictionary=None ):
                 encoding = match.group(1)
             current_line.extend( textual_content( token, dictionary=dictionary ))
         elif type == tokenize.STRING:
-            if token[0].isalpha():
-                log.warn( 'Prefixed String: %r', token )
             while token and token[0].isalpha():
                 current_line.append( token[0] )
                 token = token[1:]
@@ -319,38 +322,3 @@ def codetowords( lines, dictionary=None ):
     return new_lines
 
 
-def main():
-    logging.basicConfig(level=logging.INFO)
-    from . import context
-    for filename in sys.argv[1:]:
-        log.info('Translating: %s', filename )
-        lines = open( filename ).readlines()
-        translated = codetowords( lines )
-        composed = '\n'.join([
-            '<s> %s </s>'%( ' '.join( line ))
-            for line in translated
-        ])
-        context.twrite( filename + '.dictation', composed )
-    
-def missing_words():
-    logging.basicConfig(level=logging.INFO)
-    from . import context
-    translated = []
-    for filename in sys.argv[1:]:
-        log.info('Translating: %s', filename )
-        lines = open( filename ).readlines()
-        translated.extend( codetowords( lines ) )
-    context = context.Context('default')
-    unmapped = set()
-    all_words = set()
-    for line in translated:
-        all_words |= set(line)
-    log.info( 'Checking %s words for transcriptions', len(all_words))
-    transcriptions = context.transcriptions( sorted(all_words) )
-    for word,arpa in transcriptions.items():
-        if not arpa:
-            unmapped.add( word )
-    log.info( '%s words unmapped', len(unmapped))
-    import pprint
-    pprint.pprint( sorted(unmapped))
-    

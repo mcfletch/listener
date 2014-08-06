@@ -107,14 +107,6 @@ def translate( word, ipa=None ):
         err.args += (word,ipa)
         raise
 
-def translate_main():
-    logging.basicConfig( level=logging.INFO )
-    content = sys.stdin.read().split()
-    for word in content:
-        print word
-        for possible in translate(word):
-            print u'\t%s'%(possible,)
-
 def frequency_table( count_table, threshold=0.05 ):
     """Generate a frequency table from a count-of-correspondence table"""
     result = {}
