@@ -103,8 +103,7 @@ def _create_op_names( ):
 OP_NAMES = _create_op_names()
 
 def parse_camel( name ):
-    expanded = re.sub(r'([A-Z]+)', r' \1', name)
-    expanded = re.sub(r'([0-9]+)', r' \1', expanded )
+    expanded = re.sub(r'([A-Z]+|[0-9]+)', r' \1', name)
     split = expanded.strip().split()
     all_caps = [x.upper() for x in split] == split
     cap_camel_case = [x.title() for x in split] == split 
@@ -185,7 +184,7 @@ def break_down_name( name, dictionary=None ):
     possibles = parse_camel( name )
     return possibles
 
-TEXT_SPLITTER = re.compile( r"""(\w|['])+|[^\w\s]+|[\n]""", re.U|re.M )
+TEXT_SPLITTER = re.compile( r"""(\w+[']\w+)|\w+|[^\w\s]+|[\n]""", re.U|re.M )
 def textual_content( content ):
     """Break down textual content (strings, comments) into dictation"""
     words = [x.group(0) for x in TEXT_SPLITTER.finditer(content)]
@@ -199,11 +198,14 @@ def operator( token ):
         return [OP_NAMES[token]]
     elif all([t in OP_NAMES for t in token]):
         return [OP_NAMES[t] for t in token]
-    
+
+CODING = re.compile( r'coding[:=]\s*([-\w.]+)' )
+        
 def codetowords( lines, dictionary=None ):
     """Tokenize a given line for further processing"""
     current_line = []
     new_lines = [current_line]
+    encoding = 'ascii'
     for type,token,starting,ending,line in tokenize.generate_tokens( iter(lines).next ):
         if type ==tokenize.OP:
             split_up = operator( token ) or [token]
@@ -217,27 +219,34 @@ def codetowords( lines, dictionary=None ):
         elif type == tokenize.NUMBER:
             current_line.extend( ['number']+ [digit(x) for x in token]+['end number'] )
         elif type == tokenize.COMMENT:
+            match = CODING.search( token )
+            if match:
+                encoding = match.group(1)
             current_line.extend( textual_content( token ))
         elif type == tokenize.STRING:
-            # TODO: deal with u,U,r,R, etc. prefixes!
+            if token[0].isalpha():
+                log.warn( 'Prefixed String: %r', token )
+            while token and token[0].isalpha():
+                current_line.append( token[0] )
+                token = token[1:]
             if token.startswith( '"""' ):
                 current_line.extend( ['"""triple-quote'] )
-                current_line.extend( textual_content( token[3:-3] ) )
+                current_line.extend( textual_content( token[3:-3].decode(encoding) ) )
                 current_line.extend( ['"""triple-quote'] )
             elif token.startswith( "'''" ):
                 current_line.extend( ["'''triple-single-quote"] )
-                current_line.extend( textual_content( token[3:-3] ) )
+                current_line.extend( textual_content( token[3:-3].decode(encoding) ) )
                 current_line.extend( ["'''triple-single-quote"] )
             elif token.startswith( '"' ):
                 current_line.extend( ['"quote'] )
-                current_line.extend( textual_content( token[1:-1] ) )
+                current_line.extend( textual_content( token[1:-1].decode(encoding) ) )
                 current_line.extend( ['"quote'] )
             elif token.startswith( "'" ):
                 current_line.extend( ["'single-quote"] )
-                current_line.extend( textual_content( token[1:-1] ) )
+                current_line.extend( textual_content( token[1:-1].decode(encoding) ) )
                 current_line.extend( ["'single-quote"] )
             else:
-                current_line.append( token )
+                raise RuntimeError( 'Unknown string format: %r'%( token,) )
         elif type == tokenize.DEDENT:
             current_line.append( 'dedent' )
         elif type == tokenize.INDENT:
