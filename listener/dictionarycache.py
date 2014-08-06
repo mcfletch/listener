@@ -84,14 +84,3 @@ class DictionaryDB( object ):
     def __contains__( self, word ):
         return bool(self.have_words( word ).get(word))
 
-usage = 'listener-dictionary-cache <words>\n'
-def main():
-    from . import context 
-    import pprint, sys
-    if not sys.argv[1:]:
-        sys.stdout.write( usage )
-        sys.exit(1)
-    c = context.Context('default')
-    db = DictionaryDB( c )
-    pprint.pprint( db.have_words( *sys.argv[1:] ))
-    db.connection.close()
