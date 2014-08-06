@@ -1,0 +1,27 @@
+|bar,B AA R
+~tilde,T IH L D IY
+^caret,K AE R AH T
+<less-than,L EH S DH AH N
+>greater-than,G R EY T ER  DH AH N
+=equals,iy k w ah l z
+=equals-equals,iy k w ah l z iy k w ah l z
+=equal-equal,iy k w ah l iy k w ah l
+!=not-equals,N AA T IY K W AH L Z
+!=not-equal,N AA T IY K W AH L
+{open-brace,OW P AH N B R EY S
+}close-brace,K L OW S B R EY S
+}close-brace,K L OW Z B R EY S
+@at,AE T
+"""triple-quote,T R IH P AH L K W OW T
+'''triple-single-quote,T R IH P AH L S IH NG G AH L K W OW T
+"quote,K W OW T
+'single-quote,S IH NG G AH L K W OW T
+**asterisk-asterisk,AE S T ER IH S K AE S T ER IH S K
+$dollar-sign,D AA L ER S AY N
+$dollar-sign,D AO L ER S AY N
+_under,AH N D ER
+[left-bracket,L EH F T B R AE K IH T
+]right-bracket,R AY T  B R AE K IH T
+[open-bracket,OW P AH N B R AE K IH T
+]close-bracket,K L OW S  B R AE K IH T
+]close-bracket,K L OW Z  B R AE K IH T

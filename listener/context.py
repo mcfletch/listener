@@ -142,19 +142,20 @@ class Context( object ):
                         self.hmm_directory,
                     )
                     found = True 
-            open( self.custom_dictionary_file, 'a')
+            lines = [
+                line.split(',',1)
+                for line in open( os.path.join( HERE, 'punctuation.csv' ) ).read().splitlines()
+                if line.strip()
+            ]
+            with open( self.custom_dictionary_file, 'a') as fh:
+                for line in lines:
+                    fh.write( '%s\t%s\n'%line)
             if not found:
                 raise RuntimeError( 
                     """We appear to be missing the ubuntu/debian package pocketsphinx-hmm-en-hub4wsj""" 
                 )
             if not os.path.exists( self.buffer_directory ):
                 os.mkdir( self.buffer_directory )
-            self.add_custom_word(
-                '[left-bracket','L EH F T B R AE K IH T',
-            )
-            self.add_custom_word(
-                ']right-bracket','R AY T B R AE K IH T',
-            )
             return self.directory
         finally:
             shutil.rmtree( tempdir )
@@ -254,8 +255,11 @@ class Context( object ):
             # this actually shouldn't happen save in the trivial case where 
             # it's an ascii-compatible value...
             arpabet = arpabet.encode('utf-8')
+        word = word.lower()
+        arpabet = arpabet.upper()
         with open( self.custom_dictionary_file, 'a' ) as fh:
             fh.write( '%s\t%s\n'%( word, arpabet ))
+        self.dictionary_cache.add_dictionary_iterable([(word,arpabet)])
     
     LM_TOOLS_PREFIX = os.path.expanduser( '~/.local/lib/listener/cmutk' )
     LM_BIN_DIRECTORY = os.path.join( LM_TOOLS_PREFIX, 'bin' )
