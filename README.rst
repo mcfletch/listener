@@ -61,7 +61,7 @@ to install.
 Executables
 ===========
 
-`listener-qt`
+`listener-qt --context=<name>`
 
     Launches the (not-very-useful) Qt Listener GUI. You can dictate and see 
     the results of each dictation. You can also click a button to review the 
@@ -71,6 +71,18 @@ Executables
     
     Note: this will download a *large* language model on first run. Currently
     that's done *before* the GUI starts, so the process will just seem to hang.
+
+`listener-context-from-project --context=<name> /path/to/project`
+
+    Uses code to word extraction to generate a (python) language model 
+    based on a git checkout.  Creates a new context <name>. With this 
+    done you should be able to dictate code as in the project using 
+    listener-qt (note: currently you will *not* see the actual code 
+    when dictating, you will see command such as "cap" and "no-space".
+
+`listener-context-delete --context=<name>`
+
+    Delete a context and all associated data.
 
 `listener-code-to-words-py *.py`
 
