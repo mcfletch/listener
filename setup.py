@@ -39,17 +39,18 @@ if __name__ == "__main__":
                 "listener-pipe=listener.pipeline:main",
                 'listener-code-to-words-py=listener.cli:code_to_words',
                 'listener-missing-words=listener.cli:missing_words',
+                'listener-arpa-guess=listener.cli:arpabet_guess',
+                'listener-dictionary-cache=listener.dictionarycache:main',
+                'listener-context-from-project=listener.cli:context_from_project',
+                'listener-qt=listener.cli:qt_gui',
+                
                 'listener-rawplay=listener.pipeline:rawplay',
                 
                 'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',
-                'listener-arpa-guess=listener.cli:arpabet_guess',
-                
-                'listener-qt=listener.qtgui:main',
                 
                 'listener-uinput-device=listener.uinputdriver:main',
                 'listener-uinput-rebuild-mapping=listener.uinputdriver:rebuild_mapping',
                 
-                'listener-dictionary-cache=listener.dictionarycache:main',
                 'listener-install-lm-tools=listener.context:install_lm_tools',
             ],
         ),

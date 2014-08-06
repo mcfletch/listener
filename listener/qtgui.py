@@ -47,8 +47,11 @@ class QtPipeline(pipeline.Pipeline):
 class ListenerMain( QtGui.QMainWindow ):
     """Main application window for listener"""
     def __init__( self, *args, **named ):
+        command_line_arguments = named.pop('arguments',None)
         super( ListenerMain, self ).__init__( *args, **named )
-        self.context = context.Context( 'default' )
+        self.context = context.Context( getattr(
+            command_line_arguments,'context','default'
+        ) )
         self.pipeline = QtPipeline( self.context )
         self.create_gui()
         self.pipeline.start_listening()
@@ -152,15 +155,3 @@ class ListenerMain( QtGui.QMainWindow ):
             log.info( 'Unrecognized action: %s', pprint.pformat( event ))
     
     
-    
-def main():
-    logging.basicConfig( level=logging.DEBUG )
-    app = QtGui.QApplication(sys.argv)
-    
-    MainWindow = ListenerMain()
-    MainWindow.show()
-    
-    app.exec_()
-
-if __name__ == "__main__":
-    main()

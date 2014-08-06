@@ -3,6 +3,7 @@ import sqlite3
 import os
 import logging
 from .oneshot import one_shot
+from ._bytes import as_unicode
 log = logging.getLogger( __name__ )
 
 class DictionaryDB( object ):
@@ -31,7 +32,8 @@ class DictionaryDB( object ):
             word,description = line.strip().split(separator,1)
             if word.endswith(')'):
                 word = word.rsplit('(',1)[0]
-            word = word.decode('utf-8')
+            word = as_unicode(word)
+            description = as_unicode(description)
             yield word.lower(),description.upper()
 
     def initialize( self, connection ):

@@ -2,6 +2,7 @@
 import os,shutil,tempfile,subprocess,json,time,glob
 import logging
 from .oneshot import one_shot
+from ._bytes import as_unicode,as_bytes
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 
@@ -21,7 +22,7 @@ def base_cache_directory(appname='listener'):
 def twrite( filename, data ):
     """Note: this is *not* thread/process safe!"""
     if isinstance( data, unicode ):
-        data = data.encode('utf-8')
+        data = as_bytes( data )
     elif not isinstance( data, bytes ):
         data = json.dumps( data, indent=2, sort_keys=True )
         if isinstance( data, unicode ):
@@ -278,16 +279,10 @@ class Context( object ):
     
     def add_custom_word( self, word, arpabet ):
         """Add a custom word to our dictionary"""
-        if isinstance( word, unicode ):
-            word = word.encode('utf-8')
-        if isinstance( arpabet, unicode ):
-            # this actually shouldn't happen save in the trivial case where 
-            # it's an ascii-compatible value...
-            arpabet = arpabet.encode('utf-8')
-        word = word.lower()
-        arpabet = arpabet.upper()
+        word = as_unicode(word).lower()
+        arpabet = as_unicode(arpabet).upper()
         with open( self.custom_dictionary_file, 'a' ) as fh:
-            fh.write( '%s\t%s\n'%( word, arpabet ))
+            fh.write( '%s\t%s\n'%( as_bytes(word), as_bytes(arpabet) ))
         self.dictionary_cache.add_dictionary_iterable([(word,arpabet)])
     
     LM_TOOLS_PREFIX = os.path.expanduser( '~/.local/lib/listener/cmutk' )
@@ -329,7 +324,7 @@ class Context( object ):
         with open( self.custom_language_model, 'a' ) as fh:
             # TODO: sanitize the text...
             for text in texts:
-                content = '<s> %s </s>\n'%( text, )
+                content = '<s> %s </s>\n'%( as_bytes(text), )
                 fh.write( content )
     
     def regenerate_language_model( self ):
