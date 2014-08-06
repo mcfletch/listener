@@ -108,53 +108,56 @@ class Context( object ):
         # Pull down the language model...
         archive = self.download_hmm_archive()
         tempdir = tempfile.mkdtemp( prefix='listener-', suffix='-unpack' )
-        subprocess.check_call( [
-            'tar', '-zxf',
-            archive,
-        ], cwd=tempdir )
-        HMMs = [
-            os.path.join( tempdir, 'hub4wsj_sc_8k'),
-        ]
-        DMPs = [
-            '/usr/share/pocketsphinx/model/lm/en_US/hub4.5000.DMP',
-        ]
-        DICTIONARY = [
-            '/usr/share/pocketsphinx/model/lm/en_US/cmu07a.dic',
-        ]
-        found = False
-        for (dmp,dic,hmm) in zip(DMPs,DICTIONARY,HMMs):
-            if os.path.exists( dmp ):
-                shutil.copy( 
-                    dmp, 
-                    self.language_model_file,
+        try:
+            subprocess.check_call( [
+                'tar', '-zxf',
+                archive,
+            ], cwd=tempdir )
+            HMMs = [
+                os.path.join( tempdir, 'hub4wsj_sc_8k'),
+            ]
+            DMPs = [
+                '/usr/share/pocketsphinx/model/lm/en_US/hub4.5000.DMP',
+            ]
+            DICTIONARY = [
+                '/usr/share/pocketsphinx/model/lm/en_US/cmu07a.dic',
+            ]
+            found = False
+            for (dmp,dic,hmm) in zip(DMPs,DICTIONARY,HMMs):
+                if os.path.exists( dmp ):
+                    shutil.copy( 
+                        dmp, 
+                        self.language_model_file,
+                    )
+                    shutil.copy(
+                        dic,
+                        self.dictionary_file,
+                    )
+                    shutil.copy(
+                        dic,
+                        self.base_dictionary_file,
+                    )
+                    shutil.copytree( 
+                        hmm,
+                        self.hmm_directory,
+                    )
+                    found = True 
+            open( self.custom_dictionary_file, 'a')
+            if not found:
+                raise RuntimeError( 
+                    """We appear to be missing the ubuntu/debian package pocketsphinx-hmm-en-hub4wsj""" 
                 )
-                shutil.copy(
-                    dic,
-                    self.dictionary_file,
-                )
-                shutil.copy(
-                    dic,
-                    self.base_dictionary_file,
-                )
-                shutil.copytree( 
-                    hmm,
-                    self.hmm_directory,
-                )
-                found = True 
-        open( self.custom_dictionary_file, 'a')
-        if not found:
-            raise RuntimeError( 
-                """We appear to be missing the ubuntu/debian package pocketsphinx-hmm-en-hub4wsj""" 
+            if not os.path.exists( self.buffer_directory ):
+                os.mkdir( self.buffer_directory )
+            self.add_custom_word(
+                '[left-bracket','L EH F T B R AE K IH T',
             )
-        if not os.path.exists( self.buffer_directory ):
-            os.mkdir( self.buffer_directory )
-        self.add_custom_word(
-            '[left-bracket','L EH F T B R AE K IH T',
-        )
-        self.add_custom_word(
-            ']right-bracket','R AY T B R AE K IH T',
-        )
-        return self.directory
+            self.add_custom_word(
+                ']right-bracket','R AY T B R AE K IH T',
+            )
+            return self.directory
+        finally:
+            shutil.rmtree( tempdir )
 
     def download_url( self, url, filename ):
         """Download given URL to a local filename in our cache directory 
@@ -181,7 +184,7 @@ class Context( object ):
         
         Why isn't this packaged for Ubuntu, I don't know...
         """
-        return self.download_url( self.HMM_URL, 'cmuclmtk-0.7.tar.gz' )
+        return self.download_url( self.CLM_TK_URL, 'cmuclmtk-0.7.tar.gz' )
     
     def rawplay(self, filename):
         """Play the given filename 
@@ -266,12 +269,17 @@ class Context( object ):
         archive = self.download_langauge_model_tools()
         build = tempfile.mkdtemp( prefix='listener-cmu-', suffix='-build' )
         try:
+            expected_dir = 'cmuclmtk-0.7'
             subprocess.check_call( [
                 'tar', '-zxf', archive 
             ], cwd=build)
-            expected = os.path.join( build, 'cmuclmtk-0.7' )
+            expected = os.path.join( build, expected_dir )
             if not os.path.exists( expected ):
-                raise RuntimeError( "Didn't unpack the expected directory" )
+                raise RuntimeError( "Didn't unpack the expected directory %s from %s: following directories created %s"%(
+                    expected_dir,
+                    archive,
+                    os.listdir(build) )
+                )
             subprocess.check_call([
                 os.path.join(expected,'configure'), '--prefix=%s'%(os.path.abspath( self.LM_TOOLS_PREFIX )),
             ], cwd=expected)
@@ -477,7 +485,6 @@ class AudioContext( object ):
         )
         os.close( handle )
         return filename
-
 
 def install_lm_tools( ):
     logging.basicConfig( level = logging.INFO )
