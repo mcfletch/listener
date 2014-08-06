@@ -40,10 +40,10 @@ if __name__ == "__main__":
                 'listener-code-to-words-py=listener.cli:code_to_words',
                 'listener-missing-words=listener.cli:missing_words',
                 'listener-arpa-guess=listener.cli:arpabet_guess',
-                'listener-dictionary-cache=listener.dictionarycache:main',
                 'listener-context-from-project=listener.cli:context_from_project',
                 'listener-context-delete=listener.cli:delete_context',
                 'listener-qt=listener.cli:qt_gui',
+                'listener-dictionary-lookup=listener.cli:dictionary_lookup',
                 'listener-dictionary-subset=listener.cli:subset_dictionary',
                 
                 'listener-rawplay=listener.pipeline:rawplay',
