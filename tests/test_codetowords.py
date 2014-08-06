@@ -61,7 +61,7 @@ class CodetoWordsTests( TestCase ):
                 '"""this"""',
                 [[
                     '"""triple-quote',
-                    #'this',
+                    'this',
                     '"""triple-quote'
                 ]],
             ),
@@ -69,7 +69,7 @@ class CodetoWordsTests( TestCase ):
                 "'''this'''",
                 [[
                     "'''triple-single-quote",
-                    #'this',
+                    'this',
                     "'''triple-single-quote"
                 ]],
             ),

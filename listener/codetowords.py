@@ -45,8 +45,8 @@ def _create_op_names( ):
         ')right-paren\tR AY T P ER EH N\n',
         ')un-parentheses\tAH N P ER EH N TH AH S IY Z\n',
         ',comma\tK AA M AH\n',
-        '-dash\tD AE SH\n',
         '-hyphen\tHH AY F AH N\n',
+        #'-dash\tD AE SH\n',
         '...ellipsis\tIH L IH P S IH S\n',
         '.dot\tD AA T\n',
         '.decimal\tD EH S AH M AH L\n',
@@ -64,6 +64,8 @@ def _create_op_names( ):
         # custom...
         '[left-bracket\tL EH F T B R AE K IH T',
         ']right-bracket\tR AY T B R AE K IH T',
+        '|bar\tB AA R',
+        '~tilde\tT IH L D IY',
     ]:
         punc,name = parse_op( o )
         if punc not in result:
@@ -89,6 +91,12 @@ def _create_op_names( ):
         '**': '**asterisk-asterisk',
         '+': '+plus',
         '_': '_under',
+        '://': ':colon /slash /slash',
+        '\n': 'new line',
+        '`': '`back-tick',
+        '\\': '\\backslash',
+        '^': '^caret',
+        '$': '$dollar-sign',
     })
 
     return result
@@ -100,7 +108,8 @@ def parse_camel( name ):
     split = expanded.strip().split()
     all_caps = [x.upper() for x in split] == split
     cap_camel_case = [x.title() for x in split] == split 
-    camel_case = [x.title() for x in split[1:]] == split[1:]
+    camel_case = len(split) > 1 and [x.title() for x in split[1:]] == split[1:]
+    
     words = [x for x in split if not x.isdigit()]
     split_expanded = []
     for item in split:
@@ -149,8 +158,11 @@ def digit( c ):
     
 def break_down_name( name, dictionary=None ):
     result = []
+    split = operator( name )
+    if split:
+        return split
     if name.startswith( '__' ) and name.endswith( '__'):
-        return ['dunder'] + break_down_name( name[2:-4] )
+        return ['dunder'] + break_down_name( name[2:-2] )
     elif '__' in name:
         fragments = [x for x in name.split('__')]
         for fragment in fragments[:-1]:
@@ -172,6 +184,21 @@ def break_down_name( name, dictionary=None ):
         return result
     possibles = parse_camel( name )
     return possibles
+
+TEXT_SPLITTER = re.compile( r"""(\w|['])+|[^\w\s]+|[\n]""", re.U|re.M )
+def textual_content( content ):
+    """Break down textual content (strings, comments) into dictation"""
+    words = [x.group(0) for x in TEXT_SPLITTER.finditer(content)]
+    result = []
+    for word in words:
+        result.extend( break_down_name( word ))
+    return result
+
+def operator( token ):
+    if token in OP_NAMES:
+        return [OP_NAMES[token]]
+    elif all([t in OP_NAMES for t in token]):
+        return [OP_NAMES[t] for t in token]
     
 def codetowords( lines, dictionary=None ):
     """Tokenize a given line for further processing"""
@@ -179,7 +206,8 @@ def codetowords( lines, dictionary=None ):
     new_lines = [current_line]
     for type,token,starting,ending,line in tokenize.generate_tokens( iter(lines).next ):
         if type ==tokenize.OP:
-            current_line.append( OP_NAMES.get( token, token ))
+            split_up = operator( token ) or [token]
+            current_line.extend( split_up )
         elif type == tokenize.NEWLINE:
             current_line = []
             new_lines.append( current_line )
@@ -188,26 +216,33 @@ def codetowords( lines, dictionary=None ):
             current_line.extend([ 'new','line'])
         elif type == tokenize.NUMBER:
             current_line.extend( ['number']+ [digit(x) for x in token]+['end number'] )
+        elif type == tokenize.COMMENT:
+            current_line.extend( textual_content( token ))
         elif type == tokenize.STRING:
+            # TODO: deal with u,U,r,R, etc. prefixes!
             if token.startswith( '"""' ):
                 current_line.extend( ['"""triple-quote'] )
-                #current_line.append( token[3:-3] )
+                current_line.extend( textual_content( token[3:-3] ) )
                 current_line.extend( ['"""triple-quote'] )
             elif token.startswith( "'''" ):
                 current_line.extend( ["'''triple-single-quote"] )
-                #current_line.append( token[3:-3] )
+                current_line.extend( textual_content( token[3:-3] ) )
                 current_line.extend( ["'''triple-single-quote"] )
             elif token.startswith( '"' ):
                 current_line.extend( ['"quote'] )
-                #current_line.append( token[3:-3] )
+                current_line.extend( textual_content( token[1:-1] ) )
                 current_line.extend( ['"quote'] )
             elif token.startswith( "'" ):
                 current_line.extend( ["'single-quote"] )
-                #current_line.append( token[3:-3] )
+                current_line.extend( textual_content( token[1:-1] ) )
                 current_line.extend( ["'single-quote"] )
             else:
                 current_line.append( token )
-        elif type in (tokenize.ENDMARKER,tokenize.INDENT,tokenize.DEDENT):
+        elif type == tokenize.DEDENT:
+            current_line.append( 'dedent' )
+        elif type == tokenize.INDENT:
+            current_line.append( 'indent' )
+        elif type in (tokenize.ENDMARKER,):
             pass
         elif type == tokenize.NAME:
             current_line.extend( break_down_name( token, dictionary=dictionary ) )
@@ -217,6 +252,19 @@ def codetowords( lines, dictionary=None ):
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
+    from . import context
+    for filename in sys.argv[1:]:
+        log.info('Translating: %s', filename )
+        lines = open( filename ).readlines()
+        translated = codetowords( lines )
+        composed = '\n'.join([
+            '<s> %s </s>'%( ' '.join( line ))
+            for line in translated
+        ])
+        context.twrite( filename + '.dictation', composed )
+    
+def missing_words():
     logging.basicConfig(level=logging.INFO)
     from . import context
     translated = []

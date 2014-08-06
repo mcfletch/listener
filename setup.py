@@ -38,6 +38,7 @@ if __name__ == "__main__":
                 #"text2wfreq=listener.text2wfreq:main",
                 "listener-pipe=listener.pipeline:main",
                 'listener-code-to-words-py=listener.codetowords:main',
+                'listener-missing-words=listener.codetowords:missing_words',
                 'listener-rawplay=listener.pipeline:rawplay',
                 
                 'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',

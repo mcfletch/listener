@@ -239,6 +239,7 @@ class Context( object ):
         if guess:
             for word in words:
                 if not cached.get( word ):
+                    from . import ipatoarpabet
                     cached[word] = ipatoarpabet.translate( word )
         return cached
     
