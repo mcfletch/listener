@@ -109,6 +109,8 @@ def parse_run_together( name, dictionary=None ):
     name = name.lower()
     if name in dictionary:
         return [name]
+    # TODO: use statistics to decide which sub-words are the most 
+    # *likely* to occur, rather than always searching for a longer match...
     # anything smaller than 1 is *always* in the dictionary...
     prefixes = [name[:i] for i in range(1,len(name))]
     mapped = dictionary.have_words( *prefixes )

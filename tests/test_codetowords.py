@@ -15,13 +15,14 @@ class CodeToWordsTests( TestCase ):
     def test_ops_parsed( self ):
         assert '[' in codetowords.OP_NAMES, codetowords.OP_NAMES
         assert codetowords.OP_NAMES['['] == '[open-bracket'
-    def test_names(self):
+    def test_break_down_name(self):
         for input,expected in [
-            ('thisTest',['camel', 'this', 'Test']),
-            ('ThisTest',['cap','camel', 'This', 'Test']),
+            ('thisTest',['camel', 'this', 'test']),
+            ('ThisTest',['cap','camel', 'this', 'test']),
             ('that_test',['that','under','test']),
+            #('oneshot',['no-space','one','shot','spaces']), # would need statistical model
         ]:
-            result = codetowords.break_down_name( input )
+            result = codetowords.break_down_name( input, dictionary=self.context.dictionary_cache )
             assert result == expected, (input,result)
 
     def test_tokens(self):
@@ -42,11 +43,11 @@ class CodeToWordsTests( TestCase ):
             
             (
                 'class Veridian(object):',
-                [['class', 'cap', 'Veridian', '(open-paren', 'object', ')close-paren', ':colon']],
+                [['class', 'cap', 'veridian', '(open-paren', 'object', ')close-paren', ':colon']],
             ),
             (
                 'objectReference.attributeReference = 34 * deltaValue',
-                [['camel', 'object', 'Reference', '.dot', 'camel', 'attribute', 'Reference', '=equals', 'three','four', '*asterisk', 'camel', 'delta', 'Value']],
+                [['camel', 'object', 'reference', '.dot', 'camel', 'attribute', 'reference', '=equals', 'three','four', '*asterisk', 'camel', 'delta', 'value']],
             ),
             (
                 'GLUT_SOMETHING_HERE = 0x234A',
@@ -83,7 +84,13 @@ class CodeToWordsTests( TestCase ):
             (
                 "testruntogether=2",
                 [[
-                    "no-space", "test", "run", "together", '=equals', 'two'
+                    "no-space", "test", "run", "together", 'spaces', '=equals', 'two'
+                ]],
+            ),
+            (
+                "addressof( 2 )",
+                [[
+                    'no-space', 'address', 'of', 'spaces','(open-paren', 'two', ')close-paren',
                 ]],
             ),
         ]
@@ -106,6 +113,7 @@ class CodeToWordsTests( TestCase ):
             ('kdebuildingwindow',['kde','building','window']),
             ('VeridianEgg',['veridian','egg']),
             ('Veridian',['veridian']),
+            #('oneshot',['one','shot']), # would need statistical model
         ]:
             result = codetowords.parse_run_together( run_together, dictionary )
             assert result== expected, (run_together,result)
