@@ -94,7 +94,7 @@ def _create_op_names( ):
         '://': ':colon /slash /slash',
         '\n': 'new line',
         '`': '`back-tick',
-        '\\': '\\backslash',
+        '\\': '\\back-slash',
         '^': '^caret',
         '$': '$dollar-sign',
     })
