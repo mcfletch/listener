@@ -152,6 +152,16 @@ def get_python_files( directory ):
     raise RuntimeError( 'Currently only handle git projects' )
 
 @with_logging
+def delete_context():
+    parser = base_arguments('Search for unknown words in python files')
+    arguments = parser.parse_args()
+    if arguments.context == 'default':
+        raise RuntimeError( "You can't delete the default context" )
+    working_context = context.Context( arguments.context )
+    working_context.delete()
+    
+    
+@with_logging
 def context_from_project():
     log = codetowords.log
     parser = base_arguments('Search for unknown words in python files')
@@ -165,6 +175,8 @@ def context_from_project():
         help="If True, then wipe out previous ",
     )
     arguments = parser.parse_args()
+    if arguments.context == 'default':
+        raise RuntimeError( "You can't create a new default context" )
     working_context = context.Context( arguments.context )
     files = get_python_files( arguments.directory )
     all_lines = []
