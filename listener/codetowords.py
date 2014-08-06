@@ -90,7 +90,7 @@ def _create_op_names( ):
         '*': '*asterisk',
         '**': '**asterisk-asterisk',
         '+': '+plus',
-        '_': '_under',
+        '_': '_under-score',
         '://': ':colon /slash /slash',
         '\n': 'new-line',
         '`': '`back-tick',
@@ -225,14 +225,12 @@ def break_down_name( name, dictionary=None ):
     split = operator( name )
     if split:
         return split
-    if name.startswith( '__' ) and name.endswith( '__'):
-        return ['dunder'] + break_down_name( name[2:-2], dictionary=dictionary )
-    elif '__' in name:
+    if '__' in name:
         fragments = [x for x in name.split('__')]
         for fragment in fragments[:-1]:
             if fragment:
                 result.extend( break_down_name(fragment,dictionary=dictionary))
-            result.extend( ['under','under'] )
+            result.extend( ['__dunder'] )
         if fragments[-1]:
             result.extend( break_down_name(fragments[-1],dictionary=dictionary))
         return result
@@ -242,7 +240,7 @@ def break_down_name( name, dictionary=None ):
         for fragment in fragments[:-1]:
             if fragment:
                 result.extend( break_down_name(fragment,dictionary=dictionary))
-            result.extend( ['under'] )
+            result.append( '_under-score' )
         if fragments[-1]:
             result.extend( break_down_name(fragments[-1],dictionary=dictionary))
         return result
@@ -276,8 +274,8 @@ def codetowords( lines, dictionary=None ):
             split_up = operator( token ) or [token]
             current_line.extend( split_up )
         elif type == tokenize.NEWLINE:
-            current_line = []
             current_line.extend([ 'new-line'])
+            current_line = []
             new_lines.append( current_line )
         elif type == tokenize.NL:
             # newline without new source-code-line
