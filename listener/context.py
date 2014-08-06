@@ -182,7 +182,7 @@ class Context( object ):
         written_counts = {}
         with open( dictionary, 'a') as fh:
             words = []
-            for line in self.iter_template_words( template, dictionary, separator ):
+            for line in self.iter_template_words( template, separator ):
                 try:
                     count = written_counts.get( line[0],0)
                     count += 1
@@ -197,7 +197,7 @@ class Context( object ):
         words = set()
         for template in self.TEMPLATE_FILES:
             for line in self.iter_template_words( 
-                template, self.custom_dictionary_file,
+                template, 
             ):
                 words.add(line[0])
         self.add_statements( words )
