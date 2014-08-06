@@ -3,6 +3,7 @@ import os,shutil,tempfile,subprocess,json,time,glob
 import logging
 from .oneshot import one_shot
 log = logging.getLogger( __name__ )
+HERE = os.path.dirname( __file__ )
 
 def base_config_directory(appname='listener'):
     """Produce a reasonable working directory in which to store our files"""
@@ -142,23 +143,47 @@ class Context( object ):
                         self.hmm_directory,
                     )
                     found = True 
-            lines = [
-                line.split(',',1)
-                for line in open( os.path.join( HERE, 'punctuation.csv' ) ).read().splitlines()
-                if line.strip()
-            ]
-            with open( self.custom_dictionary_file, 'a') as fh:
-                for line in lines:
-                    fh.write( '%s\t%s\n'%line)
             if not found:
                 raise RuntimeError( 
                     """We appear to be missing the ubuntu/debian package pocketsphinx-hmm-en-hub4wsj""" 
                 )
+            # this should likely be a mechanism to allow the user 
+            # to mix-in various utility dictionaries, but these
+            # are *so* common we likely always need them...
+            self.copy_template_to_dictionary(
+                os.path.join( HERE, 'punctuation.csv' ),
+                self.custom_dictionary_file,
+            )
+            self.copy_template_to_dictionary(
+                os.path.join( HERE, 'meta-commands.csv' ),
+                self.custom_dictionary_file,
+            )
             if not os.path.exists( self.buffer_directory ):
                 os.mkdir( self.buffer_directory )
             return self.directory
         finally:
             shutil.rmtree( tempdir )
+    
+    def copy_template_to_dictionary( self, template, dictionary, separator=','):
+        lines = [
+            line.split(separator,1)
+            for line in open( template ).read().splitlines()
+            if line.strip()
+        ]
+        written_counts = {}
+        with open( dictionary, 'a') as fh:
+            for line in lines:
+                try:
+                    count = written_counts.get( line[0],0)
+                    count += 1
+                    written_counts[line[0]] = count
+                    if count != 1:
+                        line[0] = '%s(%s)'%(line[0],count)
+                    fh.write( '%s\t%s\n'%tuple(line))
+                except Exception as err:
+                    err.args += (line,)
+                    raise
+        
 
     def download_url( self, url, filename ):
         """Download given URL to a local filename in our cache directory 
