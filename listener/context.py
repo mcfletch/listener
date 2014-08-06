@@ -366,6 +366,10 @@ class Context( object ):
             shell=True,
         )
         os.rename( self.language_model_file + '~', self.language_model_file )
+    
+    def delete( self ):
+        """Delete our directory and all children"""
+        shutil.rmtree( self.directory, True )
 
 class AudioContext( object ):
     """Audio/hardware/user context used to do acoustic adaptation
