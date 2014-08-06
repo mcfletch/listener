@@ -42,6 +42,7 @@ if __name__ == "__main__":
                 'listener-arpa-guess=listener.cli:arpabet_guess',
                 'listener-dictionary-cache=listener.dictionarycache:main',
                 'listener-context-from-project=listener.cli:context_from_project',
+                'listener-context-delete=listener.cli:delete_context',
                 'listener-qt=listener.cli:qt_gui',
                 'listener-dictionary-subset=listener.cli:subset_dictionary',
                 
