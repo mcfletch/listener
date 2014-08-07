@@ -1,6 +1,25 @@
 TODO Items for Listener
 =======================
 
+* Language model recompilation
+
+    * is now (loosely) working 
+    
+    * need to make the codetowords tokenization simpler and more generic,
+      just use a regex or parser to split up the text and then run the 
+      tokens through the break_down_word (or equivalent) operation 
+    
+    * need to use a *lot* more repositories in initial word-set
+    
+    * probably should just directly generate N-grams while processing the 
+      files, as all we do is feed them to the language-model compilation 
+      process
+    
+    * .vocab files *must* include all words in the vocabulary, we should 
+      likely put our words in without use of fake statements
+
+
+
 * Provide meta-context which relates to the voice service itself
 
     * `start listening`
@@ -45,23 +64,6 @@ TODO Items for Listener
       
     * should have button to "retrain" (add to the training repository)
       for each utterance (and particularly when correcting)
-
-* Language model recompilation
-
-    * is now working 
-    
-    * need to make the codetowords tokenization simpler and more generic,
-      just use a regex or parser to split up the text and then run the 
-      tokens through the break_down_word (or equivalent) operation 
-    
-    * need to use a *lot* more repositories in initial word-set
-    
-    * probably should just directly generate N-grams while processing the 
-      files, as all we do is feed them to the language-model compilation 
-      process
-    
-    * .vocab files *must* include all words in the vocabulary, we should 
-      likely put our words in without use of fake statements
 
 * Audio training http://cmusphinx.sourceforge.net/wiki/tutorialadapt
 
