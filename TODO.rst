@@ -48,6 +48,21 @@ TODO Items for Listener
 
 * Language model recompilation
 
+    * is now working 
+    
+    * need to make the codetowords tokenization simpler and more generic,
+      just use a regex or parser to split up the text and then run the 
+      tokens through the break_down_word (or equivalent) operation 
+    
+    * need to use a *lot* more repositories in initial word-set
+    
+    * probably should just directly generate N-grams while processing the 
+      files, as all we do is feed them to the language-model compilation 
+      process
+    
+    * .vocab files *must* include all words in the vocabulary, we should 
+      likely put our words in without use of fake statements
+
 * Audio training http://cmusphinx.sourceforge.net/wiki/tutorialadapt
 
     * Provide an explicit training process to start
@@ -82,24 +97,12 @@ TODO Items for Listener
     
     * defaults to `default` so out of the box it is system/pulseaudio controlled
 
-* Use an indexed format for the dictionary file so that we can quickly lookup
-  whether a given word is known/unknown
-  
-    * sqlite would work, but maybe overkill
-    
-    * bsddb might be more appropriate
-
 * Move the `uinput` device into a (system) DBus service with access 
   control to only allow `console` users to access it (access control file 
   already written, but packaging is needed)
   
 * Move the audio pipes and context management into a Session DBus service
   to decouple it and make it easy for other processes to access it
-
-* Separate out the "hardware/audio context" from the language model 
-  context. If we are on the same hardware we likely want to use and 
-  modify/train the same hardware context regardless of which app is 
-  currently active 
 
 * Language Model Contexts
 
