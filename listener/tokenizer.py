@@ -1,6 +1,50 @@
 import unicodedata
 from ._bytes import as_unicode
 
+PUNCTUATION_NAMES = {
+    # TODO: allow user overrides for all of these
+    # so they can use star-star or left-paren or some custom 
+    # word if they want...
+    '\n': 'new-line',
+    '!': '!exclamation-point',
+    '!=': '!=not-equal',
+    '"': '"double-quote',
+    '#': '#sharp-sign',
+    '$': '$dollar-sign',
+    '%': '%percent',
+    '&': '&ampersand',
+    "'": "'quote",
+    '(': '(open-paren',
+    ')': ')close-paren',
+    '*': '*asterisk',
+    '**': '**asterisk-asterisk',
+    '+': '+plus',
+    ',': ',comma',
+    '-': '-hyphen',
+    '.': '.dot',
+    '...': '...ellipsis',
+    '/': '/slash',
+    ':': ':colon',
+    '://': ':colon /slash /slash',
+    ';': ';semi-colon',
+    '<': '<less-than',
+    '=': '=equals',
+    '==': '==equal-equal',
+    '>': '>greater-than',
+    '?': '?question-mark',
+    '@': '@at',
+    '[': '[open-bracket',
+    '\\': '\\back-slash',
+    ']': ']close-bracket',
+    '^': '^caret',
+    '_': '_under-score',
+    '`': '`back-tick',
+    '{': '{open-brace',
+    '|': '|bar',
+    '}': '}close-brace',
+    '~': '~tilde',
+}
+
 class Tokenizer( object ):
     def __init__( self,dictionary ):
         self.dictionary = dictionary 
@@ -65,6 +109,47 @@ class Tokenizer( object ):
                 current_token.append( (category,chars) )
         if current_token:
             yield current_token
+    
+    def expand_N( self, token ):
+        """Expand an N-token into words"""
+        # TODO: currently is hopelessly *not* unicode functional
+        combined = u''.join([x[1] for x in token])
+        result = []
+        for char in combined:
+            explicit = self.DIGITS.get(char)
+            if not explicit:
+                explicit = unicodedata.name(char).replace(u' ',u'-').lower()
+            result.append( explicit )
+        return result
+    DIGITS = {
+        '0':'zero',
+        '1':'one',
+        '2':'two',
+        '3':'three',
+        '4':'four',
+        '5':'five',
+        '6':'six',
+        '7':'seven',
+        '8':'eight',
+        '9':'nine',
+        'a':'a',
+        'A':'cap a',
+        'b':'b',
+        'c':'c',
+        'C':'cap c',
+        'd':'d',
+        'D':'cap D',
+        'e':'e',
+        'E':'cap E',
+        'f':'f',
+        'F':'cap F',
+        'x':'x',
+        'X':'x',
+        '-':'minus',
+        '+':'plus',
+        '.':'.dot',
+    }
+        
 
 def test_tokenizer_categories( ):
     tok = Tokenizer(None)
@@ -87,7 +172,7 @@ def test_tokenizer_categories( ):
         result = [x[1] for x in raw_result]
         assert result == expected, (source,result,raw_result)
 
-def test_tokenizer_words( ):
+def test_tokenizer_tokens( ):
     tok = Tokenizer(None)
     for source,expected in [
         ('ThisIsThat',[['T','his','I','s','T','hat']]),
@@ -100,4 +185,12 @@ def test_tokenizer_words( ):
         raw_result = list(tok.runs_of_tokens( tok.runs_of_categories(source)))
         result = [[x[1] for x in result] for result in raw_result]
         assert result == expected, (source,result,raw_result)
-        
+
+def test_expand_N( ):
+    tok = Tokenizer(None)
+    for source,expected in [
+        ('0x23ad',['zero','x','two','three','a','d']),
+    ]:
+        raw_result = list(tok.runs_of_tokens( tok.runs_of_categories(source)))
+        expanded = tok.expand_N( raw_result[0] )
+        assert expanded == expected, (source,expanded)
