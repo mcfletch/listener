@@ -1,56 +1,13 @@
 import unicodedata
 from ._bytes import as_unicode
+from . import codetowords
 
-PUNCTUATION_NAMES = {
-    # TODO: allow user overrides for all of these
-    # so they can use star-star or left-paren or some custom 
-    # word if they want...
-    '\n': 'new-line',
-    '!': '!exclamation-point',
-    '!=': '!=not-equal',
-    '"': '"double-quote',
-    '#': '#sharp-sign',
-    '$': '$dollar-sign',
-    '%': '%percent',
-    '&': '&ampersand',
-    "'": "'quote",
-    '(': '(open-paren',
-    ')': ')close-paren',
-    '*': '*asterisk',
-    '**': '**asterisk-asterisk',
-    '+': '+plus',
-    ',': ',comma',
-    '-': '-hyphen',
-    '.': '.dot',
-    '...': '...ellipsis',
-    '/': '/slash',
-    ':': ':colon',
-    '://': ':colon /slash /slash',
-    ';': ';semi-colon',
-    '<': '<less-than',
-    '=': '=equals',
-    '==': '==equal-equal',
-    '>': '>greater-than',
-    '?': '?question-mark',
-    '@': '@at',
-    '[': '[open-bracket',
-    '\\': '\\back-slash',
-    ']': ']close-bracket',
-    '^': '^caret',
-    '_': '_under-score',
-    '`': '`back-tick',
-    '{': '{open-brace',
-    '|': '|bar',
-    '}': '}close-brace',
-    '~': '~tilde',
-}
 
 class Tokenizer( object ):
     def __init__( self,dictionary ):
         self.dictionary = dictionary 
     BASE_TYPE_MAP = {
         # consider category X -> basic category
-        'Pc':'P',
         'Pd':'P',
         'Pe':'P',
         'Pf':'P',
@@ -93,7 +50,7 @@ class Tokenizer( object ):
         if current:
             yield category,current
     SEPARATES_WORDS = set([
-        'P','Z','Zs','Po','Sc','Ps','Pe','Pc','Sm','Pd',
+        'P','Z','Zs','Po','Sc','Ps','Pe','Sm','Pd',
         'Cc','C','Cf',
     ])
     def runs_of_tokens( self, runs_of_categories ):
@@ -110,6 +67,32 @@ class Tokenizer( object ):
         if current_token:
             yield current_token
     
+    HAS_LETTERS = set(['L','Lu','Ll','Lt','Lm','Lo'])
+    def expand( self, runs_of_tokens ):
+        """Dispatch to our processing functions to expand each token"""
+        # expand any embedded numbers first...
+        for token in runs_of_tokens:
+            yield self.expand_token( token )
+    def expand_token( self, token ):
+        result = []
+        current = u''
+        def add_current():
+            if current:
+                result.extend(codetowords.break_down_name( current ))
+        for (category,chars) in token:
+            if category == 'N':
+                add_current()
+                current = u''
+                result.extend( self.expand_N( [(category,chars)]))
+            elif category.startswith('P'):
+                add_current()
+                current = u''
+                result.extend( self.expand_P( [(category,chars)]))
+            else:
+                current += chars 
+        add_current()
+        return result 
+    
     def expand_N( self, token ):
         """Expand an N-token into words"""
         # TODO: currently is hopelessly *not* unicode functional
@@ -119,6 +102,15 @@ class Tokenizer( object ):
             explicit = self.DIGITS.get(char)
             if not explicit:
                 explicit = unicodedata.name(char).replace(u' ',u'-').lower()
+            result.append( explicit )
+        return result
+    def expand_P( self, token ):
+        combined = u''.join([x[1] for x in token])
+        result = []
+        for char in combined:
+            explicit = self.PUNCTUATION_NAMES.get(char)
+            if not explicit:
+                explicit = char+unicodedata.name(char).replace(u' ',u'-').lower()
             result.append( explicit )
         return result
     DIGITS = {
@@ -148,6 +140,51 @@ class Tokenizer( object ):
         '-':'minus',
         '+':'plus',
         '.':'.dot',
+    }
+    PUNCTUATION_NAMES = {
+        # TODO: allow user overrides for all of these
+        # so they can use star-star or left-paren or some custom 
+        # word if they want...
+        '\n': 'new-line',
+        '!': '!exclamation-point',
+        '!=': '!=not-equal',
+        '"': '"double-quote',
+        '#': '#sharp-sign',
+        '$': '$dollar-sign',
+        '%': '%percent',
+        '&': '&ampersand',
+        "'": "'quote",
+        "'''":"'''triple-quote",
+        '"""':'"""triple-double-quote',
+        '(': '(open-paren',
+        ')': ')close-paren',
+        '*': '*asterisk',
+        '**': '**asterisk-asterisk',
+        '+': '+plus',
+        ',': ',comma',
+        '-': '-hyphen',
+        '.': '.dot',
+        '...': '...ellipsis',
+        '/': '/slash',
+        ':': ':colon',
+        '://': ':colon /slash /slash',
+        ';': ';semi-colon',
+        '<': '<less-than',
+        '=': '=equals',
+        '==': '==equal-equal',
+        '>': '>greater-than',
+        '?': '?question-mark',
+        '@': '@at',
+        '[': '[open-bracket',
+        '\\': '\\back-slash',
+        ']': ']close-bracket',
+        '^': '^caret',
+        '_': '_under-score',
+        '`': '`back-tick',
+        '{': '{open-brace',
+        '|': '|bar',
+        '}': '}close-brace',
+        '~': '~tilde',
     }
         
 
@@ -179,18 +216,22 @@ def test_tokenizer_tokens( ):
         ('This is that',[[u'T', u'his'], [u' '], [u'is'], [u' '], [u'that']]),
         ('x != this',[[u'x'], [u' '], [u'!='], [u' '], [u'this']]),
         ('0x3faD',[['0','x','3','fa','D']]),
-        ('!@#$%^&*()_+-=[]{}\\|:;\'",.<>/?',[[u'!@#$%^&*()_+-=[]{}\\|:;\'",.<>/?']]),
+        ('!@#$%^&*()_+-=[]{}\\|:;\'",.<>/?',[[u'!@#$%^&*()'], [u'_'], [u'+-=[]{}\\|:;\'",.<>/?']]),
         ('elif moo:\n\tthat()',[[u'elif'], [u' '], [u'moo'], [u':'], [u'\n\t'], [u'that'], [u'()']]),
     ]:
         raw_result = list(tok.runs_of_tokens( tok.runs_of_categories(source)))
         result = [[x[1] for x in result] for result in raw_result]
         assert result == expected, (source,result,raw_result)
 
-def test_expand_N( ):
+def test_expand( ):
     tok = Tokenizer(None)
     for source,expected in [
-        ('0x23ad',['zero','x','two','three','a','d']),
+        #('0x23ad',['zero','x','two','three','ad']), # word "Ad" as in advertisement
+        ('!==',['!exclamation-point', '=equals', '=equals']),
+        ('"',['"double-quote']),
+        ('ThisIsThat',['cap', 'camel', u'This', u'Is', u'That']),
+        ('23skido',['two', 'three', u'skido']),
     ]:
         raw_result = list(tok.runs_of_tokens( tok.runs_of_categories(source)))
-        expanded = tok.expand_N( raw_result[0] )
+        expanded = list(tok.expand( raw_result ))[0]
         assert expanded == expected, (source,expanded)

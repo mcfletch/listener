@@ -5,9 +5,10 @@ TODO Items for Listener
 
     * is now (loosely) working 
     
-    * need to make the codetowords tokenization simpler and more generic,
-      just use a regex or parser to split up the text and then run the 
-      tokens through the break_down_word (or equivalent) operation 
+    * need to make the codetowords tokenization simpler and more generic
+    
+        * this is started in tokenizer module, using unicode character classes 
+          though at the moment we only work with english and ascii sources
     
     * need to use a *lot* more repositories in initial word-set
     
