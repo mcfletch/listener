@@ -1,6 +1,6 @@
 """Base argument parser for listener utilities"""
 import argparse, logging, functools, os, sys, traceback, subprocess
-from . import context,codetowords,ipatoarpabet
+from . import context,codetowords,ipatoarpabet,tokenizer
 from ._bytes import as_bytes,as_unicode,unicode,bytes
 
 def base_arguments(purpose):
@@ -52,7 +52,7 @@ def _existing_directory( directory ):
     return os.path.abspath( directory )
 @with_logging
 def code_to_words():
-    log = codetowords.log
+    log = tokenizer.log
     parser = base_arguments('Convert passed file names to guessed pronunciation')
     parser.add_argument(
         'files',metavar='FILE',type=_existing_filename,nargs="+",
@@ -65,12 +65,13 @@ def code_to_words():
     )
     arguments = parser.parse_args()
     working_context = context.Context( arguments.context )
+    tokens = tokenizer.Tokenizer( working_context.dictionary_cache )
     for filename in arguments.files:
         log.info('Translating: %s', filename )
         lines = open( filename ).readlines()
-        translated = codetowords.codetowords( lines, working_context.dictionary_cache )
+        translated = tokens( lines )
         composed = '\n'.join([
-            '<s> %s </s>'%( ' '.join( line ))
+            u'<s> %s </s>'%( u' '.join( line ))
             for line in translated
         ])
         if not arguments.output:
