@@ -15,15 +15,6 @@ class CodeToWordsTests( TestCase ):
     def test_ops_parsed( self ):
         assert '[' in codetowords.OP_NAMES, codetowords.OP_NAMES
         assert codetowords.OP_NAMES['['] == '[open-bracket'
-    def test_break_down_name(self):
-        for input,expected in [
-            ('thisTest',['camel', 'this', 'test']),
-            ('ThisTest',['cap','camel', 'this', 'test']),
-            ('that_test',['that','_under-score','test']),
-            #('oneshot',['no-space','one','shot','spaces']), # would need statistical model
-        ]:
-            result = codetowords.break_down_name( input, dictionary=self.context.dictionary_cache )
-            assert result == expected, (input,result)
 
     def test_tokens(self):
         dictionary = self.context.dictionary_cache
@@ -102,23 +93,3 @@ class CodeToWordsTests( TestCase ):
             result = codetowords.codetowords([line], dictionary=dictionary)
             assert result == expected, (line, result)
     
-    def test_run_together( self ):
-        dictionary = self.context.dictionary_cache
-        dictionary.add_dictionary_iterable([
-            ('kde','K D IY'),
-            ('veridian','MOO'),
-        ])
-        for run_together, expected in [
-            ('om',['o','m']),
-            ('buildthis',['build','this']),
-            ('Moveoverage',['move','over','age']),
-            ('generateov',['generate','o','v']),
-            ('qapplication',['q','application']),
-            ('kdebuildingwindow',['kde','building','window']),
-            ('VeridianEgg',['veridian','egg']),
-            ('Veridian',['veridian']),
-            #('oneshot',['one','shot']), # would need statistical model
-        ]:
-            result = codetowords.parse_run_together( run_together, dictionary )
-            assert result== expected, (run_together,result)
-        
