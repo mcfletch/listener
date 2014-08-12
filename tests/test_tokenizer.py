@@ -63,11 +63,13 @@ class TokenizerTests( TestCase ):
 
     def test_break_down_name(self):
         for input,expected in [
-            ('thisTest',['camel', 'this', 'test']),
-            ('ThisTest',['cap','camel', 'this', 'test']),
+#            ('thisTest',['camel', 'this', 'test']),
+#            ('ThisTest',['cap','camel', 'this', 'test']),
             ('that_test',['that','_under-score','test']),
             #('oneshot',['no-space','one','shot','spaces']), # would need statistical model
         ]:
+            import pdb
+            pdb.set_trace()
             result = self.tokenizer.parse_camel( input )
             assert result == expected, (input,result)
     def test_run_together( self ):

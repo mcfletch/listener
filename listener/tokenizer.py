@@ -1,20 +1,62 @@
-import unicodedata,logging,re
+import unicodedata,logging,re,os,locale,itertools
+from collections import deque
 from ._bytes import as_unicode
 log = logging.getLogger(__name__)
 
-
 CODING = re.compile( r'coding[:=]\s*([-\w.]+)' )
+
+def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    args = [iter(iterable)] * n
+    return itertools.izip_longest(fillvalue=fillvalue, *args)
+
+class PeekingGenerator(object):
+    STOP_ERROR = object()
+    def __init__( self, source ):
+        self.source = iter(source)
+        self.peeked = deque()
+    def __iter__( self ):
+        return self
+    def next( self ):
+        """Retrieve our next item"""
+        try:
+            return self.peeked.popleft()
+        except IndexError:
+            return self.source.next()
+    def peek( self ):
+        """Peek at the next item
+        
+        Will return self.STOP_ERROR if the 
+        iterable is exhausted when you call peek()
+        """
+        try:
+            value = self.source.next()
+        except StopIteration as err:
+            return self.STOP_ERROR
+        else:
+            self.peeked.append( value )
+            return value 
+
 
 class Tokenizer( object ):
     def __init__( self,dictionary ):
         self.dictionary = dictionary 
+        self.SPECIAL_COMBINERS = self.locale_specials()
+    def locale_specials(self):
+        if 'LANG' in os.environ:
+            locale.setlocale(locale.LC_ALL,os.environ['LANG'])
+        env = locale.localeconv()
+        return u''.join([as_unicode(env[k]) for k in [
+            'decimal_point',
+            'thousands_sep',
+        ]])
     BASE_TYPE_MAP = {
         # consider category X -> basic category
         'Pd':'P',
         'Pe':'P',
         'Pf':'P',
         'Pi':'P',
-        'Po':'P',
+        'Po':'P', # but the SPECIAL_COMBINERS are pulled out first...
         'Ps':'P',
         
         'S': 'P',
@@ -38,7 +80,10 @@ class Tokenizer( object ):
         category=None
         for char in text:
             raw_category = unicodedata.category(char)
-            new_category = self.BASE_TYPE_MAP.get(raw_category,raw_category)
+            if char in self.SPECIAL_COMBINERS:
+                new_category = 'Px'
+            else:
+                new_category = self.BASE_TYPE_MAP.get(raw_category,raw_category)
             if new_category != category:
                 if current:
                     yield category,current 
@@ -55,11 +100,22 @@ class Tokenizer( object ):
         'P','Z','Zs','Po','Sc','Ps','Pe','Sm','Pd',
         'Cc','C','Cf',
     ])
+    
     def runs_of_tokens( self, runs_of_categories ):
         """Split runs of categories into individual tokens"""
         current_token = []
-        for (category,chars) in runs_of_categories:
+        runs_of_categories = PeekingGenerator(runs_of_categories)
+        for category,chars in runs_of_categories:
             assert isinstance(chars,unicode), (type(chars),chars)
+            if category == 'Px':
+                # a combiner that is a terminal but only iff the 
+                # character after is a splitting character...
+                next = runs_of_categories.peek()
+                if next is runs_of_categories.STOP_ERROR:
+                    # is a real terminal...
+                    category = 'P'
+                elif next[0] in self.SEPARATES_WORDS:
+                    category = 'P'
             if category in self.SEPARATES_WORDS:
                 if current_token:
                     yield current_token
@@ -276,54 +332,128 @@ class Tokenizer( object ):
             return ['no-space']+base+['spaces']
         return base
         
-    def is_title( self, first, second ):
-        return first[0] == 'Lu' and len(first) == 1 and second[0] == "Ll"
     def is_all_caps( self, name ):
-        return all([item[0]=='Lu' for item in name])
-    def is_camel( self, name ):
+        has_letters = False 
+        all_uppercase = False 
+        for (category,char) in name:
+            if category.startswith('L'):
+                has_letters = True
+                if category != 'Lu':
+                    return False 
+        return has_letters
+        
+    def is_cap_camel( self, name ):
         """Go through name checking for camel-case"""
-        while len(name)>1:
-            if not self.is_title( name[0], name[1] ):
-                return False 
-            name = name[2:]
-        return not name # no trailing bits...
-
+        has_letters = False
+        for (category,char) in name:
+            if category.startswith('L'):
+                has_letters = True 
+                if category != 'L':
+                    return False 
+        return has_letters
+    def is_camel( self, name ):
+        return len(name) > 1 and name[0][0] == 'Ll' and self.is_cap_camel( name[1:] )
+        
+    def combine_ls( self, name ):
+        """Combine all L-prefixed items..."""
+        result = []
+        for (category,chars) in name:
+            if (
+                category == 'Ll' and 
+                result and 
+                result[-1][0] == 'Lu' 
+                and len(result[-1][1]) == 1
+            ):
+                result[-1] = ('L',result[-1][1]+chars)
+            else:
+                result.append( (category,chars) )
+        return result
+    
+    def looks_like_camel( self, name ):
+        if len(name) > 1:
+            first,rest = name[0],name[1:]
+            if first[0] == 'Ll':
+                return self.looks_like_cap_camel( rest, False )
+        return False
+    def looks_like_cap_camel( self, name, whole=True ):
+        if whole:
+            min = 4
+        else:
+            min = 2
+        if len(name) >= min:
+            for (upper,lower) in grouper( name, 2 ):
+                if not (
+                    upper[0] == 'Lu' and 
+                    len(upper[1]) == 1 and 
+                    lower and 
+                    lower[0] == 'Ll'
+                ):
+                    return False
+            return True
+        return False
+    def looks_like_dunder( self, name ):
+        if len(name)>=3 and name[0] == self.DUNDER and name[-1] == self.DUNDER:
+            return True 
+        return False
+    
     def parse_camel( self, name ):
         if isinstance( name, (bytes,unicode)):
             name = list(self.runs_of_categories( name ))
+        else:
+            name = list( name )
         
-        all_caps = self.is_all_caps( name )
-        cap_camel_case = self.is_camel( name )
-        camel_case = len(name) > 1 and self.is_camel(name[1:])
+        split = self.combine_ls( name )
+        # multiple cases in approximate order of importance
+        # based on my experience in Python...
+        #  * high-level patterns (URLs being the big one, maybe filenames too)
+        #  * wrapping patterns __x__
+        #  * combining patterns x_y
+        #  * embedded numbers/digits
+        #  * simple words, with/without Title
+        #  * CapCamelCase
+        #  * camelCase 
+        #  * ALLCAPSlower
+        #  * Num.Num
+        #  * Num,Num 
+        #  * 0xNum
+        #  * Num+
         
+        all_caps = self.is_all_caps( split )
+        cap_camel_case = self.is_cap_camel( split )
+        camel_case = self.is_camel( split )
         
-        words = [x for x in split if not x.isdigit()]
+        words = [x for x in split if x[0].startswith('L')]
         split_expanded = []
         for item in split:
-            if item.isdigit():
-                split_expanded.extend( [digit(x) for x in item])
+            if item[0].startswith('N'):
+                split_expanded.extend( self.expand_N( [item] ))
+            elif item[0].startswith('P'):
+                split_expanded.extend( self.expand_P( [item] ))
             else:
-                split_expanded.append( item )
-
-        run_together_expansion = sum([
-            self.parse_run_together_with_markup(x) 
-            for x in split_expanded
-        ],[])
-        result = run_together_expansion
-        if len(words) == 0:
-            # e.g. numeric fragment of a name...
-            pass
-        elif len(words) == 1:
-            if words[0].isupper():
-                result = ['all','caps'] + run_together_expansion
-            elif words[0].title() == words[0]:
-                result = ['cap']+run_together_expansion
+                split_expanded.extend( self.parse_run_together_with_markup(item[1]) )
+        
+        if len(words) == 1:
+            word = words[0][1]
+            if len(word) == 1:
+                if word.isupper():
+                    return ['cap',word.lower()]
+                else:
+                    # TODO: if not in dictionary, expand to 
+                    # "unicode <name of character>"
+                    return [word.lower()]
+            elif word.isupper():
+                return ['all','caps'] + split_expanded
+            elif word.title() == word:
+                return ['cap']+split_expanded
+            else:
+                return split_expanded
         else:
             if all_caps:
-                result = ['all', 'caps'] + run_together_expansion
+                return ['all', 'caps'] + split_expanded
             elif cap_camel_case:
-                result = ['cap','camel'] + run_together_expansion
+                return ['cap','camel'] + split_expanded
             elif camel_case and len(split) > 1:
-                result = ['camel'] + run_together_expansion
-        return result
+                return ['camel'] + split_expanded
+            else:
+                return split_expanded
 
