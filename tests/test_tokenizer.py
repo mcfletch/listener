@@ -38,7 +38,9 @@ class TokenizerTests( TestCase ):
             ('This is that',[[u'T', u'his'], [u' '], [u'is'], [u' '], [u'that']]),
             ('x != this',[[u'x'], [u' '], [u'!='], [u' '], [u'this']]),
             ('0x3faD',[['0','x','3','fa','D']]),
-            ('!@#$%^&*()_+-=[]{}\\|:;\'",.<>/?',[[u'!@#$%^&*()'], [u'_'], [u'+-=[]{}\\|:;\'",.<>/?']]),
+            # TODO: this test-case is a bit arbitrary, the result is basically 
+            # 'some set of randomly divided values'
+            ('!@#$%^&*()_+-=[]{}\\|:;\'",.<>/?',[[u'!@#$%^&*()'], [u'_'], [u'+-=[]{}\\|:;\'"'], [u',.'], [u'<>/?']]),
             ('elif moo:\n\tthat()',[[u'elif'], [u' '], [u'moo'], [u':'], [u'\n\t'], [u'that'], [u'()']]),
         ]:
             raw_result = list(self.tokenizer.runs_of_tokens( 
@@ -63,13 +65,11 @@ class TokenizerTests( TestCase ):
 
     def test_break_down_name(self):
         for input,expected in [
-#            ('thisTest',['camel', 'this', 'test']),
-#            ('ThisTest',['cap','camel', 'this', 'test']),
+            ('thisTest',['camel', 'this', 'test']),
+            ('ThisTest',['cap','camel', 'this', 'test']),
             ('that_test',['that','_under-score','test']),
             #('oneshot',['no-space','one','shot','spaces']), # would need statistical model
         ]:
-            import pdb
-            pdb.set_trace()
             result = self.tokenizer.parse_camel( input )
             assert result == expected, (input,result)
     def test_run_together( self ):
@@ -91,4 +91,81 @@ class TokenizerTests( TestCase ):
         ]:
             result = self.tokenizer.parse_run_together( run_together )
             assert result== expected, (run_together,result)
+        
+    def test_tokenizer_accept( self ):
+        dictionary = self.context.dictionary_cache
+        dictionary.add_dictionary_iterable([
+            ('kde','K D IY'),
+            ('veridian','MOO'),
+        ])
+        expected = [
+            (
+                'test[this]',
+                [['test','[open-bracket','this',']close-bracket',]]
+            ),
+            (
+                'this.test(this,that)',
+                [['this','.dot','test','(open-paren','this',',comma','that',')close-paren']],
+            ),
+            
+            (
+                'class Veridian(object):',
+                [['class', ' ', 'cap', 'veridian', '(open-paren', 'object', ')close-paren', ':colon']],
+            ),
+            (
+                'objectReference.attributeReference = 34 * deltaValue',
+                [['camel', 'object', 'reference', '.dot', 'camel', 'attribute', 'reference', ' ', '=equals', ' ', 'three','four', ' ', '*asterisk', ' ', 'camel', 'delta', 'value']],
+            ),
+            (
+                'GLUT_SOMETHING_HERE = 0x234A',
+                [['all', 'caps', 'glut', '_under-score', 'all', 'caps', 'something', '_under-score', 'all', 'caps', 'here', ' ', '=equals', ' ', 'zero', 'x', 'two', 'three', 'four', 'cap', 'a',]],
+            ),
+            (
+                'class VeridianEgg:',
+                [['class', ' ', 'cap', 'camel', 'veridian', 'egg', ':colon']],
+            ),
+            (
+                'newItem34',
+                [['camel','new','item','three','four']],
+            ),
+            (
+                'new_item_34',
+                [['new','_under-score','item','_under-score','three','four']],
+            ),
+            (
+                '"""this"""',
+                [[
+                    '"""triple-quote',
+                    'this',
+                    '"""triple-quote'
+                ]],
+            ),
+            (
+                "'''this'''",
+                [[
+                    "'''triple-single-quote",
+                    'this',
+                    "'''triple-single-quote"
+                ]],
+            ),
+            (
+                "testruntogether=2",
+                [[
+                    "no-space", "test", "run", "together", 'spaces', '=equals', 'two'
+                ]],
+            ),
+            (
+                "addressof( 2 )",
+                [[
+                    'no-space', 'address', 'of', 'spaces','(open-paren', ' ', 'two', ' ', ')close-paren',
+                ]],
+            ),
+            (
+                "1",
+                [["one"]],
+            ),
+        ]
+        for line,expected in expected:
+            result = list(self.tokenizer([line]))
+            assert result == expected, (line, result)
         

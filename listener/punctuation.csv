@@ -13,8 +13,10 @@
 }close-brace,K L OW Z B R EY S
 @at,AE T
 """triple-quote,T R IH P AH L K W OW T
+"""triple-double-quote,T R IH P AH L D AH B L K W OW T
 '''triple-single-quote,T R IH P AH L S IH NG G AH L K W OW T
 "quote,K W OW T
+"double-quote,D AH B L K W OW T
 'single-quote,S IH NG G AH L K W OW T
 *asterisk,AE S T ER IH S K
 **asterisk-asterisk,AE S T ER IH S K AE S T ER IH S K

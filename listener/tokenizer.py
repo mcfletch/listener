@@ -232,8 +232,8 @@ class Tokenizer( object ):
         '%': '%percent',
         '&': '&ampersand',
         "'": "'quote",
-        "'''":"'''triple-quote",
-        '"""':'"""triple-double-quote',
+        "'''":"'''triple-single-quote",
+        '"""':'"""triple-quote',
         '(': '(open-paren',
         ')': ')close-paren',
         '*': '*asterisk',
@@ -280,6 +280,8 @@ class Tokenizer( object ):
 
     def __call__( self, text ):
         """Iterate producing all expanded tokens for a given text"""
+        if isinstance( text, (unicode,str)):
+            text = [text]
         for statement in text:
             tokens = []
             for expanded in self.expand(statement):

@@ -67,7 +67,8 @@ class ContextTests( TestCase ):
         ])
         self.context.regenerate_language_model()
     def test_punctuation_added( self ):
-        names = codetowords.OP_NAMES.values()
+        from listener import tokenizer
+        names = tokenizer.Tokenizer.PUNCTUATION_NAMES.values()
         expanded = []
         for name in names:
             if ' ' in name:
