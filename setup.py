@@ -46,6 +46,7 @@ if __name__ == "__main__":
                 'listener-qt=listener.cli:qt_gui',
                 'listener-dictionary-lookup=listener.cli:dictionary_lookup',
                 'listener-dictionary-subset=listener.cli:subset_dictionary',
+                'listener-dictionary-import=listener.cli:import_words',
                 
                 'listener-rawplay=listener.pipeline:rawplay',
                 

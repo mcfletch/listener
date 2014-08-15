@@ -167,50 +167,15 @@ class Context( object ):
             # to mix-in various utility dictionaries, but these
             # are *so* common we likely always need them...
             for template in self.TEMPLATE_FILES:
-                self.copy_template_to_dictionary(
+                self.add_dictionary_file(
                     template,
-                    self.custom_dictionary_file,
                 )
-            self.copy_template_statements()
             if not os.path.exists( self.buffer_directory ):
                 os.mkdir( self.buffer_directory )
             return self.directory
         finally:
             shutil.rmtree( tempdir )
     
-    def iter_template_words( self, template, separator=','):
-        lines = [
-            line.split(separator,1)
-            for line in open( template ).read().splitlines()
-            if line.strip()
-        ]
-        for line in lines:
-            yield line
-    
-    def copy_template_to_dictionary( self, template, dictionary, separator=','):
-        written_counts = {}
-        with open( dictionary, 'a') as fh:
-            words = []
-            for line in self.iter_template_words( template, separator ):
-                try:
-                    count = written_counts.get( line[0],0)
-                    count += 1
-                    written_counts[line[0]] = count
-                    if count != 1:
-                        line[0] = '%s(%s)'%(line[0],count)
-                    fh.write( '%s\t%s\n'%tuple(line))
-                except Exception as err:
-                    err.args += (line,)
-                    raise
-    def copy_template_statements(self):
-        words = set()
-        for template in self.TEMPLATE_FILES:
-            for line in self.iter_template_words( 
-                template, 
-            ):
-                words.add(line[0])
-        self.add_statements( words )
-
     def download_url( self, url, filename ):
         """Download given URL to a local filename in our cache directory 
         
@@ -298,13 +263,55 @@ class Context( object ):
                     cached[word] = ipatoarpabet.translate( word )
         return cached
     
-    def add_custom_word( self, word, arpabet ):
+    def add_dictionary_file( self, filename, separator=',', dictionary=None ):
+        dictionary = dictionary or self.custom_dictionary_file
+        return self.add_dictionary_iterable( 
+            self.iter_template_words( filename, separator ),
+            dictionary=dictionary,
+        )
+    
+    def add_dictionary_iterable( self, iterable, dictionary ):
+        """Add all words in the iterable to our dictionary and cache"""
+        written_counts = {}
+        cache = self.dictionary_cache
+        to_write = []
+        with open( dictionary, 'a') as fh:
+            for word,pron in iterable:
+                word = as_unicode(word).lower()
+                pron = as_unicode(pron).upper()
+                if not pron in cache.have_words( word ).get(word):
+                    try:
+                        written_counts[word] = count = written_counts.get( word,0) + 1
+                        if count != 1:
+                            fh.write( '%s(%s)\t%s\n'%(
+                                as_bytes( word ),
+                                count,
+                                as_bytes( pron ),
+                            ))
+                        else:
+                            fh.write( '%s\t%s\n'%(as_bytes(word),as_bytes(pron)))
+                        to_write.append( (word,pron) )
+                    except Exception as err:
+                        err.args += (word,pron,)
+                        raise
+                else:
+                    log.debug( 'Duplicate: %s -> %s', word, pron )
+        cache.add_dictionary_iterable( to_write )
+        self.add_statements( [x[0] for x in to_write] )
+        
+    def iter_template_words( self, template, separator=','):
+        """Iterate over an arpa dictionary file yield word,pron (8-bit strings)"""
+        lines = [
+            line.split(separator,1)
+            for line in open( template ).read().splitlines()
+            if line.strip()
+        ]
+        for line in lines:
+            yield line
+    
+    def add_custom_word( self, word, pron ):
         """Add a custom word to our dictionary"""
-        word = as_unicode(word).lower()
-        arpabet = as_unicode(arpabet).upper()
-        with open( self.custom_dictionary_file, 'a' ) as fh:
-            fh.write( '%s\t%s\n'%( as_bytes(word), as_bytes(arpabet) ))
-        self.dictionary_cache.add_dictionary_iterable([(word,arpabet)])
+        return self.add_dictionary_iterable( [[word,pron]] )
     
     LM_TOOLS_PREFIX = os.path.expanduser( '~/.local/lib/listener/cmutk' )
     LM_BIN_DIRECTORY = os.path.join( LM_TOOLS_PREFIX, 'bin' )

@@ -116,6 +116,20 @@ def missing_words():
         if fh is not sys.stdout:
             fh.close()
 
+@with_logging
+def import_words( ):
+    """Import words from a csv-delimited ARPABet dictionary"""
+    log = tokenizer.log
+    parser = base_arguments('Search for unknown words in python files')
+    parser.add_argument(
+        'file',metavar='FILE',type=_existing_filename,nargs="+",
+        help="The file(s) to add to the context",
+    )
+    arguments = parser.parse_args()
+    working_context = context.Context( arguments.context )
+    for file in arguments.file:
+        working_context.add_dictionary_file( file )
+
 def iter_translated_lines( files, working_context ):
     log = tokenizer.log
     parser = tokenizer.Tokenizer( working_context.dictionary_cache )
@@ -204,10 +218,9 @@ def context_from_project():
             fh.write( '\n' )
     if arguments.clean:
         working_context.copy_template_statements()
-    for word,pron in iter_unmapped_words( all_lines, working_context ):
-        log.info( 'Adding word: %r -> %r', word,pron )
-        working_context.add_custom_word( as_unicode(word),as_unicode(pron) )
-
+    working_context.add_dictionary_iterable(
+        iter_unmapped_words( all_lines, working_context )
+    )
     working_context.regenerate_language_model()
 
 @with_logging
