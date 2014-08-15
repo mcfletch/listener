@@ -16,10 +16,14 @@ one for which I need a solution.
 Big Caveats:
 
  * This is a *very* early stage project
- * Seriously, it *does not* do anything yet See `The TODO List`_
+ 
+    * Seriously, it *does not* do much yet See `The TODO List`_
+    
  * This project is currently English-only (and English-US keyboard only). 
    It would be nice to support other languages, but it is not a priority for me
+   
  * This project is Linux-only.I am targetting modern (K)ubuntu desktops.
+ 
  * The use of pocketsphinx is actually somewhat incidental. While we are using 
    pocketsphinx right now, we should be able to switch out the engine for 
    another at some point with little change to the GUI and services.
@@ -61,6 +65,14 @@ to install.
 Executables
 ===========
 
+`listener-context-from-project --context=<name> /path/to/project`
+
+    Uses word extraction to generate a language model (from Python files)
+    based on a git checkout.  Creates a new context <name>. With this 
+    done you should be able to dictate code as in the project using 
+    listener-qt (note: currently you will *not* see the actual code 
+    when dictating, you will see commands such as "cap" and "no-space".
+
 `listener-qt --context=<name>`
 
     Launches the (not-very-useful) Qt Listener GUI. You can dictate and see 
@@ -72,14 +84,6 @@ Executables
     Note: this will download a *large* language model on first run. Currently
     that's done *before* the GUI starts, so the process will just seem to hang.
 
-`listener-context-from-project --context=<name> /path/to/project`
-
-    Uses code to word extraction to generate a (python) language model 
-    based on a git checkout.  Creates a new context <name>. With this 
-    done you should be able to dictate code as in the project using 
-    listener-qt (note: currently you will *not* see the actual code 
-    when dictating, you will see command such as "cap" and "no-space".
-
 `listener-context-delete --context=<name>`
 
     Delete a context and all associated data.
@@ -87,9 +91,8 @@ Executables
 `listener-code-to-words-py *.py`
 
     Attempts to do a code-to-words translation (for building a language model)
-    based on a hand-coded Python code transformation. Still needs to get 
-    support for "runtogether" words to be able to produce even a basic 
-    mapping. Writes .py.dictation files next to the source files currently.
+    Writes .py.dictation files next to the source files for manual review 
+    in order to improve the translations.
 
 `listener-missing-words *.py`
 

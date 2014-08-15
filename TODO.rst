@@ -5,11 +5,6 @@ TODO Items for Listener
 
     * is now (loosely) working 
     
-    * need to make the codetowords tokenization simpler and more generic
-    
-        * this is started in tokenizer module, using unicode character classes 
-          though at the moment we only work with english and ascii sources
-    
     * need to use a *lot* more repositories in initial word-set
     
     * probably should just directly generate N-grams while processing the 
@@ -18,7 +13,6 @@ TODO Items for Listener
     
     * .vocab files *must* include all words in the vocabulary, we should 
       likely put our words in without use of fake statements
-
 
 
 * Provide meta-context which relates to the voice service itself
