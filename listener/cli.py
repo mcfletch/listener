@@ -1,7 +1,7 @@
 """Base argument parser for listener utilities"""
 import argparse, logging, functools, os, sys, traceback, subprocess
 from . import context,ipatoarpabet,tokenizer
-from ._bytes import as_bytes,as_unicode,unicode,bytes
+from ._bytes import as_bytes,as_unicode,bytes
 
 def base_arguments(purpose):
     parser = argparse.ArgumentParser(description=purpose)
@@ -88,7 +88,6 @@ def code_to_words():
         
 @with_logging
 def missing_words():
-    log = tokenizer.log
     parser = base_arguments('Search for unknown words in python files')
     parser.add_argument(
         'files',metavar='FILE',type=_existing_filename,nargs="+",
@@ -119,7 +118,6 @@ def missing_words():
 @with_logging
 def import_words( ):
     """Import words from a csv-delimited ARPABet dictionary"""
-    log = tokenizer.log
     parser = base_arguments('Search for unknown words in python files')
     parser.add_argument(
         'file',metavar='FILE',type=_existing_filename,nargs="+",

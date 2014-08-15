@@ -1,5 +1,5 @@
 """Spike test for uinput generation of key events"""
-import os, sys, logging, select, fcntl, time, json
+import os, logging, fcntl, time, json
 import ctypes
 import contextlib
 log = logging.getLogger( __name__ )

@@ -242,7 +242,7 @@ class Context( object ):
 
     @one_shot
     def dictionary_cache( self ):
-        from . import dictionarycache, ipatoarpabet
+        from . import dictionarycache
         return dictionarycache.DictionaryDB( self )
         
     def transcriptions( self, words, guess=False ):

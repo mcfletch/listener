@@ -1,5 +1,5 @@
 """Qt GUI wrapper"""
-import sys,logging,Queue,cgi, os,json, pprint, math
+import logging,os,json, pprint, math
 from . import pipeline, context
 from .oneshot import one_shot
 try:

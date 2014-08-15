@@ -6,7 +6,7 @@ You may modify and redistribute this file under the same terms as
 the CMU Sphinx system.  See 
 http://cmusphinx.sourceforge.net/html/LICENSE for more information.
 """
-import sys, os, shutil, logging, pprint,subprocess, urlparse
+import sys, os, logging, pprint
 import pygst
 pygst.require("0.10")
 import gst
@@ -208,9 +208,9 @@ class Pipeline( object ):
             http://cmusphinx.sourceforge.net/wiki/tutoriallm
         """
         self.stop_listening()
-        sphinx.set_property('configured', False)
-        sphinx.set_property('lm', source)
-        sphinx.set_property('configured', True)
+        self.sphinx.set_property('configured', False)
+        self.sphinx.set_property('lm', source)
+        self.sphinx.set_property('configured', True)
         self.start_listening()
     
     def on_level( self, bus, message ):
@@ -263,8 +263,8 @@ class QueuePipeline( Pipeline ):
 
 def main():
     """Command-line script to run the pipeline"""
-    context = context.Context( 'default' )
-    pipe = QueuePipeline(context)
+    working_context = context.Context( 'default' )
+    pipe = QueuePipeline(working_context)
     pipe.start_listening()
     while True:
         try:
@@ -280,6 +280,6 @@ def main():
                 
 def rawplay():
     """Play file from the default context (or an absolute pathname)"""
-    context = context.Context( 'default' )
+    working_context = context.Context( 'default' )
     filename = sys.argv[1]
-    return context.rawplay( filename )
+    return working_context.rawplay( filename )

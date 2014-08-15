@@ -1,8 +1,7 @@
 """IPA to ARPABet pipeline/converter"""
 # -*- coding: utf-8 -*-
 import json
-import pprint 
-import os, csv, subprocess, codecs, sys
+import os, subprocess
 import logging
 import difflib
 log = logging.getLogger( __name__ )
@@ -52,8 +51,6 @@ def dictionary_espeak( ):
     if not os.path.exists( output_mapping ):
         log.warn( 'Running IPA conversion, this will take 1/4 hour or more' )
         dictionary = os.path.expanduser( '~/.config/listener/default/lm/dictionary.dict' )
-        mapping = {}
-        mapped = 0
         i = 0
         with open( output_mapping, 'w') as output:
             for i,line in enumerate(open(dictionary)):
@@ -74,7 +71,6 @@ def get_espeak( word, voice='en-us' ):
         word,
     ]).decode('utf-8'))
 def _stat_translate( ipa ):
-    result = []
     mapping = get_stat_mapping()
     ipa = [
         c.strip() for c in 
@@ -215,7 +211,6 @@ def test():
                     close_count += 1
                     #print '%s\n%s\n'%(description,close[0])
                 bad += 1
-                our_options = "\n\t\t".join( translated )
             if not i%1000:
                 print 'good=%s bad=%s close=%s good=%0.3f (good_or_close=%0.3f) avg choices %0.1f'%(
                     good,bad, close_count,
