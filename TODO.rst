@@ -1,6 +1,18 @@
 TODO Items for Listener
 =======================
 
+* Voice dictation accurracy is pretty lousy
+    
+    * with a `listener-context-from-project` we get reasonable accurracy
+      picking up words that are in the project, but there are a *lot* 
+      of stray "junk" words showing up in between the words spoken
+      
+      * this *might* just be a volume issue?
+    
+    * we are *not* getting the N-best results from pocketsphinx, so we 
+      wind up just having to accept the result we got or explicitly 
+      try to fix it 
+
 * Language model recompilation
 
     * is now (loosely) working 
