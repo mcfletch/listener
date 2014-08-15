@@ -1,6 +1,6 @@
 from unittest import TestCase
 import tempfile, shutil, os
-from listener import context, codetowords
+from listener import context
 
 class ContextTests( TestCase ):
     def setUp( self ):

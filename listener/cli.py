@@ -1,6 +1,6 @@
 """Base argument parser for listener utilities"""
 import argparse, logging, functools, os, sys, traceback, subprocess
-from . import context,codetowords,ipatoarpabet,tokenizer
+from . import context,ipatoarpabet,tokenizer
 from ._bytes import as_bytes,as_unicode,unicode,bytes
 
 def base_arguments(purpose):
@@ -83,7 +83,7 @@ def code_to_words():
         
 @with_logging
 def missing_words():
-    log = codetowords.log
+    log = tokenizer.log
     parser = base_arguments('Search for unknown words in python files')
     parser.add_argument(
         'files',metavar='FILE',type=_existing_filename,nargs="+",
@@ -112,20 +112,19 @@ def missing_words():
             fh.close()
 
 def iter_translated_lines( files, working_context ):
-    log = codetowords.log
+    log = tokenizer.log
+    parser = tokenizer.Tokenizer( working_context.dictionary_cache )
     for filename in files:
         log.info('Translating: %s', filename )
         lines = open( filename ).readlines()
         try:
-            yield codetowords.codetowords( 
-                lines, working_context.dictionary_cache 
-            )
+            yield parser( lines )
         except Exception as err:
             log.error( 'Unable to translate: %s\n%s', filename, traceback.format_exc())
             continue 
             
 def iter_unmapped_words( translated, working_context ):
-    log = codetowords.log
+    log = tokenizer.log
     unmapped = set()
     all_words = set()
     for line in translated:
@@ -164,7 +163,7 @@ def delete_context():
     
 @with_logging
 def context_from_project():
-    log = codetowords.log
+    log = tokenizer.log
     parser = base_arguments('Search for unknown words in python files')
     parser.add_argument(
         'directory',metavar='DIR',type=_existing_directory,
