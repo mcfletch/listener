@@ -62,6 +62,15 @@ class Context( object ):
                 self.initial_working_directory( )
             else:
                 raise RuntimeError( """Don't have chained/parent contexts working yet""" )
+    @classmethod 
+    def keys( self ):
+        """Return the set of contexts currently available"""
+        return [
+            os.path.basename(directory)
+            for directory in glob.glob( os.path.join( base_config_directory(), '*' ))
+        ]
+    
+    
     @one_shot
     def directory( self ):
         base = base_config_directory()

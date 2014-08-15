@@ -41,6 +41,7 @@ if __name__ == "__main__":
                 'listener-missing-words=listener.cli:missing_words',
                 'listener-arpa-guess=listener.cli:arpabet_guess',
                 'listener-context-from-project=listener.cli:context_from_project',
+                'listener-contexts=listener.cli:context_keys',
                 'listener-context-delete=listener.cli:delete_context',
                 'listener-qt=listener.cli:qt_gui',
                 'listener-dictionary-lookup=listener.cli:dictionary_lookup',

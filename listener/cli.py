@@ -28,6 +28,11 @@ def with_logging( function ):
     return logging_wrapper
 
 @with_logging
+def context_keys():
+    for key in context.Context.keys():
+        print( key )
+    
+@with_logging
 def arpabet_guess():
     parser = argparse.ArgumentParser(description='Guess ARPABet pronunciation')
     parser.add_argument(
@@ -71,7 +76,7 @@ def code_to_words():
         lines = open( filename ).readlines()
         translated = tokens( lines )
         composed = '\n'.join([
-            u'<s> %s </s>'%( u' '.join( line ))
+            u'<s> %s </s>'%( u' '.join( [x for x in line if x.strip()] ))
             for line in translated
         ])
         if not arguments.output:
@@ -105,7 +110,7 @@ def missing_words():
     else:
         fh = open( arguments.output, 'a' )
     try:
-        for word,pron in iter_unmapped_words( translated ):
+        for word,pron in iter_unmapped_words( translated, working_context ):
             fh.write('%s,%s\n'%(word,pron))
     finally:
         if fh is not sys.stdout:
@@ -184,14 +189,17 @@ def context_from_project():
     all_lines = []
     with open( working_context.custom_language_model,['a','w'][bool(arguments.clean)]) as fh:
         for translated in iter_translated_lines( files, working_context ):
+            translated = list(translated)
             all_lines.extend(translated)
-            composed = '\n'.join([
+            formatted = [
                 '<s> %s </s>'%( ' '.join( [
                     as_bytes(word)
                     for word in line 
                 ]))
                 for line in translated
-            ])
+            ]
+            composed = '\n'.join(formatted)
+            log.info( '%s statements', len(formatted))
             fh.write( composed )
             fh.write( '\n' )
     if arguments.clean:
