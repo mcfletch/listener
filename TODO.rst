@@ -13,6 +13,15 @@ TODO Items for Listener
       wind up just having to accept the result we got or explicitly 
       try to fix it 
 
+* Vocabulary Hinting, Commands and Actions
+
+    * open-quote -> 'space' + " + 'no space after'
+    
+    * close-quote -> " + maybe space after
+    
+    * "context commands" -> change interpretation context until an 
+      exit from that context
+
 * Language model recompilation
 
     * is now (loosely) working 
