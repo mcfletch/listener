@@ -8,6 +8,9 @@ TODO Items for Listener
       of stray "junk" words showing up in between the words spoken
       
       * this *might* just be a volume issue?
+      
+      * investigate whether there are knobs to reduce this when dealing with 
+        non-transcription modes of operation
     
     * we are *not* getting the N-best results from pocketsphinx, so we 
       wind up just having to accept the result we got or explicitly 
@@ -21,6 +24,9 @@ TODO Items for Listener
     
     * "context commands" -> change interpretation context until an 
       exit from that context
+      
+    * needs to feed into statistical model (HMM) for the tokenizer to 
+      decide how to split up "run together" words...
 
 * Language model recompilation
 

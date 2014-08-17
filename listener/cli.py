@@ -1,6 +1,6 @@
 """Base argument parser for listener utilities"""
-import argparse, logging, functools, os, sys, traceback, subprocess
-from . import context,ipatoarpabet,tokenizer
+import argparse, logging, functools, os, sys, traceback
+from . import context,ipatoarpabet,tokenizer,project
 from ._bytes import as_bytes,as_unicode,bytes
 
 def base_arguments(purpose):
@@ -101,7 +101,7 @@ def missing_words():
     arguments = parser.parse_args()
     working_context = context.Context( arguments.context )
     translated = []
-    for lines in iter_translated_lines( arguments.files, working_context ):
+    for lines in project.iter_translated_lines( arguments.files, working_context ):
         translated.extend(lines)
     
     if arguments.output is None:
@@ -109,7 +109,7 @@ def missing_words():
     else:
         fh = open( arguments.output, 'a' )
     try:
-        for word,pron in iter_unmapped_words( translated, working_context ):
+        for word,pron in project.iter_unmapped_words( translated, working_context ):
             fh.write('%s,%s\n'%(word,pron))
     finally:
         if fh is not sys.stdout:
@@ -127,46 +127,6 @@ def import_words( ):
     working_context = context.Context( arguments.context )
     for file in arguments.file:
         working_context.add_dictionary_file( file )
-
-def iter_translated_lines( files, working_context ):
-    log = tokenizer.log
-    parser = tokenizer.Tokenizer( working_context.dictionary_cache )
-    for filename in files:
-        log.info('Translating: %s', filename )
-        lines = open( filename ).readlines()
-        try:
-            yield parser( lines )
-        except Exception as err:
-            log.error( 'Unable to translate: %s\n%s', filename, traceback.format_exc())
-            continue 
-            
-def iter_unmapped_words( translated, working_context ):
-    log = tokenizer.log
-    unmapped = set()
-    all_words = set()
-    for line in translated:
-        all_words |= set(line)
-    log.info( 'Checking %s words for transcriptions', len(all_words))
-    transcriptions = working_context.transcriptions( sorted(all_words) )
-    for word,arpa in transcriptions.items():
-        if not arpa:
-            unmapped.add( word )
-    log.info( '%s words unmapped', len(unmapped))
-    for word in unmapped:
-        possible = ipatoarpabet.translate( word )
-        for i,pron in enumerate( possible ):
-            yield word,pron
-            
-def get_python_files( directory ):
-    """Given a vcs directory, list the checked-in python files"""
-    if os.path.exists( os.path.join( directory,'.git')):
-        files = subprocess.check_output(
-            'git ls-files |grep "[.]py"',
-            shell=True,
-        )
-        return [ os.path.join(directory,f) for f in files.splitlines() if f.strip()]
-    # TODO: other vcs's and default to os.walkdir()
-    raise RuntimeError( 'Currently only handle git projects' )
 
 @with_logging
 def delete_context():
@@ -197,10 +157,10 @@ def context_from_project():
     if arguments.context == 'default':
         raise RuntimeError( "You can't create a new default context" )
     working_context = context.Context( arguments.context )
-    files = get_python_files( arguments.directory )
+    files = project.get_python_files( arguments.directory )
     all_lines = []
     with open( working_context.custom_language_model,['a','w'][bool(arguments.clean)]) as fh:
-        for translated in iter_translated_lines( files, working_context ):
+        for translated in project.iter_translated_lines( files, working_context ):
             translated = list(translated)
             all_lines.extend(translated)
             formatted = [
@@ -217,7 +177,7 @@ def context_from_project():
     if arguments.clean:
         working_context.copy_template_statements()
     working_context.add_dictionary_iterable(
-        iter_unmapped_words( all_lines, working_context )
+        project.iter_unmapped_words( all_lines, working_context )
     )
     working_context.regenerate_language_model()
 
