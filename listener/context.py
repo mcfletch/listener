@@ -270,8 +270,10 @@ class Context( object ):
             dictionary=dictionary,
         )
     
-    def add_dictionary_iterable( self, iterable, dictionary ):
+    def add_dictionary_iterable( self, iterable, dictionary=None ):
         """Add all words in the iterable to our dictionary and cache"""
+        if dictionary is None:
+            dictionary = self.custom_dictionary_file
         written_counts = {}
         cache = self.dictionary_cache
         to_write = []

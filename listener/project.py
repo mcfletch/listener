@@ -32,6 +32,7 @@ def iter_unmapped_words( translated, working_context ):
             yield word,pron
 
 def get_project_files( directory ):
+    """Retrieve all files checked into a source-code project"""
     if os.path.exists( os.path.join( directory,'.git') ):
         files = subprocess.check_output(
             ['git','ls-files'],
@@ -65,11 +66,7 @@ def get_project_files( directory ):
                 os.path.join( directory, path, file )
                 for file in files 
             ])
-    return [ 
-        os.path.join(directory,f)
-        for f in files.splitlines() 
-        if f.strip()
-    ]
+    return files
 
 def get_python_files( directory ):
     """Given a vcs directory, list the checked-in python files"""
