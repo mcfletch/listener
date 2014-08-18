@@ -35,27 +35,27 @@ def get_project_files( directory ):
     """Retrieve all files checked into a source-code project"""
     if os.path.exists( os.path.join( directory,'.git') ):
         files = subprocess.check_output(
-            ['git','ls-files'],
+            ['git','ls-files', directory],
         )
         files = [ 
             os.path.join( directory, f ) 
             for f in files.splitlines() 
             if f.strip() 
         ]
-    elif os.path.exists( os.path.join( os.path.directory, '.bzr') ):
+    elif os.path.exists( os.path.join( directory, '.bzr') ):
         files = subprocess.check_output(
-            ['bzr','ls','--recursive','--from-root','--versioned'],
+            ['bzr','ls','--recursive','--versioned', directory],
         )
         files = [ 
             os.path.join( directory, f ) 
             for f in files.splitlines() 
             if f.strip() 
         ]
-    elif os.path.exists( os.path.join( os.path.directory, '.hg') ):
+    elif os.path.exists( os.path.join( directory, '.hg') ):
         files = [
             [ x[6:].strip() ]
             for x in subprocess.check_output(
-                ['hg','manifest']
+                ['hg','manifest', directory]
             ).read().splitlines()
             if x[6:].strip()
         ]
