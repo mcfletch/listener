@@ -1,14 +1,28 @@
 """Utility functions for processing source-code directories into vocabularies"""
 from . import tokenizer, ipatoarpabet
-import logging, traceback, os, subprocess
+from ._bytes import as_unicode
+import logging, traceback, os, subprocess, re
 log = logging.getLogger( __name__)
 
+coding_match = re.compile( r'coding[:=]\s*(?P<encoding>[-\w.]+)', re.U|re.I )
+# Handling of non-utf-8 encoding schemes...
+def text_converter( lines ):
+    """Convert lines to appropriate format if we find a magic coding statement"""
+    encoding = 'ascii'
+    for line in lines[:2]:
+        match = coding_match.search( line )
+        if match:
+            encoding = match.group('encoding')
+    return [
+        as_unicode( line, encoding )
+        for line in lines 
+    ]
 
 def iter_translated_lines( files, working_context ):
     parser = tokenizer.Tokenizer( working_context.dictionary_cache )
     for filename in files:
         log.info('Translating: %s', filename )
-        lines = open( filename ).readlines()
+        lines = text_converter( open( filename ).readlines() )
         try:
             yield parser( lines )
         except Exception as err:
@@ -35,7 +49,8 @@ def get_project_files( directory ):
     """Retrieve all files checked into a source-code project"""
     if os.path.exists( os.path.join( directory,'.git') ):
         files = subprocess.check_output(
-            ['git','ls-files', directory],
+            ['git','ls-files'],
+            cwd = directory,
         )
         files = [ 
             os.path.join( directory, f ) 
