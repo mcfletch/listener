@@ -131,9 +131,15 @@ def import_words( ):
 @with_logging
 def delete_context():
     parser = base_arguments('Search for unknown words in python files')
+    parser.add_argument(
+        '-f', '--force',action='store_const', const=True,
+        default=False,
+        help="Force deletion even of the default context",
+    )
+    
     arguments = parser.parse_args()
-    if arguments.context == 'default':
-        raise RuntimeError( "You can't delete the default context" )
+    if arguments.context == 'default' and not arguments.force:
+        raise RuntimeError( "You must specify --force to delete the default context" )
     working_context = context.Context( arguments.context )
     working_context.delete()
     
