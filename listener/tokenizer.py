@@ -42,6 +42,7 @@ class Tokenizer( object ):
     def __init__( self,dictionary ):
         self.dictionary = dictionary 
         self.SPECIAL_COMBINERS = self.locale_specials()
+        self.category_cache = {}
     def locale_specials(self):
         if 'LANG' in os.environ:
             locale.setlocale(locale.LC_ALL,os.environ['LANG'])
@@ -73,17 +74,26 @@ class Tokenizer( object ):
         'Zs':'Z',
         'Zp':'Z',
     }
+    
+    def category_for_char( self, char ):
+        """Caches char:category decisions to speed up tokenization"""
+        new_category = self.category_cache.get( char )
+        if new_category is None:
+            raw_category = unicodedata.category(char)
+            if char in self.SPECIAL_COMBINERS:
+                new_category = 'Px'
+            else:
+                new_category = self.BASE_TYPE_MAP.get(raw_category,raw_category)
+            self.category_cache[char] = new_category
+        return new_category
+    
     def runs_of_categories( self, text ):
         """Produce iterable of runs-of-unicode-categories"""
         text = as_unicode( text )
         current = None
         category=None
         for char in text:
-            raw_category = unicodedata.category(char)
-            if char in self.SPECIAL_COMBINERS:
-                new_category = 'Px'
-            else:
-                new_category = self.BASE_TYPE_MAP.get(raw_category,raw_category)
+            new_category = self.category_for_char( char )
             if new_category != category:
                 if current:
                     yield category,current 
