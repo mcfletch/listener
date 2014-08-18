@@ -170,6 +170,8 @@ class Tokenizer( object ):
                     add_current()
                     current = []
                     result.extend( self.expand_P( [(category,chars)]))
+                elif chars in self.PUNCTUATION_NAMES:
+                    result.append( self.PUNCTUATION_NAMES[chars] )
                 else:
                     current.append( (category, chars) )
         except (ValueError,TypeError) as err:
@@ -233,6 +235,8 @@ class Tokenizer( object ):
         # TODO: allow user overrides for all of these
         # so they can use star-star or left-paren or some custom 
         # word if they want...
+        '\r\n': 'new-line',
+        '\r': 'new-line',
         '\n': 'new-line',
         '!': '!exclamation-point',
         '!=': '!=not-equal',
@@ -297,9 +301,25 @@ class Tokenizer( object ):
             for expanded in self.expand(statement):
                 tokens.extend( expanded )
             yield tokens 
-        
+    
+    _cached_run_together = None
+    def cached_run_together( self, name ):
+        if self._cached_run_together is None:
+            self._cached_run_together = {}
+        return self._cached_run_together.get(name )
+    
     def parse_run_together( self, name ):
         """Parse dictionary words that are run together"""
+        possible = self.cached_run_together( name )
+        if possible:
+            return possible[:]
+        else:
+            self._cached_run_together[name] = possible = self._parse_run_together(
+                name 
+            )
+            return possible
+    
+    def _parse_run_together( self, name ):
         if not self.dictionary:
             return [name]
         # split up the name looking for runtogether words...
