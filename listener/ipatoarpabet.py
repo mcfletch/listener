@@ -33,6 +33,10 @@ def kill_speaking_cues( word ):
         u'\u0303',''
     ).replace(
         u'ʲ', '',
+    ).replace(
+        '(en-us)',''
+    ).replace(
+        '(es)','',
     ).replace( u'__', u'_' )
 
 def dictionary_espeak( ):
