@@ -433,6 +433,9 @@ class AudioContext( object ):
     def save_settings( self ):
         content = json.dumps( self.settings, indent=2, sort_keys=True )
         twrite( self.settings_file, content )
+    def update_settings( self, settings ):
+        self.settings.update( settings )
+        self.save_settings()
     @one_shot
     def settings( self ):
         if os.path.exists( self.settings_file ):
