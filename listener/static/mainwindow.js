@@ -75,4 +75,8 @@ $(document).ready( function() {
         }
         final_results.append( display );
     };
+    var record_button = $('.record-button');
+    recording_level = function( level_fraction ) {
+        record_button.css({'backgroundColor':'rgb('+Math.round(level_fraction*255)+',0,0)'});
+    };
 });

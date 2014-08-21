@@ -96,16 +96,20 @@ class ListenerMain( QtGui.QMainWindow ):
             HERE = os.path.abspath( HERE ),
         )
     def quit( self, *args ):
-        self.listener.active = False 
+        self.pipeline.close()
         QtGui.qApp.quit()
     def create_menus( self ):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
         
         chooseAction = QtGui.QAction('&Microphone', self)
-        chooseAction.setShortcut('CTRL-M')
         chooseAction.setStatusTip('Choose the ALSA microphone to use')
-        chooseAction.triggered.connect(self.on_choose_microphone)
+        chooseAction.triggered.connect(self.on_choose_input)
+        fileMenu.addAction(chooseAction)
+        
+        chooseAction = QtGui.QAction('&Speaker', self)
+        chooseAction.setStatusTip('Choose the ALSA speaker to use')
+        chooseAction.triggered.connect(self.on_choose_output)
         fileMenu.addAction(chooseAction)
         
         exitAction = QtGui.QAction(QtGui.QIcon('exit.png'), '&Exit', self)        
@@ -115,6 +119,7 @@ class ListenerMain( QtGui.QMainWindow ):
         fileMenu.addAction(exitAction)
     
     ZERO_LEVEL_AUDIO = math.log( 60 )
+    FULL_LEVEL_AUDIO = math.log( 20 )
     def on_level( self, record ):
         """Interpret recording level in manner useful to user...
         
@@ -123,9 +128,13 @@ class ListenerMain( QtGui.QMainWindow ):
         input, but in noisy environments the vader won't pick up the 
         end of the utterance
         """
-#        translated = max((0,1.0 - math.log( abs(record['level']))/self.ZERO_LEVEL_AUDIO))
-#        translated = min((1.0,translated))
-#        print( 'Level %0.1f%%'%(translated*100) )
+        intensity = math.log( abs(record['level']))
+        intensity = (intensity - self.ZERO_LEVEL_AUDIO)/(self.FULL_LEVEL_AUDIO-self.ZERO_LEVEL_AUDIO)
+        translated = min((1.0,max((0,intensity))))
+        js = 'recording_level( %f )'%(translated,)
+        self.view_frame.evaluateJavaScript(
+            js
+        )
     
     def on_partial( self, record ):
         self.statusBar().showMessage( record['text'] )
@@ -160,14 +169,37 @@ class ListenerMain( QtGui.QMainWindow ):
         else:
             log.info( 'Unrecognized action: %s', pprint.pformat( event ))
     
-    def on_choose_microphone( self, event=None ):
-        current = self.context.audio_context().settings['input_device']
-        choices = self.context.available_alsa_devices()['input']
+    def on_choose_input( self, event=None ):
+        def update_input( choice ):
+            self.pipeline.stop_listening()
+            self.pipeline._source = None
+            self.pipeline.pipeline.get_by_name( 
+                'source' 
+            ).set_property(
+                'device',choice
+            )
+            self.pipeline.start_listening()
+        return self.on_choose_alsa_device( 'input', update_input )
+    def on_choose_output( self, event=None ):
+        return self.on_choose_alsa_device( 'output', None )
+    
+    def on_choose_alsa_device( self, key='input', updater=None ):
+        current = self.context.audio_context().settings['%s_device'%(key,)]
+        choices = self.context.available_alsa_devices()[key]
+        current_index = 0
+        for i,(label,name) in enumerate(choices):
+            if name == current:
+                current_index = i
+        if key == 'input':
+            title,label = "Choose Input Microphone", "ALSA Microphone"
+        else:
+            title,label = "Choose Output Speaker", "ALSA Speaker"
         item,ok = QtGui.QInputDialog.getItem(
             self,
-            "Choose Input Microphone",
-            "ALSA Microphone",
+            title,
+            label,
             [label for label,name in choices],
+            current=current_index,
             editable=False,
             ok=True,
         )
@@ -175,12 +207,13 @@ class ListenerMain( QtGui.QMainWindow ):
             choice = None
             for label,name in choices:
                 if item == label:
-                    choice = name
-                    self.context.audio_context().update_settings({
-                        'input_device': choice,
-                    })
-                    self.pipeline.stop_listening()
-                    self.pipeline._source = None
-                    self.pipeline.pipeline.get_by_name( 'source' ).device = name 
-                    self.pipeline.start_listening()
-        
+                    if name != current:
+                        choice = name
+                        log.info( 'Chose device: %s (%s)', label, name )
+                        self.context.audio_context().update_settings({
+                            '%s_device'%(key,): choice,
+                        })
+                        if updater:
+                            updater( choice )
+                    else:
+                        log.info( 'Chose the current device, ignoring' )
