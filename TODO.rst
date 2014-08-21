@@ -41,7 +41,6 @@ TODO Items for Listener
     * .vocab files *must* include all words in the vocabulary, we should 
       likely put our words in without use of fake statements
 
-
 * Provide meta-context which relates to the voice service itself
 
     * `start listening`
@@ -221,7 +220,32 @@ TODO Items for Listener
             * layer the project-specific language model onto a 
               generic natural-language model
 
-* GUI Bits
+* GUI Controls/Setup
+
+    * Eliminate use of HTML control, i.e. create native Qt controls for 
+      everything
+    
+    * Contexts
+
+        * Switch contexts
+    
+        * Add directory to context 
+        
+        * Context delete
+        
+        * Recompile context (should be automatic)
+    
+    * Edit dictionary/context words 
+    
+        * Define "actions" based on dictated words
+        
+            * Maybe allow for ways to recognize the results, or do we just 
+              record the result of each one in statements in our language 
+              model?
+            
+        * Edit punctuation rules for given dictation words/phrases
+        
+        * Add corrected word to dictionary 
 
     * Export/Import settings for use on another machine (and backup/restore)
     
@@ -232,15 +256,10 @@ TODO Items for Listener
     
     * Choice of input/output ALSA devices
     
-    * GUI for per-app context editing
-    
     * Potentially a "restore volume" mechanism, though that might be best 
       provided at the platform/desktop level
 
     * System tray icon for bringing up the GUI
-    
-    * Eliminate use of HTML control, i.e. create native Qt controls for 
-      everything
     
     * Raw-file playout is currently happening in the GUI thread
 
