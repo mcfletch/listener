@@ -18,8 +18,8 @@ def text_converter( lines ):
         for line in lines 
     ]
 
-def iter_translated_lines( files, working_context ):
-    parser = tokenizer.Tokenizer( working_context.dictionary_cache )
+def iter_translated_lines( files, working_context, **tokenizer_params ):
+    parser = tokenizer.Tokenizer( working_context.dictionary_cache, **tokenizer_params )
     for filename in files:
         log.info('Translating: %s', filename )
         lines = text_converter( open( filename ).readlines() )
