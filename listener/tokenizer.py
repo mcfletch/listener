@@ -39,10 +39,11 @@ class PeekingGenerator(object):
 
 
 class Tokenizer( object ):
-    def __init__( self,dictionary ):
+    def __init__( self,dictionary, run_together_guessing=True ):
         self.dictionary = dictionary 
         self.SPECIAL_COMBINERS = self.locale_specials()
         self.category_cache = {}
+        self.run_together_guessing = run_together_guessing
     def locale_specials(self):
         if 'LANG' in os.environ:
             locale.setlocale(locale.LC_ALL,os.environ['LANG'])
@@ -320,7 +321,7 @@ class Tokenizer( object ):
             return possible
     
     def _parse_run_together( self, name ):
-        if not self.dictionary:
+        if (not self.dictionary) or not (self.run_together_guessing):
             return [name]
         # split up the name looking for runtogether words...
         name = name.lower()
