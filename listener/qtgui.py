@@ -99,13 +99,19 @@ class ListenerMain( QtGui.QMainWindow ):
         self.listener.active = False 
         QtGui.qApp.quit()
     def create_menus( self ):
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        
+        chooseAction = QtGui.QAction('&Microphone', self)
+        chooseAction.setShortcut('CTRL-M')
+        chooseAction.setStatusTip('Choose the ALSA microphone to use')
+        chooseAction.triggered.connect(self.on_choose_microphone)
+        fileMenu.addAction(chooseAction)
+        
         exitAction = QtGui.QAction(QtGui.QIcon('exit.png'), '&Exit', self)        
         exitAction.setShortcut('Alt-F4')
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(self.quit)
-        
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(exitAction)
     
     ZERO_LEVEL_AUDIO = math.log( 60 )
@@ -154,4 +160,27 @@ class ListenerMain( QtGui.QMainWindow ):
         else:
             log.info( 'Unrecognized action: %s', pprint.pformat( event ))
     
-    
+    def on_choose_microphone( self, event=None ):
+        current = self.context.audio_context().settings['input_device']
+        choices = self.context.available_alsa_devices()['input']
+        item,ok = QtGui.QInputDialog.getItem(
+            self,
+            "Choose Input Microphone",
+            "ALSA Microphone",
+            [label for label,name in choices],
+            editable=False,
+            ok=True,
+        )
+        if ok:
+            choice = None
+            for label,name in choices:
+                if item == label:
+                    choice = name
+                    self.context.audio_context().update_settings({
+                        'input_device': choice,
+                    })
+                    self.pipeline.stop_listening()
+                    self.pipeline._source = None
+                    self.pipeline.pipeline.get_by_name( 'source' ).device = name 
+                    self.pipeline.start_listening()
+        
