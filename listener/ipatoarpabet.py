@@ -11,7 +11,7 @@ STAT_MAP_FILE = os.path.join( HERE,'ipastatmap.json')
 # Threshold below which we stop generating IPA -> ARPA correspondences
 # this prevents generating dozens of possible options where the likelihood 
 # is low of a match
-STAT_MAP_THREHOLD = .2
+STAT_MAP_THRESHOLD = .2
 
 STAT_MAPPING = None 
 def get_stat_mapping( ):
@@ -91,7 +91,7 @@ def _stat_translate( ipa ):
             log.error(u'Unrecognized ipa: %s', sound)
             continue
         # choose the most likely 
-        translations = [ t[0] for t in translations if t[1] > STAT_MAP_THREHOLD ]
+        translations = [ t[0] for t in translations if t[1] > STAT_MAP_THRESHOLD ]
         if not results:
             results = translations[:]
         else:
