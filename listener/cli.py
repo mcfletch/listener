@@ -157,6 +157,11 @@ def context_from_project():
         default=False,
         help="If True, then wipe out previous ",
     )
+    parser.add_argument(
+        '-g','--guess-run-together',action='store_const', const=True,
+        default=False,
+        help="If True attempt to split apart run-together words into separate words",
+    )
     arguments = parser.parse_args()
     if arguments.context == 'default':
         arguments.context = os.path.basename(os.path.abspath(arguments.directory))
@@ -166,7 +171,10 @@ def context_from_project():
     files = project.get_python_files( arguments.directory )
     all_lines = []
     with open( working_context.custom_language_model,['a','w'][bool(arguments.clean)]) as fh:
-        for translated in project.iter_translated_lines( files, working_context ):
+        for translated in project.iter_translated_lines( 
+            files, working_context,
+            run_together_guessing=arguments.guess_run_together,
+        ):
             translated = list(translated)
             all_lines.extend(translated)
             formatted = [
