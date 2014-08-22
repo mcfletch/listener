@@ -47,6 +47,13 @@ class SourceDescription( object ):
                     #'device=hw:2,0', # setting somewhere or other...                
                 '!',
             ]
+        elif self.url.scheme == 'pulse':
+            return [
+                'pulsesrc',
+                    'name=source',
+                    'device=%s'%(self.url.netloc),
+                '!',
+            ]
         else:
             raise ValueError(
                 "Unsupported source protocol (file/alsa only at the moment): %r"%(
