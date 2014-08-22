@@ -194,7 +194,10 @@ class Pipeline( object ):
         vader.set_property('silent', True)
     def stop_listening( self ):
         """Stop listening"""
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        if self._pipeline:
+            self._pipeline.set_state(gst.STATE_NULL)
+            self._pipeline.send_event( gst.event_new_eos() )
+            self._pipeline = None
     
     def close( self ):
         """Close and cleanup our pipeline entirely"""
@@ -211,6 +214,12 @@ class Pipeline( object ):
         self.sphinx.set_property('configured', False)
         self.sphinx.set_property('lm', source)
         self.sphinx.set_property('configured', True)
+        self.start_listening()
+    
+    def reset( self ):
+        """Restart our pipeline, including resetting of source"""
+        self.stop_listening()
+        self.source = None
         self.start_listening()
     
     def on_level( self, bus, message ):
