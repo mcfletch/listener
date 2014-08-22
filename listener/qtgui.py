@@ -171,14 +171,7 @@ class ListenerMain( QtGui.QMainWindow ):
     
     def on_choose_input( self, event=None ):
         def update_input( choice ):
-            self.pipeline.stop_listening()
-            self.pipeline._source = None
-            self.pipeline.pipeline.get_by_name( 
-                'source' 
-            ).set_property(
-                'device',choice
-            )
-            self.pipeline.start_listening()
+            self.pipeline.reset( )
         return self.on_choose_alsa_device( 'input', update_input )
     def on_choose_output( self, event=None ):
         return self.on_choose_alsa_device( 'output', None )
@@ -210,7 +203,7 @@ class ListenerMain( QtGui.QMainWindow ):
                     if name != current:
                         choice = name
                         log.info( 'Chose device: %s (%s)', label, name )
-                        self.context.audio_context().update_settings({
+                        self.pipeline.audio_context.update_settings({
                             '%s_device'%(key,): choice,
                         })
                         if updater:
