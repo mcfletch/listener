@@ -88,10 +88,10 @@ def code_to_words():
         
 @with_logging
 def missing_words():
-    parser = base_arguments('Search for unknown words in python files')
+    parser = base_arguments('Search for unknown words in vcs project/directory')
     parser.add_argument(
-        'files',metavar='FILE',type=_existing_filename,nargs="+",
-        help="The files to process",
+        'directory',metavar='DIR',type=_existing_directory,
+        help="The directory/vcs-checkout to process",
     )
     parser.add_argument(
         '--output',metavar='FILE',type=bytes,
@@ -100,8 +100,9 @@ def missing_words():
     )
     arguments = parser.parse_args()
     working_context = context.Context( arguments.context )
+    files = project.get_python_files( arguments.directory )
     translated = []
-    for lines in project.iter_translated_lines( arguments.files, working_context ):
+    for lines in project.iter_translated_lines( files, working_context ):
         translated.extend(lines)
     
     if arguments.output is None:
@@ -118,7 +119,7 @@ def missing_words():
 @with_logging
 def import_words( ):
     """Import words from a csv-delimited ARPABet dictionary"""
-    parser = base_arguments('Search for unknown words in python files')
+    parser = base_arguments('Import words from a csv-delimited ARPABet dictionary')
     parser.add_argument(
         'file',metavar='FILE',type=_existing_filename,nargs="+",
         help="The file(s) to add to the context",
@@ -147,10 +148,10 @@ def delete_context():
 @with_logging
 def context_from_project():
     log = tokenizer.log
-    parser = base_arguments('Search for unknown words in python files')
+    parser = base_arguments('Create a new listener context (or update an existing one) with guessed pronunciation from a vcs checkout')
     parser.add_argument(
         'directory',metavar='DIR',type=_existing_directory,
-        help="The files to process",
+        help="The directory/vcs-checkout to process",
     )
     parser.add_argument(
         '--clean',action='store_const', const=True,
