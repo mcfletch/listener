@@ -36,9 +36,13 @@ MAINLOOP = None
 
 class ContextService( dbus.service.Object ):
     """Service controlling a particular listener context"""
+    # Note: this seems to be "interface name", and apparently 
+    # needs to be different for each class?
     DBUS_NAME = 'com.vrplumber.listener.context'
     DBUS_PATH = '/com/vrplumber/listener/context'
     
+    # this seems awkward at this point, 99% of the time 
+    # we just want the bare string path, *not* the BusName
     @classmethod
     def bus_name( cls, key='default' ):
         return dbus.service.BusName(
@@ -78,6 +82,7 @@ class ContextService( dbus.service.Object ):
     def import_project( self, path ):
         """Import a project from the given path"""
         # iterate project importing files from the path...
+        return False
 
 class ListenerService( dbus.service.Object ):
     """Overall per-session listener service"""
