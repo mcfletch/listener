@@ -1,23 +1,32 @@
 """DBus "service" for Listener
 
 Provides a mechanism by which code running as the current user 
-(namely the listener service) can send messages.  Currently this 
-is just to allow for running uinput "type on the keyboard" style 
-messages, but eventually should allow for:
+(namely the listener service) can send messages.
 
-    context setup/switches (i.e. create new language models)
+    context setup (i.e. create new language models)
     
-    training
+        add projects to context 
+        
+        create new contexts
+        
+        modify/edit dictionaries
+        
+        correction process
+        
+    context choice (switch current context)
     
-    ???
+    sample/training playback
+    
+    microphone selection enabling/disabling, etc
+    
+    uinput (keyboard simulation)
 
 We will want to use permission restrictions such that only console 
-users can access the service. (There's already a sample conf created 
+users can access the uinput service. (There's a sample conf started
 for that).
 
-Will (eventually) want all of the pipeline etc. to run in the service,
-though possibly as two separate processes, one running on the system 
-bus (uinput) and the other on the session bus (listener itself).
+Will (eventually) want the pipelines to run in the Listener service 
+and the uinput service to run in a separate service.
     
 The code in this module is BSD licensed (as is the rest of listener).
 
@@ -140,7 +149,7 @@ def main():
     """Start up the listener Daemon, should be a DBus "service"
     
     This should be an on-demand service eventually, that is, when you 
-    request a com.vrplumber.Listener.Uinput you should instantiate one
+    request a com.vrplumber.Listener you should instantiate one
     and/or get the running one.
     """
     global MAINLOOP
