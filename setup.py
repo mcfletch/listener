@@ -43,6 +43,7 @@ if __name__ == "__main__":
                 'listener-contexts=listener.cli:context_keys',
                 'listener-context-delete=listener.cli:delete_context',
                 'listener-qt=listener.cli:qt_gui',
+                'listener-dbus=listener.service:main',
                 'listener-dictionary-lookup=listener.cli:dictionary_lookup',
                 'listener-dictionary-subset=listener.cli:subset_dictionary',
                 'listener-dictionary-import=listener.cli:import_words',
