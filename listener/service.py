@@ -21,12 +21,9 @@ bus (uinput) and the other on the session bus (listener itself).
     
 The code in this module is BSD licensed (as is the rest of listener).
 
-But Note: this module loads python-dbus, which on PyPI declares itself
-to be MIT licensed, but the FAQ for which declares to be a dual license 
-AFL/GPL license.
-
-Licensing should be reviewed, and notices posted that if you use 
-this script you may be further restricted than the rest of the package.
+Note: this module loads python-dbus, which on PyPI and in it's source 
+distribution declares itself to be MIT licensed, but the FAQ for which 
+declares to be a dual license AFL/GPL license.
 """
 import dbus
 import dbus.service
@@ -133,26 +130,6 @@ class ListenerService( dbus.service.Object ):
             return False
         c = context.Context( key )
         return ContextService.bus_name( key ).get_name()
-    
-    
-#    def context( self, key ):
-#        """Retrieve reference to the given listening context raise AttributeError on failure"""
-#    def create_context( self, key, parent=None ):
-#        try:
-#            return self.context( key )
-#        except AttributeError as err:
-#            context = Context( self, key, parent )
-#            return context
-#
-#class Context( object ):
-#    def __init__( self, service, key, parent=None ):
-#        """Create a new listening context based on the parent context"""
-#    def add_phrase( self, phrase, recording=None, phonetic=None ):
-#        """Add a (corrected) phrase to the context"""
-#    def add_word( self, word, phonetic=None ):
-#        """Add a single word to the context"""
-#    def phrases( self ):
-#        """Generate the set of (trained) phrases"""
     
 def main():
     """Start up the listener Daemon, should be a DBus "service"
