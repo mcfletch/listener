@@ -88,10 +88,13 @@ class ContextService( dbus.service.Object ):
         DBUS_NAME,
         in_signature='s',
     )
-    def import_project( self, path ):
+    def integrate_project( self, path ):
         """Import a project from the given path"""
         # iterate project importing files from the path...
-        return False
+        # TODO: should be async, as can wind up doing a *lot* 
+        # of processing...
+        self.context.integrate_project( path )
+        return path
 
 class ListenerService( dbus.service.Object ):
     """Overall per-session listener service"""

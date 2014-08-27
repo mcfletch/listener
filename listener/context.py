@@ -263,6 +263,39 @@ class Context( object ):
                     cached[word] = ipatoarpabet.translate( word )
         return cached
     
+    def integrate_project( self, directory, clean=False, guess_run_together=False ):
+        """Integrate statements from directory into the language model for this context"""
+        from . import project
+        files = project.get_python_files( directory )
+        all_lines = []
+        with open( 
+            self.custom_language_model,
+            ['a','w'][bool(clean)]
+        ) as fh:
+            for translated in project.iter_translated_lines( 
+                files, self,
+                run_together_guessing=guess_run_together,
+            ):
+                translated = list(translated)
+                all_lines.extend(translated)
+                formatted = [
+                    '<s> %s </s>'%( ' '.join( [
+                        as_bytes(word)
+                        for word in line 
+                    ]))
+                    for line in translated
+                ]
+                composed = '\n'.join(formatted)
+                log.info( '%s statements', len(formatted))
+                fh.write( composed )
+                fh.write( '\n' )
+        if clean:
+            self.copy_template_statements()
+        self.add_dictionary_iterable(
+            project.iter_unmapped_words( all_lines, self )
+        )
+        self.regenerate_language_model()
+    
     def add_dictionary_file( self, filename, separator=',', dictionary=None ):
         dictionary = dictionary or self.custom_dictionary_file
         return self.add_dictionary_iterable( 

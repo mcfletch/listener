@@ -169,32 +169,12 @@ def context_from_project():
     if arguments.context == 'default':
         raise RuntimeError( "You can't create a new default context" )
     working_context = context.Context( arguments.context )
-    files = project.get_python_files( arguments.directory )
-    all_lines = []
-    with open( working_context.custom_language_model,['a','w'][bool(arguments.clean)]) as fh:
-        for translated in project.iter_translated_lines( 
-            files, working_context,
-            run_together_guessing=arguments.guess_run_together,
-        ):
-            translated = list(translated)
-            all_lines.extend(translated)
-            formatted = [
-                '<s> %s </s>'%( ' '.join( [
-                    as_bytes(word)
-                    for word in line 
-                ]))
-                for line in translated
-            ]
-            composed = '\n'.join(formatted)
-            log.info( '%s statements', len(formatted))
-            fh.write( composed )
-            fh.write( '\n' )
-    if arguments.clean:
-        working_context.copy_template_statements()
-    working_context.add_dictionary_iterable(
-        project.iter_unmapped_words( all_lines, working_context )
+    
+    working_context.integrate_project( 
+        arguments.directory, 
+        clean=arguments.clean, 
+        guess_run_together=arguments.guess_run_together
     )
-    working_context.regenerate_language_model()
 
 @with_logging
 def subset_dictionary(  ):
