@@ -115,9 +115,7 @@ class ListenerService( dbus.service.Object ):
         self._context_proxies.empty()
         self._context_proxies.update( new_proxies )
         return self._context_proxies
-    @dbus.service.method(
-        DBUS_NAME,
-    )
+    @dbus.service.method(DBUS_NAME,)
     def contexts( self ):
         """Lists the contexts currently defined in the service
         
@@ -128,25 +126,48 @@ class ListenerService( dbus.service.Object ):
             proxy.name.get_name()
             for (name,proxy) in sorted(self.context_proxies.items())
         ]
-    @dbus.service.method(
-        DBUS_NAME,
-        in_signature='s',
-    )
+    @dbus.service.method(DBUS_NAME,in_signature='s',)
     def context( self, key ):
         proxy = self.context_proxies.get( key )
         if proxy:
             return proxy.name.get_name()
         return None
-    @dbus.service.method(
-        DBUS_NAME,
-        in_signature='s',
-    )
+    @dbus.service.method(DBUS_NAME,in_signature='s',)
     def create_context( self, key ):
         proxy = self.context_proxies.get( key )
         if proxy:
             return False
         c = context.Context( key )
         return ContextService.bus_name( key ).get_name()
+    # current pipeline manipulation...
+    @dbus.service.method(DBUS_NAME)
+    def start_listening( self ):
+        """Start up pipeline for current context"""
+        return True 
+    @dbus.service.method(DBUS_NAME)
+    def stop_listening( self ):
+        """Shut down pipeline for current context"""
+        return True
+    @dbus.service.method(DBUS_NAME):
+    def pause_listening( self ):
+        """Pause listening (block pipeline)"""
+        return True 
+    @dbus.service.method(DBUS_NAME):
+    def reset( self ):
+        """Reset/restart the pipeline"""
+        return True 
+    @dbus.service.signal('%s.level'%(DBUS_NAME,))
+    def send_level( self, message ):
+        return message 
+    @dbus.service.signal('%s.partial'%(DBUS_NAME,))
+    def send_partial( self, message ):
+        return message 
+    @dbus.service.signal('%s.final'%(DBUS_NAME,))
+    def send_final( self, message ):
+        return message 
+    
+    
+    
     
 def main():
     """Start up the listener Daemon, should be a DBus "service"
