@@ -148,14 +148,15 @@ class ListenerService( dbus.service.Object ):
     def stop_listening( self ):
         """Shut down pipeline for current context"""
         return True
-    @dbus.service.method(DBUS_NAME):
+    @dbus.service.method(DBUS_NAME)
     def pause_listening( self ):
         """Pause listening (block pipeline)"""
         return True 
-    @dbus.service.method(DBUS_NAME):
+    @dbus.service.method(DBUS_NAME)
     def reset( self ):
         """Reset/restart the pipeline"""
         return True 
+    
     @dbus.service.signal('%s.level'%(DBUS_NAME,))
     def send_level( self, message ):
         return message 
