@@ -54,6 +54,7 @@ class ListenerMain( QtGui.QMainWindow ):
         ) )
         self.pipeline = QtPipeline( self.context )
         self.create_gui()
+        self.create_systray()
         self.pipeline.start_listening()
     def create_gui( self ):
         self.setWindowTitle( 'Listener' )
@@ -81,6 +82,12 @@ class ListenerMain( QtGui.QMainWindow ):
         self.pipeline.events.partial.connect( self.on_partial )
         self.pipeline.events.final.connect( self.on_final )
         self.pipeline.events.level.connect( self.on_level )
+    def create_systray( self ):
+        self.systray = QtGui.QSystemTrayIcon()
+        self.systray.setToolTip( 'Listener Voice-Coding' )
+        self.systray.setIcon( QtGui.QIcon.fromTheme('media-playback-stop'))
+        self.systray.show()
+        self.systray.activated.connect( self.on_systray )
     
     @property
     def view_frame( self ):
@@ -143,10 +150,23 @@ class ListenerMain( QtGui.QMainWindow ):
         self.view_frame.evaluateJavaScript(
             js
         )
+        self.systray.showMessage( 'Recognized', record['text'] , msecs=500 )
 #        self.final_results.appendInside(
 #            '''<li class="final-result">%s</li>'''%(cgi.escape( record['text']) )
 #        )
 #        element = self.final_results.lastChild()
+
+    def on_systray( self, reason ):
+        if self.pipeline.running:
+            self.pipeline.stop_listening()
+            self.systray.setIcon( QtGui.QIcon.fromTheme('media-record'))
+            self.systray.showMessage( "Listener", "Shut down Listener Pipeline" )
+        else:
+            self.pipeline.start_listening()
+            self.systray.setIcon( QtGui.QIcon.fromTheme('media-playback-stop'))
+            self.systray.showMessage( "Listener", "Restarted Listener Pipeline for %s"%( self.context.key,) )
+        return False
+
     @QtCore.Slot()
     def add_gui_bridge( self ):
         self.bridge = JavascriptBridge()

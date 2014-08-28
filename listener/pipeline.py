@@ -180,18 +180,28 @@ class Pipeline( object ):
             self.pipeline.set_state(gst.STATE_PAUSED)
 
         return self._pipeline
+    @property 
+    def running( self ):
+        return self._pipeline is not None
     
     @property 
     def sphinx( self ):
         return self.pipeline.get_by_name('sphinx')
+    @property 
+    def vader( self ):
+        return self.pipeline.get_by_name('vader')
+    
     
     def start_listening( self ):
         """Start Listening for spoken input"""
         self.pipeline.set_state(gst.STATE_PLAYING)
     def pause_listening( self ):
         """Pause listening"""
-        vader = self.pipeline.get_by_name('vad')
-        vader.set_property('silent', True)
+        self.vader.set_property('silent', True)
+    def unpause_listening( self ):
+        """Un-Pause listening"""
+        self.vader.set_property('silent', False)
+    
     def stop_listening( self ):
         """Stop listening"""
         if self._pipeline:
