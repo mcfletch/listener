@@ -160,11 +160,11 @@ class ListenerMain( QtGui.QMainWindow ):
         if self.pipeline.running:
             self.pipeline.stop_listening()
             self.systray.setIcon( QtGui.QIcon.fromTheme('media-record'))
-            self.systray.showMessage( "Listener", "Shut down Listener Pipeline" )
+            self.systray.showMessage( "Listener", "Shut down Listener Pipeline, click to re-start" )
         else:
             self.pipeline.start_listening()
             self.systray.setIcon( QtGui.QIcon.fromTheme('media-playback-stop'))
-            self.systray.showMessage( "Listener", "Restarted Listener Pipeline for %s"%( self.context.key,) )
+            self.systray.showMessage( "Listener", "Restarted Listener Pipeline for %s, click to stop"%( self.context.key,) )
         return False
 
     @QtCore.Slot()
