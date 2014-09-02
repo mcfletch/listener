@@ -119,7 +119,11 @@ class ListenerMain( QtGui.QMainWindow ):
         chooseAction.triggered.connect(self.on_choose_output)
         fileMenu.addAction(chooseAction)
         
-        exitAction = QtGui.QAction(QtGui.QIcon('exit.png'), '&Exit', self)        
+        testCorrection = QtGui.QAction('&Test Correction', self)
+        testCorrection.triggered.connect(self.on_correction)
+        fileMenu.addAction(testCorrection)
+        
+        exitAction = QtGui.QAction(QtGui.QIcon('exit.png'), 'E&xit', self)        
         exitAction.setShortcut('Alt-F4')
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(self.quit)
@@ -230,3 +234,11 @@ class ListenerMain( QtGui.QMainWindow ):
                             updater( choice )
                     else:
                         log.info( 'Chose the current device, ignoring' )
+    def on_correction( self, event=None ):
+        from . import correction 
+        dialog = QtGui.QDialog( parent = self )
+        view = correction.CorrectionView( parent=dialog, text='Moo' )
+        view.setGeometry(0,0,dialog.width(), dialog.height())
+        #dialog.setCentralWidget( view )
+        dialog.show()
+    
