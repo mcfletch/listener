@@ -239,6 +239,8 @@ class ListenerMain( QtGui.QMainWindow ):
         dialog = QtGui.QDialog( parent = self )
         view = correction.CorrectionView( parent=dialog, text='Moo' )
         view.setGeometry(0,0,dialog.width(), dialog.height())
+        view.setMinimumSize(400,200)
         #dialog.setCentralWidget( view )
+        dialog.setMinimumSize(450,250)
         dialog.show()
     
