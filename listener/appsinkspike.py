@@ -6,7 +6,7 @@ pygst.require("0.10")
 import gst
 import gobject
 import numpy
-from numpy.fft import fft
+from numpy.fft import fft, fftfreq
 
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
@@ -41,7 +41,18 @@ def main(filename=os.path.join( HERE, '../tests/fixtures/hello_world.wav' )):
         # in a real app you'd combine the data on longer 
         # time-scales such that you would see patterns 
         # at the phoneme scale I suppose
-        fft( buf )
+        raw = fft( buf )
+        frequencies = raw[:int(len(raw)/2)]
+        mags = numpy.round(numpy.absolute( frequencies ),0).astype('i')
+        max_bucket = (len(raw)/2-1)/(len(raw)/8000.)
+        
+        freqs = fftfreq( len(buf), d=(1/8000.))[:len(mags)]
+        mapped = zip([int(x) for x in mags],[int(y) for y in freqs])
+        mapped = sorted(mapped)
+        mapped = mapped[-10:]
+        for mag,freq in mapped:
+            print '%s - %s'%(freq, mag)
+        print
     app.connect('new-buffer',on_new_buffer )
 
     bus = pipeline.get_bus()
