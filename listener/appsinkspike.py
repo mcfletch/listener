@@ -8,15 +8,17 @@ import gobject
 import Queue
 import numpy
 from numpy.fft import fft
-from listener import sourcedescription
 
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
 
-def main(url):
+def main(filename=os.path.join( HERE, '../tests/fixtures/hello_world.wav' )):
     gobject.threads_init()
-    source = sourcedescription.SourceDescription(url)
-    pipeline_command = source.gst_fragment() + [
+    pipeline_command = [
+        'filesrc',
+            'location=%s'%(filename,),
+            '!',
+        'decodebin2', '!',
         'audioconvert', '!',
         'audioresample', '!',
         'audio/x-raw-int,width=16,depth=16,channels=1,rate=8000', '!',
@@ -31,20 +33,23 @@ def main(url):
     pipeline = gst.parse_launch(command)
     app = pipeline.get_by_name( 'app' )
     def on_new_buffer( appsink ):
+        # TODO: why doesn't on_new_buffer give us the 
+        # gst.Buf object? here we're using the last-buffer, 
+        # but that's not thread-safe
         buf = appsink.get_property('last-buffer')
         buf = numpy.frombuffer( buf.data, numpy.int16 )
-        #print( fft( buf ))
-        #print( buf )
-        return False
+        # Example of doing something on the data, though 
+        # in a real app you'd combine the data on longer 
+        # time-scales such that you would see patterns 
+        # at the phoneme scale I suppose
+        print( fft( buf ))
     app.connect('new-buffer',on_new_buffer )
 
     bus = pipeline.get_bus()
     bus.add_signal_watch()
-    source.EOS = False
     mainloop = gobject.MainLoop()
     def on_message(bus, message):
         if message.type == gst.MESSAGE_EOS:
-            source.EOS = True
             pipeline.set_state(gst.STATE_NULL)
             mainloop.quit()
     bus.connect( "message", on_message )
@@ -54,7 +59,4 @@ def main(url):
     mainloop.run()
 
 if __name__ == "__main__":
-    filename = os.path.abspath(
-        os.path.join( HERE, '../tests/fixtures/hello_world.wav' )
-    )
-    main( 'file://'+filename )
+    main( *sys.argv[1:] )
