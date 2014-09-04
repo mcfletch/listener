@@ -1,11 +1,10 @@
 #! /usr/bin/env python
 """Spike test for using an app-sink to get raw data"""
-import sys, os, logging, pprint, time
+import sys, os, logging
 import pygst
 pygst.require("0.10")
 import gst
 import gobject
-import Queue
 import numpy
 from numpy.fft import fft
 
@@ -42,7 +41,7 @@ def main(filename=os.path.join( HERE, '../tests/fixtures/hello_world.wav' )):
         # in a real app you'd combine the data on longer 
         # time-scales such that you would see patterns 
         # at the phoneme scale I suppose
-        print( fft( buf ))
+        fft( buf )
     app.connect('new-buffer',on_new_buffer )
 
     bus = pipeline.get_bus()
