@@ -20,6 +20,7 @@ class CorrectionView( QtGui.QWidget ):
         layout = QtGui.QFormLayout(parent=self)
         layout.addRow( u"Recognized Text", QtGui.QLabel( self.original ))
         layout.addRow( u"Correction", QtGui.QLineEdit( text=self.original ))
+        layout.addRow( u"Interpretation", QtGui.QLineEdit( text=self.original ))
         self.setLayout( layout )
     def sizeHint( self ):
         print 'Using size hint'
