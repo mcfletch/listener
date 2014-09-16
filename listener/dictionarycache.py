@@ -84,3 +84,21 @@ class DictionaryDB( object ):
     def __contains__( self, word ):
         return bool(self.have_words( word ).get(word))
 
+    def arpa_to_text( self, arpas ):
+        cursor = self.connection.cursor()
+        results = {}
+        arpas = [as_unicode(a).lower() for a in arpas]
+        cursor.execute( 
+            "SELECT word,arpa from dictionary where arpa in ?",
+            arpas,
+        )
+        return [
+            # flags needed too
+            # 'period' -> space after flag, no space before
+            # 'dot' -> no space after flag, no space before
+            # 'point' -> no space before (if digits), no space after (if digits)
+            # 'open paren' -> no space before flag, space after flag 
+            # 'close paren' -> space before flag, no space after flag
+            (r.arpa,r.word) for r in cursor.fetchall()
+        ]
+        
