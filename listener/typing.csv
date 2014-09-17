@@ -1,0 +1,109 @@
+[ ]*\|bar[ ]*	|
+[ ]*\~tilde[ ]*	~
+[ ]*\^caret[ ]*	^
+[ ]*\<less\-than[ ]*	<
+[ ]*\>greater\-than[ ]*	>
+\=equals	=
+\=\=equals\-equals	==
+\=\=equal\-equal	==
+\!\=not\-equals	!=
+\!\=not\-equal	!=
+\{open\-brace[ ]*	{
+[ ]*\}close\-brace	}
+[ ]*\}close\-brace	}
+[ ]*\@at[ ]*	@
+[ ]*\"\"\"triple\-quote[ ]*	"""
+[ ]*\"\"\"triple\-double\-quote[ ]*	"""
+[ ]*\'\'\'triple\-single\-quote[ ]*	'''
+[ ]*\"quote[ ]*	"
+[ ]*\"double\-quote[ ]*	"
+[ ]*\'single\-quote[ ]*	'
+[ ]*\*asterisk[ ]*	*
+[ ]*\*\*asterisk\-asterisk[ ]*	**
+[ ]*\*star[ ]*	*
+[ ]*\*\*star\-star[ ]*	**
+[ ]*\$dollar\-sign[ ]*	$
+[ ]*\$dollar\-sign[ ]*	$
+[ ]*[_]under[ ]*	_
+[ ]*\_under\-score[ ]*	_
+[ ]*\_under\-score[ ]*	_
+\[left\-bracket[ ]*	[
+[ ]*\]right\-bracket	]
+\[open\-bracket[ ]*	[
+[ ]*\]close\-bracket	]
+[ ]*\]close\-bracket	]
+[ ]*\\back\-slash[ ]*	\\
+[ ]*\`back\-tick[ ]*	`
+[ ]*\+plus[ ]*	+
+[ ]*\-minus[ ]*	-
+\(open\-paren[ ]*	(
+\(open\-paren[ ]*	(
+[ ]*\)close\-paren	)
+[ ]*\_\_dunder[ ]*	__
+[ ]*\!exclamation\-point[ ]*	!
+[ ]*\"close\-quote[ ]*	"
+[ ]*\"double\-quote[ ]*	"
+[ ]*\"end\-of\-quote[ ]*	"
+[ ]*\"end\-quote[ ]*	"
+[ ]*\"in\-quotes[ ]*	"
+[ ]*\"quote[ ]*	"
+[ ]*\"unquote[ ]*	"
+[ ]*\#sharp\-sign[ ]*	#
+[ ]*\%percent[ ]*	%
+[ ]*\&ampersand[ ]*	&
+[ ]*\'end\-inner\-quote[ ]*	'
+[ ]*\'end\-quote	'
+[ ]*\'inner\-quote[ ]*	'
+[ ]*\'quote[ ]*	'
+[ ]*\'single\-quote[ ]*	'
+\(begin\-parens[ ]*	(
+\(in\-parentheses[ ]*	(
+\(left\-paren[ ]*	(
+\(open\-parentheses[ ]*	(
+\(paren[ ]*	(
+\(parens[ ]*	(
+\(parentheses[ ]*	(
+[ ]*\)close\-paren	)
+[ ]*\)close\-parentheses	)
+[ ]*\)end\-paren	)
+[ ]*\)end\-parens	)
+[ ]*\)end\-parentheses	)
+[ ]*\)end\-the\-paren	)
+[ ]*\)paren	)
+[ ]*\)parens	)
+[ ]*\)right\-paren	)
+[ ]*\)right\-paren	)
+[ ]*\)un\-parentheses	)
+[ ]*\,comma	,
+[ ]*\-dash	-
+[ ]*\-hyphen	-
+[ ]*\.\.\.ellipsis[ ]*	...
+[ ]*\.decimal[ ]*	.
+[ ]*\.dot[ ]*	.
+[ ]*\.full\-stop	.
+[ ]*\.period	.
+[ ]*\.point[ ]*	.
+[ ]*\/slash[ ]*	/
+[ ]*\:colon	:
+[ ]*\;semi\-colon	;
+[ ]*\;semi\-colon	;
+[ ]*\?question\-mark	?
+\{brace[ ]*	{
+\{left\-brace[ ]*	{
+\{open\-brace[ ]*	{
+[ ]*\}close\-brace	}
+[ ]*\}right\-brace	}
+[ ]*one[ ]*	1
+[ ]*two[ ]*	2
+[ ]*three[ ]*	3
+[ ]*four[ ]*	4
+[ ]*five[ ]*	5
+[ ]*six[ ]*	6
+[ ]*seven[ ]*	7
+[ ]*eight[ ]*	8
+[ ]*nine[ ]*	9
+[ ]*zero[ ]*	0
+([])}])[ ]*([[({])	\1\2
+([(])[ ]*([(])	\1\2
+([)])[ ]*([)])	\1\2
+([(])[ ]*([)])	\1\2
