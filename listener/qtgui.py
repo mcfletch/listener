@@ -222,7 +222,7 @@ class ListenerMain( QtGui.QMainWindow ):
             self,
             title,
             label,
-            [label for label,name in choices],
+            [l for l,name in choices],
             current=current_index,
             editable=False,
             ok=True,

@@ -1,5 +1,5 @@
 """Base argument parser for listener utilities"""
-import argparse, logging, functools, os, sys, traceback, re
+import argparse, logging, functools, os, sys, traceback
 from . import context,ipatoarpabet,tokenizer,project
 from ._bytes import as_bytes,as_unicode,bytes
 
@@ -18,7 +18,7 @@ def with_logging( function ):
         logging.basicConfig( level=logging.INFO )
         try:
             return function( *args, **named )
-        except Exception as err:
+        except Exception:
             logging.getLogger('__main__').error( 
                 'Crashed during main function %s: %s',
                 function.__name__,
@@ -154,7 +154,6 @@ def delete_context():
     
 @with_logging
 def context_from_project():
-    log = tokenizer.log
     parser = base_arguments('Create a new listener context (or update an existing one) with guessed pronunciation from a vcs checkout')
     parser.add_argument(
         'directory',metavar='DIR',type=_existing_directory,

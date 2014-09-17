@@ -36,10 +36,6 @@ declares to be a dual license AFL/GPL license.
 """
 import dbus
 import dbus.service
-from dbus.mainloop.glib import DBusGMainLoop
-import gobject
-
-MAINLOOP = None
 
 class ListenerService( dbus.service.Object ):
     """Overall per-session listener service"""
