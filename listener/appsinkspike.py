@@ -43,7 +43,7 @@ def main(filename=os.path.join( HERE, '../tests/fixtures/hello_world.wav' )):
         raw = fft( buf )
         frequencies = raw[:int(len(raw)/2)]
         mags = numpy.round(numpy.absolute( frequencies ),0).astype('i')
-        max_bucket = (len(raw)/2-1)/(len(raw)/8000.)
+        #max_bucket = (len(raw)/2-1)/(len(raw)/8000.)
         
         freqs = fftfreq( len(buf), d=(1/8000.))[:len(mags)]
         mapped = zip([int(x) for x in mags],[int(y) for y in freqs])

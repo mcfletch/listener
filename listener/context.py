@@ -558,7 +558,7 @@ class AudioContext( object ):
         for n in (name+'.json', name ):
             try:
                 os.remove( n )
-            except (IOError,OSError) as err:
+            except (IOError,OSError):
                 pass
     def training_records( self, private=True ):
         for json_file in glob.glob( 
@@ -572,7 +572,7 @@ class AudioContext( object ):
                 else:
                     log.error( 'Training record in %s does not have accompanying data', json_file )
                     os.rename( json_file, json_file+'.stale' )
-            except Exception as err:
+            except Exception:
                 pass 
     def transcription_filename( self, transcription ):
         """This isn't "safe" in the universal sense, but it's safe enough for now"""

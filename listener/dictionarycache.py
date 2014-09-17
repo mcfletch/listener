@@ -86,7 +86,6 @@ class DictionaryDB( object ):
 
     def arpa_to_text( self, arpas ):
         cursor = self.connection.cursor()
-        results = {}
         arpas = [as_unicode(a).lower() for a in arpas]
         cursor.execute( 
             "SELECT word,arpa from dictionary where arpa in ?",
