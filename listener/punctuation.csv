@@ -39,8 +39,58 @@ _under-score,AH N D ER S K AO
 (open-paren,OW P EH N P AH R EH N
 (open-paren,OW P AH N P AH R EH N
 )close-paren,K L OW S P AH R EH N
-new-line,N UW L AY N
 ://,K OW L AH N S L AE SH S L AE SH
-dedent,D IY D EH N T
 __dunder,D AH N D ER
-no-space,N OW S P EY S
+!exclamation-point	EH K S K L AH M EY SH AH N P OY N T
+"close-quote	K L OW Z K W OW T
+"double-quote	D AH B AH L K W OW T
+"end-of-quote	EH N D AH V K W OW T
+"end-quote	EH N D K W OW T
+"in-quotes	IH N K W OW T S
+"quote	K W OW T
+"unquote	AH N K W OW T
+#sharp-sign	SH AA R P S AY N
+%percent	P ER S EH N T
+&ampersand	AE M P ER S AE N D
+'end-inner-quote	EH N D IH N ER K W OW T
+'end-quote	EH N D K W OW T
+'inner-quote	IH N ER K W OW T
+'quote	K W OW T
+'round	R AW N D
+'single-quote	S IH NG G AH L K W OW T
+(begin-parens	B IH G IH N P ER EH N Z
+(in-parentheses	IH N P ER EH N TH AH S IY Z
+(left-paren	L EH F T P ER EH N
+(open-parentheses	OW P AH N P ER EH N TH AH S IY Z
+(paren	P ER EH N
+(parens	P ER EH N Z
+(parentheses	P ER EH N TH AH S IY Z
+)close-paren	K L OW Z P ER EH N
+)close-parentheses	K L OW Z P ER EH N TH AH S IY Z
+)end-paren	EH N D P ER EH N
+)end-parens	EH N D P ER EH N Z
+)end-parentheses	EH N D P ER EH N TH AH S IY Z
+)end-the-paren	EH N D DH AH P ER EH N
+)paren	P ER EH N
+)parens	P ER EH N Z
+)right-paren	R AY T P ER EH N
+)right-paren(2)	R AY T P EH R AH N
+)un-parentheses	AH N P ER EH N TH AH S IY Z
+,comma	K AA M AH
+-dash	D AE SH
+-hyphen	HH AY F AH N
+...ellipsis	IH L IH P S IH S
+.decimal	D EH S AH M AH L
+.dot	D AA T
+.full-stop	F UH L S T AA P
+.period	P IH R IY AH D
+.point	P OY N T
+/slash	S L AE SH
+:colon	K OW L AH N
+;semi-colon	S EH M IY K OW L AH N
+;semi-colon(2)	S EH M IH K OW L AH N
+?question-mark	K W EH S CH AH N M AA R K
+{brace	B R EY S
+{left-brace	L EH F T B R EY S
+}close-brace	K L OW Z B R EY S
+}right-brace	R AY T B R EY S
