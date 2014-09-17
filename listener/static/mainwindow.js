@@ -25,7 +25,7 @@ $(document).ready( function() {
                 if ( new_text !== record.text) {
                     gui_event({
                         'action': 'correction',
-                        'record': 'record',
+                        'record': record,
                         'text': new_text
                     });
                     element.addClass( 'corrected' );
