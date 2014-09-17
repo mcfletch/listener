@@ -56,7 +56,6 @@ __dunder,D AH N D ER
 'end-quote,EH N D K W OW T
 'inner-quote,IH N ER K W OW T
 'quote,K W OW T
-'round,R AW N D
 'single-quote,S IH NG G AH L K W OW T
 (begin-parens,B IH G IH N P ER EH N Z
 (in-parentheses,IH N P ER EH N TH AH S IY Z
@@ -92,5 +91,6 @@ __dunder,D AH N D ER
 ?question-mark,K W EH S CH AH N M AA R K
 {brace,B R EY S
 {left-brace,L EH F T B R EY S
+{open-brace,OW P AH N B R EY S
 }close-brace,K L OW Z B R EY S
 }right-brace,R AY T B R EY S
