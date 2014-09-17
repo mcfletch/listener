@@ -238,11 +238,7 @@ def qt_gui():
     arguments = parser.parse_args()
 
     from . import qtgui
-    app = qtgui.QtGui.QApplication(sys.argv)
-    MainWindow = qtgui.ListenerMain(arguments=arguments)
-    MainWindow.show()
-    
-    app.exec_()
+    return qtgui.main(arguments)
 
 @with_logging
 def dictionary_lookup():

@@ -1,6 +1,7 @@
 """Qt GUI wrapper"""
-import logging,os,json, pprint, math
+import logging,os,json, pprint, math, sys
 from . import pipeline, context
+from . import service
 from .oneshot import one_shot
 try:
     from PySide import (
@@ -11,6 +12,9 @@ except ImportError as err:
         QtCore, QtGui, QtWebKit
     )
 from jinja2 import Environment, FileSystemLoader
+import dbus
+import dbus.service
+import dbus.mainloop.glib
 
 HERE = os.path.dirname( __file__ )
 
@@ -56,6 +60,10 @@ class ListenerMain( QtGui.QMainWindow ):
         self.create_gui()
         self.create_systray()
         self.pipeline.start_listening()
+        self.proxy = self.create_proxy()
+    def create_proxy(self):
+        """Create our DBus Service (proxy) instance"""
+        return service.ListenerService(self)
     def create_gui( self ):
         self.setWindowTitle( 'Listener' )
         self.statusBar().showMessage( 'Initializing the context' )
@@ -146,19 +154,18 @@ class ListenerMain( QtGui.QMainWindow ):
         self.view_frame.evaluateJavaScript(
             js
         )
+        self.proxy.send_level( intensity )
     
     def on_partial( self, record ):
         self.statusBar().showMessage( record['text'] )
+        self.proxy.send_partial( record['text'] )
     def on_final( self, record ):
         js = '''add_final( %s );'''%(json.dumps( record ))
         self.view_frame.evaluateJavaScript(
             js
         )
         self.systray.showMessage( 'Recognized', record['text'] , msecs=500 )
-#        self.final_results.appendInside(
-#            '''<li class="final-result">%s</li>'''%(cgi.escape( record['text']) )
-#        )
-#        element = self.final_results.lastChild()
+        self.proxy.send_final( record['text'] )
 
     def on_systray( self, reason ):
         if self.pipeline.running:
@@ -244,3 +251,10 @@ class ListenerMain( QtGui.QMainWindow ):
         dialog.setMinimumSize(450,250)
         dialog.show()
     
+def main(arguments):
+    app = QtGui.QApplication(sys.argv)
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+    
+    MainWindow = ListenerMain(arguments=arguments)
+    MainWindow.show()
+    app.exec_()
