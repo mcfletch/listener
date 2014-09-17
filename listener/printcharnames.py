@@ -13,10 +13,10 @@ def main():
         return False
     for charrange in [
         xrange( 0, 0xFF ),
-#        xrange( 0x100, 0xFFFF ),
-#        xrange( 0x10000, 0x1FFFF ),
-#        xrange( 0x20000, 0x2FFFF ),
-#        xrange( 0xE0000, 0xEFFFF )
+        xrange( 0x100, 0xFFFF ),
+        xrange( 0x10000, 0x1FFFF ),
+        xrange( 0x20000, 0x2FFFF ),
+        xrange( 0xE0000, 0xEFFFF )
     ]:
         for i in charrange:
             char = unichr( i )
