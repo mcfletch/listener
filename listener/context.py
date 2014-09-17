@@ -266,7 +266,7 @@ class Context( object ):
     def integrate_project( self, directory, clean=False, guess_run_together=False ):
         """Integrate statements from directory into the language model for this context"""
         from . import project
-        files = project.get_python_files( directory )
+        files = project.get_filtered_files( directory )
         all_lines = []
         with open( 
             self.custom_language_model,

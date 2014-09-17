@@ -1,5 +1,5 @@
 """Base argument parser for listener utilities"""
-import argparse, logging, functools, os, sys, traceback
+import argparse, logging, functools, os, sys, traceback, re
 from . import context,ipatoarpabet,tokenizer,project
 from ._bytes import as_bytes,as_unicode,bytes
 
@@ -85,7 +85,7 @@ def code_to_words():
             with open( arguments.output,'a') as fh:
                 fh.write( composed )
                 fh.write( '\n' )
-        
+
 @with_logging
 def missing_words():
     parser = base_arguments('Search for unknown words in vcs project/directory')
@@ -98,9 +98,16 @@ def missing_words():
         help="File into which to write the guessed pronunciation (custom dictionary, default stdout)",
         default=None,
     )
+    parser.add_argument(
+        '--filter', metavar='REGEX', type='bytes',
+        help="Regex expression to use to filter the files (must match the filename with .match()), %r"%(
+            project.DEFAULT_FILENAME_REGEX,
+        ),
+        default = project.DEFAULT_FILENAME_REGEX,
+    )
     arguments = parser.parse_args()
     working_context = context.Context( arguments.context )
-    files = project.get_python_files( arguments.directory )
+    files = project.get_filtered_files( arguments.directory, arguments.filter )
     translated = []
     for lines in project.iter_translated_lines( files, working_context ):
         translated.extend(lines)

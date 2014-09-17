@@ -3,6 +3,7 @@ from . import tokenizer, ipatoarpabet
 from ._bytes import as_unicode
 import logging, traceback, os, subprocess, re
 log = logging.getLogger( __name__)
+DEFAULT_FILENAME_REGEX = '^.*[.](py[xw23]?|htm[l]?|svg|xml|kid)$'
 
 coding_match = re.compile( r'coding[:=]\s*(?P<encoding>[-\w.]+)', re.U|re.I )
 # Handling of non-utf-8 encoding schemes...
@@ -83,15 +84,14 @@ def get_project_files( directory ):
             ])
     return files
 
-def get_python_files( directory ):
-    """Given a vcs directory, list the checked-in python files"""
+def get_filtered_files( directory, pattern=DEFAULT_FILENAME_REGEX ):
+    """Given a vcs directory, list the checked-in python files
+    
+    pattern -- regex for matching or string (glob matching)
+    """
+    if not hasattr( pattern, 'match' ):
+        pattern = re.compile( pattern, re.I|re.U )
     return [
         name for name in get_project_files( directory )
-        if (
-            name.endswith( '.py' ) or 
-            name.endswith( '.pyx' ) or 
-            name.endswith( '.pyw' ) or 
-            name.endswith( '.py2' ) or 
-            name.endswith( '.py3' )
-        )
+        if pattern.match( name )
     ]
