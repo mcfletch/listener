@@ -1,39 +1,47 @@
-import os,re
+import os,re,  logging
+log = logging.getLogger(__name__)
 HERE = os.path.dirname( __file__ )
 TYPING = os.path.join( HERE, 'typing.csv' )
+
 class Interpreter( object ):
     """Sketch of an interpreter for dictation -> typing
     
-    We still need:
+    Currently missing is the ability to do meta-commands:
     
-        * interpretation-as-command (call a function)
-        * sub-interpreters (e.g. number interpreter)
-        * state-change pattern (e.g. no-space, cap, title)
+        * trigger a GUI operation
+        * generate a new utterance (e.g. splitting utterances)
+        
+            * 'switch to console c d ~tilde' -> two commands to two different processes,
+              the context for processing commands needs to change mid-way through the 
+              processing operation...
+            
+            * ':colon new line dedent' -> three commands to 1 process...
     """
     def __init__( self ):
         self.matchers = []
         self.load()
     def load( self ):
+        """Load a flat-file definition of an interpretation context"""
         for line in open(TYPING).read().splitlines():
             try:
                 pattern,text = line.split('\t')
             except Exception:
                 # skip null lines...
+                if line.strip():
+                    log.error( 'Unable to read line %r, ignoring',  line)
                 continue
             matcher = re.compile( pattern, re.I|re.U|re.DOTALL )
             self.matchers.append( (matcher, self.action(text)))
     def action(self,  text):
+        """Determine what to do given the replacement text from a flat-file import"""
         if text.startswith( ':') and not text.startswith( '::'):
             return self.lookup_function( text[1:])
         elif text.startswith( ':'):
             return text[1:]
         else:
             return text
-    def process( self, text ):
-        for matcher,replacement in self.matchers:
-            text= matcher.sub( replacement , text )
-        return text
     def lookup_function(self, specifier):
+        """Lookup a function based on a specifier in a flat-file import"""
         split = specifier.split('.')
         if not split > 1:
             raise ValueError('%r is not a valid function specifier')
@@ -45,6 +53,13 @@ class Interpreter( object ):
             return getattr( source,  split[-1])
         except AttributeError:
             raise ValueError( '%r was not defined in %s'%(split[-1], source))
+    def __call__( self, record ):
+        text = record.get('text')
+        for matcher,replacement in self.matchers:
+            text= matcher.sub( replacement , text )
+        record['interpreted'] = text
+        # eventually we'll return N records...
+        return [ record ]
 
 def caps( match ):
     return match.group(1).title()

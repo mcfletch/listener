@@ -256,7 +256,7 @@ class Pipeline( object ):
                 if filename not in self.existing_utterances:
                     self.existing_utterances.add( filename )
                     new.append( filename )
-        except (OSError,IOError) as err:
+        except (OSError,IOError):
             log.warning( 'Unable to read buffer directory?' )
             pass 
         self.send( {
@@ -288,7 +288,7 @@ def main():
     while True:
         try:
             result = pipe.queue.get( True, 2 )
-        except Queue.Empty as err:
+        except Queue.Empty:
             pass 
         else:
             if result['type'] == 'final':

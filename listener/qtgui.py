@@ -56,6 +56,7 @@ class ListenerMain( QtGui.QMainWindow ):
         self.context = context.Context( getattr(
             command_line_arguments,'context','default'
         ) )
+        self.interpreter = self.context.interpreter('default')
         self.pipeline = QtPipeline( self.context )
         self.create_gui()
         self.create_systray()
@@ -154,18 +155,19 @@ class ListenerMain( QtGui.QMainWindow ):
         self.view_frame.evaluateJavaScript(
             js
         )
-        self.proxy.send_level( intensity )
     
     def on_partial( self, record ):
-        self.statusBar().showMessage( record['text'] )
-        self.proxy.send_partial( record['text'] )
+        for record in self.interpreter( record ):
+            self.statusBar().showMessage( record['interpreted'] )
+            self.proxy.send_partial( record['interpreted'], record['text'],  record['uttid'] )
     def on_final( self, record ):
-        js = '''add_final( %s );'''%(json.dumps( record ))
-        self.view_frame.evaluateJavaScript(
-            js
-        )
-        self.systray.showMessage( 'Recognized', record['text'] , msecs=500 )
-        self.proxy.send_final( record['text'] )
+        for record in self.interpreter( record ):
+            js = '''add_final( %s );'''%(json.dumps( record ))
+            self.view_frame.evaluateJavaScript(
+                js
+            )
+            self.systray.showMessage( 'Recognized', record['text'] , msecs=500 )
+            self.proxy.send_partial( record['interpreted'], record['text'],  record['uttid'] )
 
     def on_systray( self, reason ):
         if self.pipeline.running:

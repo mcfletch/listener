@@ -7,6 +7,7 @@ $(document).ready( function() {
         display.data('final-result-record', record);
         display.find( '[data-property=uttid]').text( record.uttid);
         display.find( '[data-property=text]').text( record.text);
+        display.find( '[data-property=interpreted]').text( record.interpreted );
         display.find( '[data-action]').each( function( clickable ) {
             var element = $(this);
             element.click( function( evt ) {

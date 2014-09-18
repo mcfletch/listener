@@ -70,7 +70,14 @@ class Context( object ):
             for directory in glob.glob( os.path.join( base_config_directory(), '*' ))
         ]
     
-    
+    def interpreter(self,  key='default'):
+        """Retrieve interpreter by key
+        
+        Currently the interpreter is hard-coded, so you always get 
+        a default interpreter
+        """
+        from . import interpreter
+        return interpreter.Interpreter( )
     @one_shot
     def directory( self ):
         base = base_config_directory()

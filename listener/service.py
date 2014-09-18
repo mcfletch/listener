@@ -61,12 +61,12 @@ class ListenerService( dbus.service.Object ):
 #    @dbus.service.signal('%s.level'%(DBUS_NAME,))
 #    def send_level( self, message ):
 #        return message 
-    @dbus.service.signal('%s.partial'%(DBUS_NAME,))
-    def send_partial( self, message ):
-        return message 
+    @dbus.service.signal('%s.partial'%(DBUS_NAME,), signature='sss')
+    def send_partial( self, interpreted,  text,  uttid ):
+        return interpreted 
     @dbus.service.signal('%s.final'%(DBUS_NAME,))
-    def send_final( self, message ):
-        return message 
+    def send_final( self, interpreted,  text,  uttid ):
+        return interpreted
 
 class PipelineService(dbus.service.Object):
     # current pipeline manipulation...

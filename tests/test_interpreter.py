@@ -74,8 +74,8 @@ class InterpreterTests( TestCase ):
 #            ), 
             
         ]:
-            result = self.interpreter.process(text)
-            assert result == expected,  (result, expected, text)
+            record = self.interpreter({'text':text})[0]
+            assert record['interpreted'] == expected,  (record['interpreted'], expected, text)
         
     def test_lookup(self):
         assert self.interpreter.lookup_function( 'listener.interpreter.caps') is interpreter.caps
