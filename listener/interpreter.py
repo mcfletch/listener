@@ -49,7 +49,8 @@ class Interpreter( object ):
 def caps( match ):
     return match.group(1).title()
 def all_caps( match ):
-    return match.group(1).upper()
+    next = match.group('next')
+    return next.upper()
 def lowercase( match ):
     return match.group(1).lower()
 def cap_next(match):
@@ -58,3 +59,15 @@ def cap_next(match):
         return u'%s %s'%(this, next.title())
     else:
         return this
+def cap_camel(match):
+    next = match.group('next')
+    return "".join([s.title() for s in next.split(' ')])
+def camel(match):
+    next = match.group('next')
+    fragments = next.split()
+    return u'%s%s'%(fragments[0],"".join([s.title() for s in fragments[1:]]))
+
+def collapse_spaces( match ):
+    base = match.group(0)
+    return base.replace(' ', '')
+    

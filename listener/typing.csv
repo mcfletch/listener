@@ -1,3 +1,13 @@
+\bone\b	1
+\btwo\b	2
+\bthree\b	3
+\bfour\b	4
+\bfive\b	5
+\bsix\b	6
+\bseven\b	7
+\beight\b	8
+\bnine\b	9
+\bzero\b	0
 [ ]*\|bar[ ]*	|
 [ ]*\~tilde[ ]*	~
 [ ]*\^caret[ ]*	^
@@ -24,9 +34,9 @@
 [ ]*\*\*star\-star[ ]*	**
 [ ]*\$dollar\-sign[ ]*	$
 [ ]*\$dollar\-sign[ ]*	$
+[ ]*\_under\-score[ ]*	_
+[ ]*\_under\-score[ ]*	_
 [ ]*[_]under[ ]*	_
-[ ]*\_under\-score[ ]*	_
-[ ]*\_under\-score[ ]*	_
 \[left\-bracket[ ]*	[
 [ ]*\]right\-bracket	]
 \[open\-bracket[ ]*	[
@@ -91,22 +101,19 @@
 \{open\-brace[ ]*	{
 [ ]*\}close\-brace	}
 [ ]*\}right\-brace	}
-[ ]*one[ ]*	1
-[ ]*two[ ]*	2
-[ ]*three[ ]*	3
-[ ]*four[ ]*	4
-[ ]*five[ ]*	5
-[ ]*six[ ]*	6
-[ ]*seven[ ]*	7
-[ ]*eight[ ]*	8
-[ ]*nine[ ]*	9
-[ ]*zero[ ]*	0
+(0[xX])?([0123456789.*]([ ]*))+	:listener.interpreter.collapse_spaces
 ([])}])[ ]*([[({])	\1\2
 ([(])[ ]*([(])	\1\2
 ([)])[ ]*([)])	\1\2
 ([(])[ ]*([)])	\1\2
-cap[ ]+([^ ]+)	:listener.interpreter.caps
-title[ ]+([^ ]+)	:listener.interpreter.caps
-all-cap[ ]+([^ ]+)	:listener.interpreter.all_caps
+title[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
+\ball[ ]+cap([s])?[ ]+(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.all_caps
+\bcamel[ ]+cap([s])?[ ]+(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.cap_camel
+\bcap[ ]+camel[ ]+(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.cap_camel
+(?!\bcap[ ]+)\bcamel[ ]+(?!cap)(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.camel
+cap[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
 [ ]*(?P<this>\.)full\-stop([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
 [ ]*(?P<this>\.)period([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
+[ ]*no\-space[ ]*	
+[ ]*space-bar[ ]*	 
+[ ]*space[ ]*	 
