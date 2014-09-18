@@ -80,11 +80,9 @@
 [ ]*\.\.\.ellipsis[ ]*	...
 [ ]*\.decimal[ ]*	.
 [ ]*\.dot[ ]*	.
-[ ]*\.full\-stop	.
-[ ]*\.period	.
 [ ]*\.point[ ]*	.
 [ ]*\/slash[ ]*	/
-[ ]*\:colon	:
+[ ]*\:colon	::
 [ ]*\;semi\-colon	;
 [ ]*\;semi\-colon	;
 [ ]*\?question\-mark	?
@@ -107,3 +105,8 @@
 ([(])[ ]*([(])	\1\2
 ([)])[ ]*([)])	\1\2
 ([(])[ ]*([)])	\1\2
+cap[ ]+([^ ]+)	:listener.interpreter.caps
+title[ ]+([^ ]+)	:listener.interpreter.caps
+all-cap[ ]+([^ ]+)	:listener.interpreter.all_caps
+[ ]*(?P<this>\.)full\-stop([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
+[ ]*(?P<this>\.)period([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next

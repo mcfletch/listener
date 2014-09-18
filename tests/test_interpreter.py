@@ -20,7 +20,18 @@ class InterpreterTests( TestCase ):
             ('(open-paren (open-paren',  '(('), 
             (')close-paren )close-paren',  '))'), 
             ('(open-paren )close-paren',  '()'), 
+            (
+                'cap he opened the door .period then he walked away .period good',
+                'He opened the door. Then he walked away. Good'
+            ),
+            (
+                'identifier no-space 2 _under-score 3', 
+                'identifier2_3'
+            ), 
         ]:
             result = self.interpreter.process(text)
             assert result == expected,  (result, expected, text)
         
+    def test_lookup(self):
+        assert self.interpreter.lookup_function( 'listener.interpreter.caps') is interpreter.caps
+    
