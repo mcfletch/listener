@@ -314,7 +314,7 @@ class Context( object ):
             for word,pron in iterable:
                 word = as_unicode(word).lower()
                 pron = as_unicode(pron).upper()
-                if not pron in cache.have_words( word ).get(word):
+                if not pron in cache.have_words( word ).get(word,()):
                     try:
                         written_counts[word] = count = written_counts.get( word,0) + 1
                         if count != 1:

@@ -77,7 +77,8 @@ class ContextTests( TestCase ):
                 expanded.append( name )
         mapping = self.context.transcriptions( expanded )
         for name,translated in mapping.items():
-            assert translated, name
+            if name != 'new-line':
+                assert translated, name
         
     
 class AudioContextTests( TestCase ):
