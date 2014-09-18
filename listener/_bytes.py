@@ -21,7 +21,13 @@ if sys.version_info[:2] < (3,0):
         return bytes( x )
     def as_unicode( x, encoding='utf-8'):
         if isinstance( x, bytes ):
-            return x.decode(encoding)
+            try:
+                return x.decode(encoding)
+            except UnicodeError:
+                try:
+                    return x.decode('utf-8')
+                except UnicodeError:
+                    return x.decode('latin-1')
         return unicode(x)
     integer_types = int,long
 else:
