@@ -3,7 +3,7 @@ from . import tokenizer, ipatoarpabet
 from ._bytes import as_unicode
 import logging, traceback, os, subprocess, re
 log = logging.getLogger( __name__)
-DEFAULT_FILENAME_REGEX = '^.*[.](py[xw23]?|htm[l]?|svg|xml|kid)$'
+DEFAULT_FILENAME_REGEX = '^.*[.](py[xw23]?|htm[l]?|kid)$'
 
 coding_match = re.compile( r'coding[:=]\s*(?P<encoding>[-\w.]+)', re.U|re.I )
 # Handling of non-utf-8 encoding schemes...
@@ -26,7 +26,7 @@ def iter_translated_lines( files, working_context, **tokenizer_params ):
         lines = text_converter( open( filename ).readlines() )
         try:
             yield parser( lines )
-        except Exception as err:
+        except Exception:
             log.error( 'Unable to translate: %s\n%s', filename, traceback.format_exc())
             continue 
             
