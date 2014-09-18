@@ -166,8 +166,8 @@ class ListenerMain( QtGui.QMainWindow ):
             self.view_frame.evaluateJavaScript(
                 js
             )
-            self.systray.showMessage( 'Recognized', record['text'] , msecs=500 )
-            self.proxy.send_partial( record['interpreted'], record['text'],  record['uttid'] )
+            self.systray.showMessage( 'Recognized', record['interpreted'] , msecs=500 )
+            self.proxy.send_final( record['interpreted'], record['text'],  record['uttid'] )
 
     def on_systray( self, reason ):
         if self.pipeline.running:

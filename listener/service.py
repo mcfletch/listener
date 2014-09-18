@@ -58,10 +58,10 @@ class ListenerService( dbus.service.Object ):
         from . import context
         return context.Context.keys()
     
-    @dbus.service.signal('%s.partial'%(DBUS_NAME,), signature='sss')
+    @dbus.service.signal('%s.results'%(DBUS_NAME,), signature='sss')
     def send_partial( self, interpreted,  text,  uttid ):
         return interpreted 
-    @dbus.service.signal('%s.final'%(DBUS_NAME,))
+    @dbus.service.signal('%s.results'%(DBUS_NAME,), signature='sss')
     def send_final( self, interpreted,  text,  uttid ):
         return interpreted
 
