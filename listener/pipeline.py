@@ -6,7 +6,7 @@ You may modify and redistribute this file under the same terms as
 the CMU Sphinx system.  See 
 http://cmusphinx.sourceforge.net/html/LICENSE for more information.
 """
-import sys, os, logging, pprint
+import sys, os, logging, pprint, time
 import pygst
 pygst.require("0.10")
 import gst
@@ -16,6 +16,9 @@ from . import context
 from . import sourcedescription
 log = logging.getLogger( __name__ )
 HERE = os.path.dirname( __file__ )
+
+def timestamp():
+    return time.time()
 
 class Pipeline( object ):
     """Holds the PocketSphinx Pipeline we'll use for recognition
@@ -265,6 +268,7 @@ class Pipeline( object ):
             'uttid': uttid,
             'nbest': getattr( self.sphinx, 'nbest',(text,)),
             'files': new,
+            'time': timestamp(), 
         })
     def send( self, message ):
         raise NotImplemented( 'Must have a send method on pipelines' )
