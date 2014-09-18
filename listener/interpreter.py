@@ -74,3 +74,7 @@ def collapse_spaces( match ):
 def new_line(match): return '\n'
 def tab_key(match): return '\t'
 def backspace(match): return '\b'
+def dunder_wrap(match): 
+    next = match.group('next')
+    return '__%s__'%(next)
+    

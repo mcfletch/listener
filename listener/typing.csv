@@ -25,16 +25,14 @@
 [ ]*\"\"\"triple\-quote[ ]*	"""
 [ ]*\"\"\"triple\-double\-quote[ ]*	"""
 [ ]*\'\'\'triple\-single\-quote[ ]*	'''
-[ ]*\"quote[ ]*	"
 [ ]*\"double\-quote[ ]*	"
 [ ]*\'single\-quote[ ]*	'
-[ ]*\*asterisk[ ]*	*
+[ ]*\"quote[ ]*	"
 [ ]*\*\*asterisk\-asterisk[ ]*	**
-[ ]*\*star[ ]*	*
+[ ]*\*asterisk[ ]*	*
 [ ]*\*\*star\-star[ ]*	**
+[ ]*\*star[ ]*	*
 [ ]*\$dollar\-sign[ ]*	$
-[ ]*\$dollar\-sign[ ]*	$
-[ ]*\_under\-score[ ]*	_
 [ ]*\_under\-score[ ]*	_
 [ ]*[_]under[ ]*	_
 \[left\-bracket[ ]*	[
@@ -49,13 +47,12 @@
 \(open\-paren[ ]*	(
 \(open\-paren[ ]*	(
 [ ]*\)close\-paren	)
-[ ]*\_\_dunder[ ]*	__
+\b\_\_dunder\b	__
 [ ]*\!exclamation\-point[ ]*	!
 [ ]*\"close\-quote[ ]*	"
 [ ]*\"double\-quote[ ]*	"
 [ ]*\"end\-of\-quote[ ]*	"
 [ ]*\"end\-quote[ ]*	"
-[ ]*\"in\-quotes[ ]*	"
 [ ]*\"quote[ ]*	"
 [ ]*\"unquote[ ]*	"
 [ ]*\#sharp\-sign[ ]*	#
@@ -120,3 +117,4 @@ cap[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
 [ ]*no\-space[ ]*	
 [ ]*space-bar[ ]*	 
 [ ]*space[ ]*	 
+\b\_\_[ ]+(?P<next>[^ ]+)[ ]+\_\_\b	:listener.interpreter.dunder_wrap

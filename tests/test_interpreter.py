@@ -55,6 +55,18 @@ class InterpreterTests( TestCase ):
                 'back space', 
                 '\b'
             ), 
+            (
+                '(open-paren "quote this and that "quote )close-paren', 
+                '("this and that")', 
+            ), 
+            (
+                '__dunder this _under those __dunder', 
+                '__this_those__', 
+            ), 
+            (
+                '__dunder init __dunder', 
+                '__init__', 
+            ), 
             # Macro functionality is not yet that important
 #            (
 #                'pie main line', 
