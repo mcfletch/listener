@@ -37,6 +37,12 @@ class InterpreterTests( TestCase ):
            ( 'all caps this _under that', 'THIS_THAT'), 
            ( 'camel this and that', 'thisAndThat'), 
            ( 'cap camel this and that', 'ThisAndThat'), 
+           ( 'test -hyphen moo', 'test-moo'), 
+           ( '@at property',  '@property'), 
+           ( 
+                'object .dot method _under name (open-paren __dunder cap this __dunder )close-paren',  
+                'object.method_name (__This__)'
+            ), 
         ]:
             result = self.interpreter.process(text)
             assert result == expected,  (result, expected, text)

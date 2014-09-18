@@ -85,8 +85,8 @@
 [ ]*\)right\-paren	)
 [ ]*\)un\-parentheses	)
 [ ]*\,comma	,
-[ ]*\-dash	-
-[ ]*\-hyphen	-
+[ ]*\-dash[ ]*	-
+[ ]*\-hyphen[ ]*	-
 [ ]*\.\.\.ellipsis[ ]*	...
 [ ]*\.decimal[ ]*	.
 [ ]*\.dot[ ]*	.
