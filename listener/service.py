@@ -58,9 +58,6 @@ class ListenerService( dbus.service.Object ):
         from . import context
         return context.Context.keys()
     
-#    @dbus.service.signal('%s.level'%(DBUS_NAME,))
-#    def send_level( self, message ):
-#        return message 
     @dbus.service.signal('%s.partial'%(DBUS_NAME,), signature='sss')
     def send_partial( self, interpreted,  text,  uttid ):
         return interpreted 
