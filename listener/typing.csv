@@ -96,6 +96,9 @@
 [ ]*\;semi\-colon	;
 [ ]*\;semi\-colon	;
 [ ]*\?question\-mark	?
+[ ]*new[ -]+line[ ]*	:listener.interpreter.new_line
+[ ]*tab[ -]+key[ ]*	:listener.interpreter.tab_key
+[ ]*back[ -]+space[ ]*	:listener.interpreter.backspace
 \{brace[ ]*	{
 \{left\-brace[ ]*	{
 \{open\-brace[ ]*	{

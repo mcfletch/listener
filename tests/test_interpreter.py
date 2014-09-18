@@ -32,17 +32,35 @@ class InterpreterTests( TestCase ):
                 'id _under three _under four', 
                 'id_3_4'
             ),
-           ( 'two .point three four five',  '2.345'), 
-           ( 'two *asterisk right _under margin',  '2*right_margin'), 
-           ( 'all caps this _under that', 'THIS_THAT'), 
-           ( 'camel this and that', 'thisAndThat'), 
-           ( 'cap camel this and that', 'ThisAndThat'), 
-           ( 'test -hyphen moo', 'test-moo'), 
-           ( '@at property',  '@property'), 
-           ( 
+            ( 'two .point three four five',  '2.345'), 
+            ( 'two *asterisk right _under margin',  '2*right_margin'), 
+            ( 'all caps this _under that', 'THIS_THAT'), 
+            ( 'camel this and that', 'thisAndThat'), 
+            ( 'cap camel this and that', 'ThisAndThat'), 
+            ( 'test -hyphen moo', 'test-moo'), 
+            ( '@at property',  '@property'), 
+            ( 
                 'object .dot method _under name (open-paren __dunder cap this __dunder )close-paren',  
                 'object.method_name (__This__)'
             ), 
+            (
+                'new line', 
+                '\n'
+            ), 
+            (
+                'tab-key', 
+                '\t'
+            ), 
+            (
+                'back space', 
+                '\b'
+            ), 
+            # Macro functionality is not yet that important
+#            (
+#                'pie main line', 
+#                'if __name__ == "__main__":\n\t'
+#            ), 
+            
         ]:
             result = self.interpreter.process(text)
             assert result == expected,  (result, expected, text)

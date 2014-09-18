@@ -71,3 +71,6 @@ def collapse_spaces( match ):
     base = match.group(0)
     return base.replace(' ', '')
     
+def new_line(match): return '\n'
+def tab_key(match): return '\t'
+def backspace(match): return '\b'
