@@ -8,14 +8,24 @@ class Interpreter( object ):
     
     Currently missing is the ability to do meta-commands:
     
-        * trigger a GUI operation
+        * trigger a Listener GUI operation
+        
+        * trigger a GUI operation in the client application
+        
+        * trigger a change to a new interpretation context
+        
+            * needs to be an API for the client app to do this too, so that 
+              e.g. we can use Eric's "editor.inDocstring()" and the like to 
+              select sub-contexts intelligently
+        
+        * ability to choose "initial space" or not
+        
         * generate a new utterance (e.g. splitting utterances)
         
             * 'switch to console c d ~tilde' -> two commands to two different processes,
               the context for processing commands needs to change mid-way through the 
               processing operation...
-            
-            * ':colon new line dedent' -> three commands to 1 process...
+        
     """
     def __init__( self ):
         self.matchers = []
