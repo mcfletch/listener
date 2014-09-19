@@ -16,6 +16,13 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 
+if hasattr( QtGui,  'QtSingleApplication'):
+    QtSingleApplication = QtGui.QtSingleApplication
+else:
+    from . import pysideqtsingleapplication
+    QtSingleApplication = pysideqtsingleapplication.QtSingleApplication
+
+
 HERE = os.path.dirname( __file__ )
 
 TEMPLATE_ENVIRONMENT = Environment( loader=FileSystemLoader(os.path.join( HERE, 'templates')) )
@@ -254,9 +261,13 @@ class ListenerMain( QtGui.QMainWindow ):
         dialog.show()
     
 def main(arguments):
-    app = QtGui.QApplication(sys.argv)
+    app = QtSingleApplication("Listener GUI", sys.argv)
+    if app.isRunning():
+        log.error("Another Listener instance is running, exiting")
+        return 0
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     
     MainWindow = ListenerMain(arguments=arguments)
     MainWindow.show()
+    app.setActivationWindow( MainWindow )
     app.exec_()
