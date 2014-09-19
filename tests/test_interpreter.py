@@ -75,6 +75,14 @@ class InterpreterTests( TestCase ):
                 'the three medals', 
                 'the 3 medals', 
             ), 
+            (
+                'spell out three', 
+                'three'
+            ), 
+            (
+                'spell out __dunder', 
+                '__dunder'
+            )
             # Macro functionality is not yet that important
 #            (
 #                'pie main line', 

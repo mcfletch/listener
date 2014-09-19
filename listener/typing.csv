@@ -1,3 +1,4 @@
+\bspell[ ]+out[ ]+(?P<word>[^ ]+)\b	:listener.interpreter.spell_out_escape
 \bone\b	1
 \btwo\b	2
 \bthree\b	3
@@ -122,3 +123,4 @@
 \b\_\_[ ]+(?P<next>[^ ]+)[ ]+\_\_\b	:listener.interpreter.dunder_wrap
 \b(?P<prefix>class[ ]+[^ ]+)[ ]+(?P<suffix>[(])	\g<prefix>\g<suffix>
 \b(?P<prefix>def[ ]+[^ ]+)[ ]+(?P<suffix>[(])	\g<prefix>\g<suffix>
+\bspell_out_(?P<word>[^ ]+)_spell_out	:listener.interpreter.spell_out_escape

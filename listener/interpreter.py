@@ -105,3 +105,8 @@ def dunder_wrap(match):
     next = match.group('next')
     return '__%s__'%(next)
     
+def spell_out_escape(match):
+    word = match.group('word')
+    return 'spell_out_%s_spell_out'%(word)
+def spell_out_unescape(match):
+    return match.group('word')
