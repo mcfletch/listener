@@ -15,9 +15,14 @@ one for which I need a solution.
 
 Big Caveats:
 
- * This is a *very* early stage project
+ * This is an early stage project
  
-    * Seriously, it *does not* do much yet See `The TODO List`_
+    * See `The TODO List`_
+    
+    * At the moment you can use command-line tools to create a dictation context
+      from your code repositories, start a qt-based `Listener` instance and 
+      have that dictate into an application that listens on DBus. I've got an
+      Eric IDE plugin that works as a client for that DBus service.
     
  * This project is currently English-only (and English-US keyboard only). 
    It would be nice to support other languages, but it is not a priority for me

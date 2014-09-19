@@ -3,30 +3,37 @@ TODO Items for Listener
 
 * Voice dictation accurracy is pretty lousy
     
-    * with a `listener-context-from-project` we get reasonable accurracy
-      picking up words that are in the project, but there are a *lot* 
-      of stray "junk" words showing up in between the words spoken
-      
-      * this *might* just be a volume issue?
-      
-      * investigate whether there are knobs to reduce this when dealing with 
-        non-transcription modes of operation
-    
     * we are *not* getting the N-best results from pocketsphinx, so we 
       wind up just having to accept the result we got or explicitly 
-      try to fix it 
-
-* Vocabulary Hinting, Commands and Actions
-
-    * open-quote -> 'space' + " + 'no space after'
+      try to fix it
     
-    * close-quote -> " + maybe space after
-    
-    * "context commands" -> change interpretation context until an 
-      exit from that context
+    * we don't have any access to words not in the corpus, and it is 
+      essentially impossible to convince the dictation to recognize 
+      a new combination of words, for instance, you basically cannot 
+      get the recognizer to recognize ",comma" at the start of an 
+      utterance, though it recognizes it perfectly well elsewhere
       
-    * needs to feed into statistical model (HMM) for the tokenizer to 
-      decide how to split up "run together" words...
+    * likely this needs to be correction/training fixes, and in 
+      particular likely need to have *every* utterance
+      (and its correction) saved in order to update the auto-extracted
+      language model with real-world usage
+    
+    * tokenizer needs to be updated to produce utterances closer to what 
+      the interpreter now allows (e.g. dunder new dunder is now sufficient,
+      don't need a lot of no-space statements).
+
+* Interpretation needs a lot more finesse
+
+    * need to be able to create separate utterances from an original
+    
+    * need to have facilities for command-and-control operation
+    
+    * need to have context-aware interpretation aware (i.e. only apply in HTML context)
+    
+    * still seeing bugs where e.g. numbers aren't getting their space preserved when 
+      next to text `this 3that` instead of `this 3 that`
+    
+    * need a way to say `spell out three` so that we can get the non-numeric representation
 
 * Language model recompilation
 
@@ -53,13 +60,21 @@ TODO Items for Listener
 
 * Provide spelling/correcting/typing context/actions
 
-    * A, B, C
+    * type A  B  C 
+    
+    * type ARABIC LETTER REH (unicodedata db search for name)
+    
+    * type GREEK CAPITAL LETTER PI
     
     * 1, 2, 3
     
     * Delete/Backspace
     
     * Navigation (Home, End, Left, Right, Word Left, Word Right, Up, Down, etc)
+    
+    * Unicode support requires ~16,000 words, many of them short/simple and likely 
+      to be too close to english words, need to do some experimentation there or see 
+      if we want a wholely different pipeline for "typing" context
 
 * Provide correct-that behaviour
     
@@ -69,6 +84,8 @@ TODO Items for Listener
       
         * the Listener application itself will activate the context
           and let the speech service know we are in-focus...
+    
+    * also need `undo that`, `scratch that`, etc.
     
     * during correction, we need to analyze each word for 
       presence in the dictionary and do ARPABet translations 
@@ -113,20 +130,12 @@ TODO Items for Listener
 
 * Use `alsadevices` to let user choose which input and output devices to use 
 
-    * store that in audio-context storage
-    
-    * gui control, preferably one that is populated on interaction to allow 
-      for plugging in new hardware
-    
     * defaults to `default` so out of the box it is system/pulseaudio controlled
 
 * Move the `uinput` device into a (system) DBus service with access 
   control to only allow `console` users to access it (access control file 
   already written, but packaging is needed)
   
-* Move the audio pipes and context management into a Session DBus service
-  to decouple it and make it easy for other processes to access it
-
 * Language Model Contexts
 
     * Language model contexts need to be able to chain to parents such that 
@@ -157,7 +166,7 @@ TODO Items for Listener
         * words that can be run-together, so an identifier of "open_that" could 
           be said "open that" and be recognized
     
-* Audio/Hardware/User Training
+* Audio/Hardware/User Training [defer]
 
     * add utterance to training set (they are already stored)
     
@@ -176,13 +185,6 @@ TODO Items for Listener
             * And in which context it is active
         
         * Context Definition and Corpus definition
-        
-            * Automated scanning of codebase to extract phrases and words,
-              likely with a base set for each language; potentially producing 
-              many possible word-sets for a given identifier where how it would 
-              be said is ambiguous
-              
-                * this has a spike-test in `listener/codetowords.py`
         
             * API for dictionary manipulation
             
@@ -209,7 +211,7 @@ TODO Items for Listener
         
         * Uinput driver for typing into arbitrary windows 
     
-    * Prototype in either Atom or Eric5 for Python editing
+    * Prototype in Eric5 for Python editing
 
         * on opening a project (git/bzr/hg repository)
         
@@ -252,8 +254,6 @@ TODO Items for Listener
         * Requires differentiating between auto-generated and user-edited 
           information
 
-    * Recording level monitoring
-    
     * Choice of input/output ALSA devices
     
     * Potentially a "restore volume" mechanism, though that might be best 
