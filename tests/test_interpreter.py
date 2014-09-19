@@ -12,8 +12,8 @@ class InterpreterTests( TestCase ):
         for text, expected in [
             (',comma', ','), 
             ('/slash this and that',  '/this and that'), 
-            ('class director (open-paren object )close-paren :colon', 'class director (object):'), 
-            ('def blue _under there (left-paren', 'def blue_there ('), 
+            ('class director (open-paren object )close-paren :colon', 'class director(object):'), 
+            ('def blue _under there (left-paren', 'def blue_there('), 
             ('three .point five', '3.5'), 
             ('{open-brace five :colon "double-quote that', '{5:"that'), 
             ('}close-brace [open-bracket 5 ]close-bracket', '}[5]'), 
@@ -70,6 +70,10 @@ class InterpreterTests( TestCase ):
             (
                 '__dunder init __dunder', 
                 '__init__', 
+            ),
+            (
+                'the three medals', 
+                'the 3 medals', 
             ), 
             # Macro functionality is not yet that important
 #            (

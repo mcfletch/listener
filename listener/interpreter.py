@@ -78,8 +78,10 @@ def all_caps( match ):
     return next.upper()
 def lowercase( match ):
     return match.group(1).lower()
-def cap_next(match):
+def full_stop(match):
     this, next = match.group('this'), match.group('next')
+    if this is None:
+        this = '.'
     if next:
         return u'%s %s'%(this, next.title())
     else:

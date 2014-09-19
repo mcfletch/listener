@@ -101,21 +101,24 @@
 \{open\-brace[ ]*	{
 [ ]*\}close\-brace	}
 [ ]*\}right\-brace	}
-(0[xX])?([0123456789.*]([ ]*))+	:listener.interpreter.collapse_spaces
+\b[0123456789.*]([ ]+[0123456789.*])+	:listener.interpreter.collapse_spaces
+\b0[xX]([0123456789a-fA-F]([ ]*))+	:listener.interpreter.collapse_spaces
 ([])}])[ ]*([[({])	\1\2
 ([(])[ ]*([(])	\1\2
 ([)])[ ]*([)])	\1\2
 ([(])[ ]*([)])	\1\2
-title[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
 \ball[ ]+cap([s])?[ ]+(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.all_caps
 \bcamel[ ]+cap([s])?[ ]+(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.cap_camel
 \bcap[ ]+camel[ ]+(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.cap_camel
 (?!\bcap[ ]+)\bcamel[ ]+(?!cap)(?P<next>[^][`~!@#$%^&*()=+{}\\|:;'",./?]+)	:listener.interpreter.camel
-cap[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
-[ ]*(?P<this>\.)full\-stop([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
-[ ]*(?P<this>\.)period([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
-[ ]*(?P<this>\.)?full[ -]stop([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
+\bcap[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
+\btitle[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
+[ ]*(?P<this>\.)?full[ -]stop([ ]+(?P<next>[^ ]+))?	:listener.interpreter.full_stop
+[ ]*(?P<this>\.)?period([ ]+(?P<next>[^ ]+))?	:listener.interpreter.full_stop
+[ ]*(?P<this>\.)?full[ -]*stop([ ]+(?P<next>[^ ]+))?	:listener.interpreter.full_stop
 [ ]*no[- ]space[ ]*	
 [ ]*space[- ]bar[ ]*	 
 [ ]*space[ ]*	 
 \b\_\_[ ]+(?P<next>[^ ]+)[ ]+\_\_\b	:listener.interpreter.dunder_wrap
+\b(?P<prefix>class[ ]+[^ ]+)[ ]+(?P<suffix>[(])	\g<prefix>\g<suffix>
+\b(?P<prefix>def[ ]+[^ ]+)[ ]+(?P<suffix>[(])	\g<prefix>\g<suffix>
