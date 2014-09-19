@@ -81,13 +81,13 @@ class Interpreter( object ):
         index = 0
         while match:
             before = text[index:match.start()]
-            if before:
+            if before and before.strip():
                 yield before 
             yield Command(tag, **match.groupdict())
             index = match.end()
             match = matcher.search(text, index)
         rest = text[index:]
-        if rest:
+        if rest and rest.strip():
             yield rest
     def __call__( self, record ):
         text = record.get('text')
