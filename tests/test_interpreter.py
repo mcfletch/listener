@@ -48,6 +48,10 @@ class InterpreterTests( TestCase ):
                 '\n'
             ), 
             (
+                'full stop', 
+                '.'
+            ), 
+            (
                 'tab-key', 
                 '\t'
             ), 

@@ -114,6 +114,7 @@ title[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
 cap[ ]+(?P<next>[^ ]+)	:listener.interpreter.caps
 [ ]*(?P<this>\.)full\-stop([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
 [ ]*(?P<this>\.)period([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
+[ ]*(?P<this>\.)?full[ -]stop([ ]+(?P<next>[^ ]+))	:listener.interpreter.cap_next
 [ ]*no[- ]space[ ]*	
 [ ]*space[- ]bar[ ]*	 
 [ ]*space[ ]*	 
