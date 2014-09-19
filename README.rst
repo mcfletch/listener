@@ -197,6 +197,9 @@ more restrictive licenses.
     * normalize.css v1.1.3 | MIT License | http://git.io/normalize
       Copyright (c) Nicolas Gallagher and Jonathan Neal
 
+	* pysideqtsingleapplication | BSD 2-Clause License
+	  http://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt
+
 `Listener` will download the following software/models when run:
 
     * `CMU HUB4 Language Model`_ -- which provides a few extra files that 
