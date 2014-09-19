@@ -31,7 +31,7 @@ class PeekingGenerator(object):
         """
         try:
             value = self.source.next()
-        except StopIteration as err:
+        except StopIteration:
             return self.STOP_ERROR
         else:
             self.peeked.append( value )
@@ -367,7 +367,6 @@ class Tokenizer( object ):
         
     def is_all_caps( self, name ):
         has_letters = False 
-        all_uppercase = False 
         for (category,char) in name:
             if category.startswith('L'):
                 has_letters = True

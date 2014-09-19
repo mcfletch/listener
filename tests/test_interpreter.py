@@ -82,7 +82,11 @@ class InterpreterTests( TestCase ):
             (
                 'spell out __dunder', 
                 '__dunder'
-            )
+            ),
+            (
+                'correct that', 
+                interpreter.Command('correct-that'), 
+            ), 
             # Macro functionality is not yet that important
 #            (
 #                'pie main line', 
@@ -90,7 +94,7 @@ class InterpreterTests( TestCase ):
 #            ), 
             
         ]:
-            record = self.interpreter({'text':text})[0]
+            record = list(self.interpreter({'text':text}))[0]
             assert record['interpreted'] == expected,  (record['interpreted'], expected, text)
         
     def test_lookup(self):

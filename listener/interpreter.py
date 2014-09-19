@@ -2,6 +2,7 @@ import os,re,  logging
 log = logging.getLogger(__name__)
 HERE = os.path.dirname( __file__ )
 TYPING = os.path.join( HERE, 'typing.csv' )
+COMMANDS = os.path.join( HERE, 'metaactions.csv')
 
 class Interpreter( object ):
     """Sketch of an interpreter for dictation -> typing
@@ -29,12 +30,22 @@ class Interpreter( object ):
     """
     def __init__( self ):
         self.matchers = []
+        self.commands = []
         self.load()
+        self.context = ['listener']
     def load( self ):
         """Load a flat-file definition of an interpretation context"""
+        for line in open(COMMANDS).read().splitlines():
+            context, command, tag = [x.decode('utf-8') for x in line.split('\t')]
+            if not tag:
+                tag = '-'.join(command.split())
+            if not context:
+                context = '.*'
+            matcher = re.compile(u'\\b%s\\b'%(command,))
+            self.commands.append((context, matcher, tag))
         for line in open(TYPING).read().splitlines():
             try:
-                pattern,text = line.split('\t')
+                pattern,text = [x.decode('utf-8') for x in line.split('\t')]
             except Exception:
                 # skip null lines...
                 if line.strip():
@@ -63,13 +74,43 @@ class Interpreter( object ):
             return getattr( source,  split[-1])
         except AttributeError:
             raise ValueError( '%r was not defined in %s'%(split[-1], source))
+    def find_command(self,  text,  command_record):
+        """Iteratively split up text by any instances of command..."""
+        context, matcher, tag = command_record
+        match = matcher.search(text)
+        index = 0
+        while match:
+            before = text[index:match.start()]
+            if before:
+                yield before 
+            yield Command(tag, **match.groupdict())
+            index = match.end()
+            match = matcher.search(text, index)
+        rest = text[index:]
+        if rest:
+            yield rest
     def __call__( self, record ):
         text = record.get('text')
-        for matcher,replacement in self.matchers:
-            text= matcher.sub( replacement , text )
-        record['interpreted'] = text
-        # eventually we'll return N records...
-        return [ record ]
+        
+        sub_records = [text]
+        for command_record in self.commands:
+            # IFF command_record[0] matches current_context
+            expanded = []
+            for item in sub_records:
+                if isinstance(item, Command):
+                    expanded.append( item )
+                else:
+                    expanded.extend( self.find_command(item, command_record))
+            sub_records = expanded
+        expanded = []
+        for item in sub_records:
+            local_record = record.copy()
+            if isinstance( item, (bytes, unicode)):
+                for matcher,replacement in self.matchers:
+                    item= matcher.sub( replacement, item )
+            expanded.append( item )
+            local_record['interpreted'] = item
+            yield local_record
 
 def caps( match ):
     return match.group(1).title()
@@ -107,6 +148,27 @@ def dunder_wrap(match):
     
 def spell_out_escape(match):
     word = match.group('word')
-    return 'spell_out_%s_spell_out'%(word)
+    return u'\u8eb2%s\u8eb2'%(word)
 def spell_out_unescape(match):
     return match.group('word')
+
+class Command(object):
+    """Control flow jump on detection of a (meta) command"""
+    def __init__(self,  command,  *args,  **named):
+        self.command = command 
+        self.args = args
+        self.named = named
+    def __eq__(self,  other):
+        return (
+            other.command == self.command and 
+            other.args == self.args and 
+            other.named == self.named
+        )
+    def __unicode__(self):
+        return u'%s -> %s'%(
+            self.command, 
+            ", ".join([x for x in [
+                ', '.join([unicode(a) for a in self.args]),
+                ', '.join([(unicode(k), unicode(v)) for k, v in sorted(self.named.items())]),
+            ] if x])
+        )

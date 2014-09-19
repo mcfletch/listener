@@ -47,7 +47,6 @@ class Context( object ):
     """
     TEMPLATE_FILES = [
         os.path.join( HERE, 'punctuation.csv' ),
-        os.path.join( HERE, 'meta-commands.csv' ),
         os.path.join( HERE, 'commonshortforms.csv' ),
     ]
     

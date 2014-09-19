@@ -173,8 +173,11 @@ class ListenerMain( QtGui.QMainWindow ):
             self.view_frame.evaluateJavaScript(
                 js
             )
-            self.systray.showMessage( 'Recognized', record['interpreted'] , msecs=500 )
-            self.proxy.send_final( record['interpreted'], record['text'],  record['uttid'] )
+            self.systray.showMessage( 'Recognized', unicode(record['interpreted']) , msecs=500 )
+            if isinstance(record['interpreted'],  (bytes, unicode)):
+                self.proxy.send_final( record['interpreted'], record['text'],  record['uttid'] )
+            else:
+                log.info( 'Command detected: %s',  record['interpreted'])
 
     def on_systray( self, reason ):
         if self.pipeline.running:
