@@ -1,0 +1,11 @@
+	correct that	
+	undo that	
+	scratch that	undo-that
+	spell that	
+	start listening	
+	stop listening	
+	verbatim (?P<content>.+)(?: verbatim off)	verbatim-content
+	verbatim (?P<content>.+)$	verbatim-content
+.code	indent	
+.code	dedent	
+.code	save	

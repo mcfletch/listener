@@ -87,6 +87,14 @@ class InterpreterTests( TestCase ):
                 'correct that', 
                 interpreter.Command('correct-that'), 
             ), 
+            (
+                'verbatim three four five verbatim off', 
+                interpreter.Command('verbatim-content', content='three four five')
+            ), 
+            (
+                'verbatim three four five', 
+                interpreter.Command('verbatim-content', content='three four five')
+            ), 
             # Macro functionality is not yet that important
 #            (
 #                'pie main line', 

@@ -41,7 +41,7 @@ class Interpreter( object ):
                 tag = '-'.join(command.split())
             if not context:
                 context = '.*'
-            matcher = re.compile(u'\\b%s\\b'%(command,))
+            matcher = re.compile(u'\\b%s\\b'%(command,),  re.U|re.I|re.DOTALL)
             self.commands.append((context, matcher, tag))
         for line in open(TYPING).read().splitlines():
             try:
@@ -167,8 +167,17 @@ class Command(object):
     def __unicode__(self):
         return u'%s -> %s'%(
             self.command, 
-            ", ".join([x for x in [
-                ', '.join([unicode(a) for a in self.args]),
-                ', '.join([(unicode(k), unicode(v)) for k, v in sorted(self.named.items())]),
-            ] if x])
+            ", ".join(
+                [
+                    u'%s=%r'%(k, v)
+                    for k, v in sorted(self.named.items())
+                ]
+            )
         )
+    def __repr__(self):
+        try:
+            return unicode(self)
+        except Exception as err:
+            print err 
+            return object.__repr__(self)
+        
