@@ -191,11 +191,11 @@
   "BRIGHTNESSUP": [
     225
   ], 
+  "BRIGHTNESS_AUTO": [
+    244
+  ], 
   "BRIGHTNESS_CYCLE": [
     243
-  ], 
-  "BRIGHTNESS_ZERO": [
-    244
   ], 
   "C": [
     42, 
@@ -264,9 +264,6 @@
   ], 
   "DELETEFILE": [
     146
-  ], 
-  "DIRECTION": [
-    153
   ], 
   "DISPLAY_OFF": [
     245
@@ -731,6 +728,9 @@
   ], 
   "RO": [
     89
+  ], 
+  "ROTATE_DISPLAY": [
+    153
   ], 
   "S": [
     42, 
