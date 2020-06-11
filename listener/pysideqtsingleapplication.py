@@ -13,7 +13,9 @@ import logging
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtNetwork import *
+
 log = logging.getLogger(__name__)
+
 
 class QtSingleApplication(QApplication):
 
@@ -54,7 +56,7 @@ class QtSingleApplication(QApplication):
     def activationWindow(self):
         return self._activationWindow
 
-    def setActivationWindow(self, activationWindow, activateOnMessage = True):
+    def setActivationWindow(self, activationWindow, activateOnMessage=True):
         self._activationWindow = activationWindow
         self._activateOnMessage = activateOnMessage
 
@@ -62,20 +64,20 @@ class QtSingleApplication(QApplication):
         if not self._activationWindow:
             log.info("No registered ActivationWindow")
             return
-        # Unfortunately this *doesn't* do much of any use, as it won't 
+        # Unfortunately this *doesn't* do much of any use, as it won't
         # bring the window to the foreground under KDE... sigh.
         self._activationWindow.setWindowState(
-            self._activationWindow.windowState() & ~Qt.WindowMinimized)
+            self._activationWindow.windowState() & ~Qt.WindowMinimized
+        )
         self._activationWindow.raise_()
         self._activationWindow.activateWindow()
 
-    def sendMessage(self, msg,  msecs=5000):
+    def sendMessage(self, msg, msecs=5000):
         if not self._outStream:
             return False
         self._outStream << msg << '\n'
         if not self._outSocket.waitForBytesWritten(msecs):
-            raise RuntimeError("Bytes not written within %ss"%(msecs/1000.))
-        
+            raise RuntimeError("Bytes not written within %ss" % (msecs / 1000.0))
 
     def _onNewConnection(self):
         if self._inSocket:
@@ -92,7 +94,7 @@ class QtSingleApplication(QApplication):
     def _onReadyRead(self):
         while True:
             msg = self._inStream.readLine()
-            if not msg: break
+            if not msg:
+                break
             log.info("Message received")
             self.messageReceived.emit(msg)
-        

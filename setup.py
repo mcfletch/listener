@@ -1,10 +1,11 @@
 import os
 
 from setuptools import setup, find_packages
+
 version = [
     (line.split('=')[1]).strip().strip('"').strip("'")
-    for line in open(os.path.join('listener','version.py'))
-    if line.startswith( '__version__' )
+    for line in open(os.path.join('listener', 'version.py'))
+    if line.startswith('__version__')
 ][0]
 
 if __name__ == "__main__":
@@ -28,13 +29,11 @@ if __name__ == "__main__":
         keywords='Speech, Pocketsphinx, GUI',
         packages=find_packages(),
         include_package_data=True,
-        license='BSD', # Pocketsphinx is BSD-like
-        install_requires=[
-        ],
-        scripts = [
-        ],
-        entry_points = dict(
-            console_scripts = [
+        license='BSD',  # Pocketsphinx is BSD-like
+        install_requires=[],
+        scripts=[],
+        entry_points=dict(
+            console_scripts=[
                 "listener-pipe=listener.pipeline:main",
                 'listener-code-to-words-py=listener.cli:code_to_words',
                 'listener-missing-words=listener.cli:missing_words',
@@ -46,17 +45,12 @@ if __name__ == "__main__":
                 'listener-dictionary-lookup=listener.cli:dictionary_lookup',
                 'listener-dictionary-subset=listener.cli:subset_dictionary',
                 'listener-dictionary-import=listener.cli:import_words',
-                
                 'listener-rawplay=listener.pipeline:rawplay',
-                
                 'listener-ipa-arpa-statmap=listener.ipatoarpabet:create_stat_mapping',
-                
                 'listener-uinput-device=listener.uinputdriver:main',
                 'listener-uinput-rebuild-mapping=listener.uinputdriver:rebuild_mapping',
-                
                 'listener-install-lm-tools=listener.context:install_lm_tools',
             ],
         ),
         zip_safe=False,
     )
-
