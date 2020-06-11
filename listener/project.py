@@ -1,4 +1,5 @@
 """Utility functions for processing source-code directories into vocabularies"""
+from __future__ import absolute_import
 from . import tokenizer, ipatoarpabet
 from ._bytes import as_unicode
 import logging, traceback, os, subprocess, re

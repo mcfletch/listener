@@ -34,6 +34,7 @@ Note: this module loads python-dbus, which on PyPI and in it's source
 distribution declares itself to be MIT licensed, but the FAQ for which 
 declares to be a dual license AFL/GPL license.
 """
+from __future__ import absolute_import
 import dbus
 import dbus.service
 

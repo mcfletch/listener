@@ -6,6 +6,8 @@ You may modify and redistribute this file under the same terms as
 the CMU Sphinx system.  See 
 http://cmusphinx.sourceforge.net/html/LICENSE for more information.
 """
+from __future__ import absolute_import
+from __future__ import print_function
 import sys, os, logging, pprint, time
 import pygst
 pygst.require("0.10")
@@ -299,7 +301,7 @@ def main():
                 pprint.pprint( result )
                 print()
             else:
-                print( '%(type) 7s #%(uttid)05s %(text)s'%result )
+                print(( '%(type) 7s #%(uttid)05s %(text)s'%result ))
                 
 def rawplay():
     """Play file from the default context (or an absolute pathname)"""

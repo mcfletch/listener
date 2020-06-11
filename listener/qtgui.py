@@ -1,4 +1,5 @@
 """Qt GUI wrapper"""
+from __future__ import absolute_import
 import logging,os,json, pprint, math, sys
 from . import pipeline, context
 from . import service

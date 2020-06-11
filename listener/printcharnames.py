@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+from __future__ import absolute_import
+from __future__ import print_function
 import unicodedata
 
 
@@ -27,9 +29,9 @@ def main():
             description = [x for x in name.replace('-',' ').split() if not has_digit( x )]
             for fragment in description:
                 fragments.add( fragment )
-            print u'%s\t%s\t%s'%( i, char, name )
-    print sorted( fragments )
-    print len(fragments)
+            print(u'%s\t%s\t%s'%( i, char, name ))
+    print(sorted( fragments ))
+    print(len(fragments))
 
 if __name__ == "__main__":
     main()

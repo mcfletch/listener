@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unicodedata,logging,re,os,locale,itertools
 from collections import deque
 from ._bytes import as_unicode
@@ -22,7 +23,7 @@ class PeekingGenerator(object):
         try:
             return self.peeked.popleft()
         except IndexError:
-            return self.source.next()
+            return next(self.source)
     def peek( self ):
         """Peek at the next item
         
@@ -30,7 +31,7 @@ class PeekingGenerator(object):
         iterable is exhausted when you call peek()
         """
         try:
-            value = self.source.next()
+            value = next(self.source)
         except StopIteration:
             return self.STOP_ERROR
         else:

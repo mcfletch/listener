@@ -1,4 +1,6 @@
 """Extract alsa hardware device descriptions/ids from arecord/aplay"""
+from __future__ import absolute_import
+from __future__ import print_function
 import subprocess, re, logging, json
 log = logging.getLogger( __name__ )
 
@@ -35,6 +37,6 @@ def get_outputs( ):
     
 
 if __name__ == "__main__":
-    print json.dumps( get_inputs())
-    print json.dumps( get_outputs())
+    print(json.dumps( get_inputs()))
+    print(json.dumps( get_outputs()))
         

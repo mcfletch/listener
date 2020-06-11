@@ -1,4 +1,6 @@
 """Base argument parser for listener utilities"""
+from __future__ import absolute_import
+from __future__ import print_function
 import argparse, logging, functools, os, sys, traceback
 from . import context,ipatoarpabet,tokenizer,project
 from ._bytes import as_bytes,as_unicode,bytes
@@ -41,9 +43,9 @@ def arpabet_guess():
     )
     arguments = parser.parse_args()
     for word in arguments.words:
-        print word
+        print(word)
         for possible in ipatoarpabet.translate(word):
-            print u'\t%s'%(possible,)
+            print(u'\t%s'%(possible,))
     
 def _existing_filename( filename ):
     if not os.path.exists( filename ):
@@ -229,7 +231,7 @@ def subset_dictionary(  ):
                 break 
     items.sort()
     for word,translation in items:
-        print '%s\t%s'%(as_bytes(word),as_bytes(translation))
+        print('%s\t%s'%(as_bytes(word),as_bytes(translation)))
 
 @with_logging
 def qt_gui():

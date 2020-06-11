@@ -1,4 +1,5 @@
 """Creation of working directories for storing language models and training data"""
+from __future__ import absolute_import
 import os,shutil,tempfile,subprocess,json,time,glob
 import logging
 from .oneshot import one_shot
@@ -125,9 +126,9 @@ class Context( object ):
     def initial_working_directory( self,  ):
         """Create an initial working directory by cloning the pocketsphinx default models"""
         if not os.path.exists( self.directory ):
-            os.makedirs( self.directory, 0700 )
+            os.makedirs( self.directory, 0o700 )
         if not os.path.exists( self.language_model_directory ):
-            os.makedirs( self.language_model_directory, 0700 )
+            os.makedirs( self.language_model_directory, 0o700 )
         # Pull down the language model...
         archive = self.download_hmm_archive()
         tempdir = tempfile.mkdtemp( prefix='listener-', suffix='-unpack' )

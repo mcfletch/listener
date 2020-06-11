@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 """Spike test for using an app-sink to get raw data"""
+from __future__ import absolute_import
+from __future__ import print_function
 import sys, os, logging
 import pygst
 pygst.require("0.10")
@@ -50,8 +52,8 @@ def main(filename=os.path.join( HERE, '../tests/fixtures/hello_world.wav' )):
         mapped = sorted(mapped)
         mapped = mapped[-10:]
         for mag,freq in mapped:
-            print '%s - %s'%(freq, mag)
-        print
+            print('%s - %s'%(freq, mag))
+        print()
     app.connect('new-buffer',on_new_buffer )
 
     bus = pipeline.get_bus()

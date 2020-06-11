@@ -1,5 +1,7 @@
 """IPA to ARPABet pipeline/converter"""
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import print_function
 import json
 import os, subprocess
 import logging
@@ -129,7 +131,7 @@ def print_frequency_table( table ):
         lefts = [u'']*len(possible)
         lefts[0] = ipa
         for (left,right) in zip(lefts,possible):
-            print (u'%s\t%s (%0.1f))'%(left,right[0],right[1]*100))
+            print((u'%s\t%s (%0.1f))'%(left,right[0],right[1]*100)))
 
 def create_stat_mapping( ):
     """Process the whole dictionary attempting to find IPA -> Arpabet mapping
@@ -198,13 +200,13 @@ def test():
             try:
                 translated = translate( word, ipa )
             except ValueError as err:
-                print( 
+                print(( 
                     u'Failed to translate: %s (%s) -> %s  char=%s(%r)'%(
                     word,
                     err.args[1],
                     description, 
                     err.args[0], err.args[0],
-                ))
+                )))
                 raise
             total_tlength += len(translated)
             if description in translated:
@@ -216,14 +218,14 @@ def test():
                     #print '%s\n%s\n'%(description,close[0])
                 bad += 1
             if not i%1000:
-                print 'good=%s bad=%s close=%s good=%0.3f (good_or_close=%0.3f) avg choices %0.1f'%(
+                print('good=%s bad=%s close=%s good=%0.3f (good_or_close=%0.3f) avg choices %0.1f'%(
                     good,bad, close_count,
                     (good/float(good+bad or 1)), 
                     ((good+close_count)/float(good+bad or 1)),
                     total_tlength/float(good+bad)
-                )
+                ))
     finally:
-        print '%s good %s bad %s'%(good,bad, (good/float(good+bad or 1)))
+        print('%s good %s bad %s'%(good,bad, (good/float(good+bad or 1))))
 
 if __name__ == '__main__':
     test()

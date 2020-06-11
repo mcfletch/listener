@@ -8,6 +8,7 @@ Here:
 
     http://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt
 """
+from __future__ import absolute_import
 import logging
 from PySide.QtCore import *
 from PySide.QtGui import *

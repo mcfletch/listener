@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import os,re,  logging
 log = logging.getLogger(__name__)
 HERE = os.path.dirname( __file__ )
@@ -178,6 +180,6 @@ class Command(object):
         try:
             return unicode(self)
         except Exception as err:
-            print err 
+            print(err) 
             return object.__repr__(self)
         
