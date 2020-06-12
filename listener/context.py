@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import os, shutil, tempfile, subprocess, json, time, glob
 import logging
 from .oneshot import one_shot
-from ._bytes import as_unicode, as_bytes
+from ._bytes import as_unicode, as_bytes, unicode
 
 log = logging.getLogger(__name__)
 HERE = os.path.dirname(__file__)

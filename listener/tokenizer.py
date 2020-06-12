@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import unicodedata, logging, re, os, locale, itertools
 from collections import deque
-from ._bytes import as_unicode
+from ._bytes import as_unicode, unicode
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class PeekingGenerator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         """Retrieve our next item"""
         try:
             return self.peeked.popleft()

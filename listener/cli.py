@@ -10,7 +10,7 @@ def base_arguments(purpose):
     parser = argparse.ArgumentParser(description=purpose)
     parser.add_argument(
         '--context',
-        type=bytes,
+        type=str,
         help='Voice dictation context to use (default is "default")',
         default='default',
     )
@@ -81,7 +81,7 @@ def code_to_words():
     parser.add_argument(
         '--output',
         metavar='FILE',
-        type=bytes,
+        type=str,
         help="file into which to write the resulting statements (default to filename+'.dictation')",
         default=None,
     )
