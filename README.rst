@@ -1,6 +1,19 @@
 Pocketsphinx-based Linux Voice Dictation Service
 ================================================
 
+
+Note:
+-----
+
+
+    You likely want `Listener2`_
+
+    This old repository includes the original PocketSphinx based
+    implementation, the new repository includes the modern Deep Speech 
+    based engine.
+
+
+
 The basic idea is to see if `CMU Pocketsphinx`_ (a BSD-licensed continuous 
 voice recognition system) can be used to create a voice dictation service 
 reasonable enough to be used to drive a programmer's IDE/editor; not to 
@@ -35,6 +48,7 @@ Big Caveats:
    The reason I'm using Pocketsphinx is that it comes nicely packaged under 
    Ubuntu and provides pre-packaged language models for English-US dictation.
 
+.. _`Listener2` : https://github.com/mcfletch/listener2
 .. _`The TODO List`: ./TODO.rst
 .. _`CMU Pocketsphinx`: http://cmusphinx.sourceforge.net/pocketsphinx
 
